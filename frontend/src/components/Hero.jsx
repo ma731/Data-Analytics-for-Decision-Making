@@ -9,17 +9,25 @@ import { useEffect, useRef, useState } from "react";
 export default function Hero() {
   const videoRef = useRef(null);
   const [ready, setReady] = useState(false);
+  const [sound, setSound] = useState(false);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    v.playbackRate = 0.92; // a touch slower = more cinematic
     const onReady = () => setReady(true);
     v.addEventListener("canplay", onReady);
-    // some browsers need an explicit play() kick
-    v.play?.().catch(() => {});
+    v.play?.().catch(() => {}); // muted autoplay kick
     return () => v.removeEventListener("canplay", onReady);
   }, []);
+
+  function toggleSound() {
+    const v = videoRef.current;
+    if (!v) return;
+    const next = !sound;
+    v.muted = !next;
+    if (next) v.play?.().catch(() => {}); // user gesture lets audio play
+    setSound(next);
+  }
 
   function enter() {
     document.getElementById("war-room")?.scrollIntoView({ behavior: "smooth" });
@@ -38,9 +46,14 @@ export default function Hero() {
         poster="/airindia-poster.jpg"
         aria-hidden="true"
       >
-        <source src="/airindia-a350.mp4" type="video/mp4" />
+        <source src="/airindia-takeoff.mp4" type="video/mp4" />
       </video>
       <div className="hero-scrim" />
+
+      <button className="hero-sound" onClick={toggleSound} aria-pressed={sound}
+        aria-label={sound ? "Mute engine sound" : "Play engine sound"}>
+        {sound ? "🔊" : "🔈"} <span>{sound ? "Sound on" : "Engine sound"}</span>
+      </button>
 
       <header className="hero-top">
         <img src="/airindia-logo.svg" alt="Air India" className="hero-logo" />
@@ -50,7 +63,7 @@ export default function Hero() {
         </div>
       </header>
 
-      <div className="hero-side" aria-hidden="true">DELHI ⇄ LONDON · A350 · VISTA LIVERY</div>
+      <div className="hero-side" aria-hidden="true">NEW YORK ⇄ DELHI · A350-900 · VISTA LIVERY</div>
 
       <div className="hero-body">
         <div className="hero-eyebrow">A new Air India · the owner&rsquo;s opening diagnostic</div>
