@@ -79,6 +79,38 @@ export default function FleetMap() {
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
       }
 
+      // highlight the optimiser's top route — glowing gold arc + bright pulse + label
+      const top = d.allocation[0];
+      if (top && pos[top.src] && pos[top.dst]) {
+        const p0 = pos[top.src], p1 = pos[top.dst];
+        const mx = (p0.x + p1.x) / 2, my = (p0.y + p1.y) / 2;
+        const dx = p1.x - p0.x, dy = p1.y - p0.y, dist = Math.hypot(dx, dy) || 1;
+        const cx = mx + (dy / dist) * dist * 0.16, cy = my - (dx / dist) * dist * 0.16;
+        ctx.save();
+        ctx.shadowColor = "rgba(255,235,160,0.9)";
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.quadraticCurveTo(cx, cy, p1.x, p1.y);
+        ctx.strokeStyle = "rgba(255,228,150,0.95)";
+        ctx.lineWidth = 3.6;
+        ctx.stroke();
+        ctx.restore();
+        const u = (t * 0.9) % 1, v = 1 - u;
+        const px = v * v * p0.x + 2 * v * u * cx + u * u * p1.x;
+        const py = v * v * p0.y + 2 * v * u * cy + u * u * p1.y;
+        const g = ctx.createRadialGradient(px, py, 0, px, py, 9);
+        g.addColorStop(0, "rgba(255,255,255,1)");
+        g.addColorStop(1, "rgba(255,235,160,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(px, py, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = "600 12px 'JetBrains Mono', monospace";
+        ctx.fillStyle = "rgba(255,235,160,0.96)";
+        ctx.fillText("★ TOP " + top.src + " → " + top.dst, cx + 10, cy - 8);
+      }
+
       // city nodes
       ctx.font = "600 13px Inter, sans-serif";
       for (const c in pos) {

@@ -672,6 +672,34 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   transition: width 0.12s linear;
 }
 
+/* ===================== SIM STAGE (Monte Carlo + NSGA-II bg) ===================== */
+.sim-stage {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: 40px;
+  padding: 8px clamp(20px, 4vw, 64px) 40px;
+  background-image: url("/airindia-poster.jpg");
+  background-size: cover;
+  background-position: center 30%;
+  background-attachment: fixed;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.sim-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 7, 13, 0.93) 0%, rgba(5, 7, 13, 0.88) 50%, rgba(5, 7, 13, 0.94) 100%),
+    radial-gradient(80% 60% at 18% 8%, rgba(59, 130, 246, 0.12), transparent 60%);
+}
+.sim-stage-inner {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
 /* ===================== REVENUE STAGE (price optimiser bg) ===================== */
 .revenue-stage {
   position: relative;
