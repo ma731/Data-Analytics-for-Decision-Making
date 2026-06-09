@@ -9,6 +9,7 @@ import BusinessWhitespace from "./components/BusinessWhitespace.jsx";
 import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
+import Hero from "./components/Hero.jsx";
 import MonteCarlo from "./components/MonteCarlo.jsx";
 import ParetoEvolution from "./components/ParetoEvolution.jsx";
 import FleetMap from "./components/FleetMap.jsx";
@@ -26,11 +27,9 @@ function CommandBar() {
   return (
     <header className="cmdbar">
       <div className="brand">
-        <span className="brand-mark" aria-hidden="true">
-          AI
-        </span>
-        <span>
-          Air India <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>· War Room</span>
+        <img src="/airindia-logo.svg" alt="Air India" style={{ height: 26 }} />
+        <span style={{ color: "var(--text-muted)", fontWeight: 500, fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.12em" }}>
+          WAR ROOM
         </span>
       </div>
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -79,8 +78,9 @@ export default function App() {
   return (
     <>
       <FlightBackground />
+      <Hero />
       <CommandBar />
-      <main className="shell">
+      <main className="shell" id="war-room">
         <Section
           eyebrow="The opening diagnostic · January 2022, Tata takes the controls"
           title="A national carrier, just privatised. Two levers nobody is pulling: fuel and price."
@@ -164,7 +164,7 @@ export default function App() {
         </Section>
 
         {/* ===================== OPERATIONS RESEARCH ACT ===================== */}
-        <div className="or-hero">
+        <div className="or-hero" id="or">
           <div className="kicker">From insight to action · the optimisation engine</div>
           <h2>We don&rsquo;t just see the problem. We compute the answer.</h2>
           <p>
