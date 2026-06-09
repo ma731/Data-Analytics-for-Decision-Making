@@ -672,6 +672,69 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   transition: width 0.12s linear;
 }
 
+/* ===================== REVENUE STAGE (price optimiser bg) ===================== */
+.revenue-stage {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 56px clamp(24px, 5vw, 80px);
+  background-image: url("/cabin-a350-seat.jpg");
+  background-size: cover;
+  background-position: center 55%;
+  background-attachment: fixed;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.revenue-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 7, 13, 0.9) 0%, rgba(5, 7, 13, 0.78) 50%, rgba(5, 7, 13, 0.92) 100%),
+    radial-gradient(80% 70% at 80% 10%, rgba(251, 191, 36, 0.12), transparent 60%);
+}
+.revenue-stage > * { position: relative; }
+
+/* glowing fare curves */
+.glow-gold .recharts-area-curve,
+.glow-gold path.recharts-curve { filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.6)); }
+.glow-blue path { filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.55)); }
+
+/* passenger-mix indicator under the elasticity slider */
+.mix-bar {
+  position: relative;
+  height: 26px;
+  margin-top: 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(218, 14, 41, 0.35), rgba(96, 165, 250, 0.35));
+  border: 1px solid var(--border);
+}
+.mix-end {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(241, 245, 249, 0.85);
+  pointer-events: none;
+}
+.mix-end.left { left: 9px; }
+.mix-end.right { right: 9px; }
+.mix-marker {
+  position: absolute;
+  top: -3px;
+  width: 4px;
+  height: 32px;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  transform: translateX(-50%);
+  transition: left 0.18s ease-out;
+}
+.uplift-big { min-width: 200px; }
+.uplift-big .v { font-size: 38px; }
+
 /* RL agent: learning curve + heatmap */
 .rl-grid { grid-template-columns: 1fr 1fr; gap: 22px; }
 @media (max-width: 860px) { .rl-grid { grid-template-columns: 1fr; } }
