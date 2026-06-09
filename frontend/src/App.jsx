@@ -38,6 +38,9 @@ function CommandBar() {
         </span>
       </div>
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <span className="tag" style={{ color: "var(--brand-gold)", borderColor: "rgba(201,154,59,0.4)" }}>
+          ₹90 ≈ €1 · 1 crore = 10M
+        </span>
         <span className="tag">CDO BRIEFING</span>
         <span className="tag">DATA: FEB–MAR 2022</span>
       </div>
@@ -252,7 +255,7 @@ export default function App() {
                 <p className="muted" style={{ lineHeight: 1.65 }}>
                   Tata acquired 100% of Air India on{" "}
                   <b style={{ color: "var(--text)" }}>27 January 2022</b> for ₹
-                  {ctx.acquisition.enterprise_value_inr_crore.toLocaleString("en-IN")} crore. This
+                  {ctx.acquisition.enterprise_value_inr_crore.toLocaleString("en-US")} crore (≈&nbsp;€2B). This
                   data was scraped weeks later — the literal opening diagnostic. In 2022 IndiGo held{" "}
                   <b style={{ color: "var(--text)" }}>{ctx.market_share_2022.indigo_pct}%</b> of the
                   market; Air India + Vistara combined{" "}

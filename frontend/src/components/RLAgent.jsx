@@ -59,7 +59,7 @@ export default function RLAgent() {
           {playing ? "❚❚ Pause" : frame >= (d?.history.length || 1) - 1 ? "↻ Replay" : "▶ Train agent"}
         </button>
         <div style={{ minWidth: 200, flex: 1 }}>
-          <span className="gen-tag">EPISODE {(snap?.episode ?? 0).toLocaleString("en-IN")} / {d ? d.episodes.toLocaleString("en-IN") : "—"}</span>
+          <span className="gen-tag">EPISODE {(snap?.episode ?? 0).toLocaleString("en-US")} / {d ? d.episodes.toLocaleString("en-US") : "—"}</span>
           <div className="gen-bar"><div style={{ width: `${pct}%` }} /></div>
         </div>
         <div className="readout rl-uplift">

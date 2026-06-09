@@ -21,14 +21,14 @@ export const getRL = () => get("/rl");
 export const getDemand = () => get("/demand");
 export const getLive = () => get("/live");
 
-// ---- locale-aware formatters (Web Interface Guidelines) ----
-const inr0 = new Intl.NumberFormat("en-IN", {
+// ---- formatters: Western grouping (en-US) for a European/international audience ----
+const inr0 = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "INR",
   maximumFractionDigits: 0,
 });
-const num0 = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
-const num1 = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 1 });
+const num0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const num1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
 export const fmtINR = (n) => inr0.format(n);
 export const fmtNum = (n) => num0.format(n);
@@ -37,3 +37,14 @@ export const fmtNum1 = (n) => num1.format(n);
 // compact INR for axes: ₹14.2k
 export const fmtINRk = (n) =>
   n >= 1000 ? `₹${num1.format(n / 1000)}k` : `₹${num0.format(n)}`;
+
+// ---- EUR comprehension aids for the non-Indian audience (₹90 ≈ €1) ----
+export const RUPEE_PER_EURO = 90;
+// crore (₹10M units) -> rounded EUR, auto M/B
+export const crToEUR = (cr) => {
+  const eur = (cr * 1e7) / RUPEE_PER_EURO;
+  return eur >= 1e9 ? `€${(eur / 1e9).toFixed(1)}B` : `€${Math.round(eur / 1e6)}M`;
+};
+// plain INR -> rounded EUR
+export const inrToEUR = (n) =>
+  `€${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n / RUPEE_PER_EURO)}`;

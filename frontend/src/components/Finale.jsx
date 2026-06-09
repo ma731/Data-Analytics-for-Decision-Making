@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCountUp } from "./ui.jsx";
+import { crToEUR } from "../api.js";
 
 const AI_REVENUE_CR = 38812; // Air India standalone FY24 revenue (Tata, +23% YoY)
 const AI_LOSS_CR = 4444; // Air India standalone FY24 loss
@@ -8,18 +9,19 @@ export default function Finale() {
   const [uplift, setUplift] = useState(3.0); // revenue-management uplift %
   const gain = (AI_REVENUE_CR * uplift) / 100;
   const lossErased = Math.min(100, (gain / AI_LOSS_CR) * 100);
-  const gainShown = useCountUp(gain, { duration: 500, format: (v) => Math.round(v).toLocaleString("en-IN") });
+  const gainShown = useCountUp(gain, { duration: 500, format: (v) => Math.round(v).toLocaleString("en-US") });
   const erasedShown = useCountUp(lossErased, { duration: 500, format: (v) => Math.round(v) });
 
   return (
     <div className="finale" id="finale">
       <div className="finale-inner">
         <div className="finale-kicker">What this is worth · drag to model execution</div>
-        <h2 className="finale-num">₹{gainShown}<span>cr / year</span></h2>
+        <h2 className="finale-num">₹{gainShown}<span>cr / yr&nbsp;&nbsp;≈&nbsp;{crToEUR(gain)}</span></h2>
         <p className="finale-sub">
-          At a <b>{uplift.toFixed(1)}% revenue-management uplift</b> on Air India&rsquo;s ₹38,812&nbsp;cr FY24 revenue,
-          that&rsquo;s <b>{erasedShown}% of the airline&rsquo;s ₹4,444&nbsp;cr loss erased in a single year</b> &mdash; from
-          pricing discipline alone. Re-routing inefficient connections then cuts fuel and CO₂ on top.
+          At a <b>{uplift.toFixed(1)}% revenue-management uplift</b> on Air India&rsquo;s ₹38,812&nbsp;cr
+          (<b>≈&nbsp;€4.3B</b>) FY24 revenue, that&rsquo;s <b>{erasedShown}% of the airline&rsquo;s ₹4,444&nbsp;cr
+          (≈&nbsp;€490M) loss erased in a single year</b> &mdash; from pricing discipline alone. Re-routing inefficient
+          connections then cuts fuel and CO₂ on top.
         </p>
 
         <div className="finale-slider">
