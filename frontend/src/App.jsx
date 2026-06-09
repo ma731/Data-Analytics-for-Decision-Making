@@ -10,6 +10,7 @@ import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
 import Hero from "./components/Hero.jsx";
+import LiveMap from "./components/LiveMap.jsx";
 import MonteCarlo from "./components/MonteCarlo.jsx";
 import ParetoEvolution from "./components/ParetoEvolution.jsx";
 import FleetMap from "./components/FleetMap.jsx";
@@ -161,6 +162,15 @@ export default function App() {
           delay={60}
         >
           <Recommendations f={f} />
+        </Section>
+
+        <Section
+          eyebrow="The network"
+          title="India, live"
+          sub="Every route Air India flies between the six metros — animated by real traffic, with live aircraft pulled from the open skies."
+          delay={50}
+        >
+          <Reveal><LiveMap /></Reveal>
         </Section>
 
         {/* ===================== OPERATIONS RESEARCH ACT ===================== */}

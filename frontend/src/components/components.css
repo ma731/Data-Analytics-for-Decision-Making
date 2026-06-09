@@ -706,6 +706,110 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   margin-top: 12px;
 }
 
+/* ===================== LIVE INDIA MAP ===================== */
+.livemap-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 920px) {
+  .livemap-grid { grid-template-columns: 1fr; }
+}
+.livemap-canvas-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 560px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(31, 42, 68, 0.3), transparent 70%);
+  border: 1px solid var(--border);
+}
+.livemap-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+.live-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(5, 7, 13, 0.66);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.live-badge .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--positive);
+  box-shadow: 0 0 10px var(--positive);
+  animation: livepulse 1.6s ease-in-out infinite;
+}
+.live-badge.off .dot { background: var(--text-muted); box-shadow: none; animation: none; }
+@keyframes livepulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.arrival-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.arrival-photos {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+}
+.arrival-photos img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 1s ease-out, transform 6s ease-out;
+}
+.arrival-photos img.show {
+  opacity: 1;
+  transform: scale(1);
+}
+.arrival-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(5, 7, 13, 0.92) 4%, rgba(5, 7, 13, 0.1) 55%, rgba(5, 7, 13, 0.4) 100%);
+}
+.arrival-meta {
+  position: relative;
+  margin-top: -86px;
+  padding: 20px 22px 22px;
+  z-index: 1;
+}
+.arrival-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--accent);
+}
+.arrival-city {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.05;
+  margin-top: 6px;
+}
+.arrival-code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 /* ---- loading / error ---- */
 .state {
   min-height: 60dvh;

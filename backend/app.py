@@ -136,6 +136,41 @@ def demand():
     return optimize.ml_demand()
 
 
+# ---- real live air traffic over India (OpenSky Network, free, no key) ----
+import time as _time
+import json as _json
+import urllib.request as _url
+
+_osky = {"t": 0.0, "data": None}
+
+
+@app.get("/api/live")
+def live():
+    """
+    Live count of aircraft currently over India from the OpenSky Network.
+    Cached ~45s; fails gracefully (live=false) so the UI never breaks on stage.
+    """
+    now = _time.time()
+    if _osky["data"] and now - _osky["t"] < 45:
+        return _osky["data"]
+    try:
+        u = "https://opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=98"
+        req = _url.Request(u, headers={"User-Agent": "AirIndiaWarRoom/1.0"})
+        with _url.urlopen(req, timeout=6) as r:
+            j = _json.load(r)
+        states = j.get("states") or []
+        sample = []
+        for s in states[:80]:
+            lon, lat, head = s[5], s[6], s[10]
+            if lon is not None and lat is not None:
+                sample.append({"cs": (s[1] or "").strip(), "lat": lat, "lon": lon, "head": head})
+        data = {"live": True, "count": len(states), "sample": sample, "ts": int(now)}
+    except Exception as e:  # network down / rate-limited -> graceful fallback
+        data = {"live": False, "count": None, "sample": [], "error": str(e)[:90]}
+    _osky.update(t=now, data=data)
+    return data
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)
