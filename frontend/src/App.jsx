@@ -153,7 +153,9 @@ export default function App() {
           sub="Business class commands an 8× premium — and only Tata's two carriers sell it."
         />
         <Section eyebrow="Finding 03 — Premium" title="The whitespace only Tata can hold" delay={60}>
-          <BusinessWhitespace airlines={f.airlines} business={f.business} />
+          <div className="premium-stage">
+            <BusinessWhitespace airlines={f.airlines} business={f.business} />
+          </div>
         </Section>
 
         <Section

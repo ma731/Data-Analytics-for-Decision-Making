@@ -672,6 +672,53 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   transition: width 0.12s linear;
 }
 
+/* RL agent: learning curve + heatmap */
+.rl-grid { grid-template-columns: 1fr 1fr; gap: 22px; }
+@media (max-width: 860px) { .rl-grid { grid-template-columns: 1fr; } }
+.rl-uplift { min-width: 190px; }
+.rl-cap {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+}
+.heat-row { display: flex; gap: 2px; }
+.heat-cell {
+  flex: 1;
+  height: 10px;
+  border-radius: 2px;
+  transition: background 0.25s ease-out;
+}
+.heat-axes {
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+.heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.heat-legend i { width: 90px; height: 8px; border-radius: 999px; display: inline-block; }
+
 /* reveal on scroll */
 .reveal {
   opacity: 0;
@@ -704,6 +751,36 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   font-size: 13px;
   color: var(--text-muted);
   margin-top: 12px;
+}
+
+/* ===================== PREMIUM STAGE (A350 cabin background) ===================== */
+.premium-stage {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 56px clamp(24px, 5vw, 80px);
+  background-image: url("/cabin-a350.jpg");
+  background-size: cover;
+  background-position: center 35%;
+  background-attachment: fixed;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.premium-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 7, 13, 0.86) 0%, rgba(5, 7, 13, 0.62) 50%, rgba(5, 7, 13, 0.8) 100%),
+    radial-gradient(90% 80% at 80% 0%, rgba(201, 154, 59, 0.16), transparent 60%);
+}
+.premium-stage > * {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) {
+  .premium-stage { background-attachment: scroll; }
 }
 
 /* ===================== CINEMATIC BANNERS / DIVIDERS ===================== */
@@ -964,11 +1041,12 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .arrival-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg, rgba(5, 7, 13, 0.92) 4%, rgba(5, 7, 13, 0.1) 55%, rgba(5, 7, 13, 0.4) 100%);
+  /* stronger bottom gradient so text stays legible over any airport photo */
+  background: linear-gradient(0deg, rgba(4, 6, 11, 0.97) 0%, rgba(4, 6, 11, 0.86) 28%, rgba(4, 6, 11, 0.12) 62%, rgba(4, 6, 11, 0.45) 100%);
 }
 .arrival-meta {
   position: relative;
-  margin-top: -86px;
+  margin-top: -104px;
   padding: 20px 22px 22px;
   z-index: 1;
 }
@@ -977,6 +1055,7 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   font-size: 11px;
   letter-spacing: 0.28em;
   color: var(--accent);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
 .arrival-city {
   font-family: var(--font-display);
@@ -984,12 +1063,15 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   font-size: 32px;
   line-height: 1.05;
   margin-top: 6px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.8);
 }
 .arrival-code {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 4px;
+  color: #dbe3ee;
+  margin-top: 5px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95);
 }
 
 /* ---- loading / error ---- */
