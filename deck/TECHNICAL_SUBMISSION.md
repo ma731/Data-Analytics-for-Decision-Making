@@ -144,8 +144,8 @@ premium-cabin supply outright.
 
 The findings above are *descriptive*. We add an OR layer that turns each into a
 *prescribed, optimal* decision — every module runs live in `backend/optimize.py`.
-This maps to a Berkeley IEOR "decision analytics" core: optimization, simulation,
-risk modelling, reinforcement learning, ML.
+It covers the full decision-analytics toolkit: optimization, simulation, risk
+modelling, reinforcement learning, and machine learning.
 
 | Module | Method | What it answers |
 |---|---|---|

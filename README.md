@@ -36,8 +36,8 @@ Turns the descriptive findings into prescriptive, optimal decisions — all comp
 | RL pricing agent | Tabular Q-learning over the booking horizon | `/api/rl` |
 | ML demand engine | Gradient boosting + permutation importance + OLS elasticity | `/api/demand` |
 
-Maps to a Berkeley IEOR "decision analytics" core: optimization, simulation, risk
-modelling, reinforcement learning, machine learning.
+Covers the full decision-analytics toolkit: optimization, simulation, risk
+modelling, reinforcement learning, and machine learning.
 
 ## Run it
 ```powershell

@@ -12,8 +12,8 @@ Six modules, all computed live from the dataset + engineered fuel model:
 Animation-friendly: NSGA-II and RL return per-generation / per-episode snapshots so
 the frontend can animate the optimiser working.
 
-Maps to a Berkeley IEOR "decision analytics" core: optimization, simulation, risk
-modelling, decision analytics, ML.
+Covers the full decision-analytics toolkit: optimization, simulation, risk
+modelling, reinforcement learning, and machine learning.
 """
 
 from functools import lru_cache
