@@ -286,6 +286,10 @@ def rl_pricing(episodes=4000):
     flight. State = (days_left, seats_left bucket). Action = price level. Demand
     is stochastic and price-sensitive. Reward = fare on each sale. Learns to hold
     price early and raise it as departure nears — discovering the panic-tax curve.
+
+    Emits, per snapshot: the greedy policy ladder, the full (days × seats) policy
+    heatmap, and the evaluated revenue vs a static-price baseline — so the UI can
+    show the agent *learning* (reward curve rising, heatmap sharpening, uplift).
     """
     H = 20                                   # horizon (days)
     SEATS = 60                               # inventory
@@ -294,12 +298,46 @@ def rl_pricing(episodes=4000):
     A = len(price_levels)
     base_demand, ref_price, e = 6.0, 7000.0, 1.6
     Q = np.zeros((H + 1, seat_buckets + 1, A))
-    alpha, gamma = 0.2, 0.95
+    alpha, gamma = 0.05, 0.96
 
     def sb(seats):
         return min(seat_buckets, int(seats / SEATS * seat_buckets))
 
-    curve_hist = []
+    def demand_sales(price, d, seats):
+        lam = base_demand * (price / ref_price) ** (-e) * (1 + 0.5 * (H - d) / H)
+        return min(int(RNG.poisson(lam)), seats)
+
+    def rollout(price_fn, rolls=40):
+        """Average total revenue of a pricing policy over `rolls` booking windows."""
+        tot = 0.0
+        for _ in range(rolls):
+            seats = SEATS
+            for d in range(H, 0, -1):
+                price = price_fn(d, seats)
+                sold = demand_sales(price, d, seats)
+                tot += sold * price
+                seats -= sold
+                if seats <= 0:
+                    break
+        return tot / rolls
+
+    greedy = lambda d, seats: price_levels[int(np.argmax(Q[d, sb(seats)]))]
+    # baseline = the "discount-to-fill" instinct: always price low to fill the plane
+    # (exactly the giveaway the panic-tax finding warns against). The agent should beat it.
+    baseline = lambda d, seats: price_levels[0]
+    baseline_rev = rollout(baseline, rolls=150)
+
+    def heatmap():
+        # price level index chosen for each (days_left desc, seats bucket)
+        return [[int(np.argmax(Q[d, s])) for s in range(seat_buckets + 1)]
+                for d in range(H, 0, -1)]
+
+    # snapshot the untrained agent first (Q=0 -> it just gives seats away = baseline)
+    hist = [{"episode": 0,
+             "policy": [{"days_left": d, "price": float(price_levels[0])} for d in range(H, 0, -1)],
+             "heatmap": heatmap(), "agent_rev": round(rollout(greedy, 60), 0),
+             "baseline_rev": round(baseline_rev, 0)}]
+    snap_every = max(1, episodes // 58)
     for ep in range(int(episodes)):
         eps = max(0.05, 1.0 - ep / (episodes * 0.7))
         seats = SEATS
@@ -307,31 +345,30 @@ def rl_pricing(episodes=4000):
             s = sb(seats)
             a = RNG.integers(A) if RNG.random() < eps else int(np.argmax(Q[d, s]))
             price = price_levels[a]
-            # expected sales this day (Poisson), price-sensitive, urgency rises late
-            lam = base_demand * (price / ref_price) ** (-e) * (1 + 0.5 * (H - d) / H)
-            sales = min(int(RNG.poisson(lam)), seats)
+            sales = demand_sales(price, d, seats)
             reward = sales * price
             seats2 = seats - sales
-            s2 = sb(seats2)
-            best_next = 0 if d - 1 == 0 else np.max(Q[d - 1, s2])
+            best_next = 0 if d - 1 == 0 else np.max(Q[d - 1, sb(seats2)])
             Q[d, s, a] += alpha * (reward + gamma * best_next - Q[d, s, a])
             seats = seats2
             if seats <= 0:
                 break
-        if ep % max(1, episodes // 60) == 0:
-            # snapshot greedy policy price by days_left (at mid inventory)
+        if ep > 0 and ep % snap_every == 0:
             pol = [{"days_left": d, "price": float(price_levels[int(np.argmax(Q[d, seat_buckets // 2]))])}
                    for d in range(H, 0, -1)]
-            # quick greedy revenue estimate
-            curve_hist.append({"episode": int(ep), "policy": pol})
+            agent_rev = rollout(greedy, rolls=50)
+            hist.append({"episode": int(ep), "policy": pol, "heatmap": heatmap(),
+                         "agent_rev": round(agent_rev, 0), "baseline_rev": round(baseline_rev, 0)})
 
-    final_policy = [{"days_left": d,
-                     "price": float(price_levels[int(np.argmax(Q[d, seat_buckets // 2]))])}
+    final_policy = [{"days_left": d, "price": float(price_levels[int(np.argmax(Q[d, seat_buckets // 2]))])}
                     for d in range(H, 0, -1)]
+    final_rev = rollout(greedy, rolls=160)
+    uplift = (final_rev - baseline_rev) / baseline_rev * 100 if baseline_rev else 0
     return {"episodes": int(episodes), "horizon": H,
-            "price_levels": price_levels.tolist(),
-            "history": curve_hist, "final_policy": final_policy,
-            "n_frames": len(curve_hist)}
+            "price_levels": price_levels.tolist(), "seat_buckets": seat_buckets,
+            "history": hist, "final_policy": final_policy,
+            "baseline_rev": round(baseline_rev, 0), "final_rev": round(final_rev, 0),
+            "uplift_pct": round(float(uplift), 1), "n_frames": len(hist)}
 
 
 # ----------------------------------------------------------------------------
