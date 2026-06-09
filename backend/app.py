@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 import analysis
+import optimize
 from fuel_model import fuel_breakdown, CITY_COORDS, ROUTING_FACTOR
 
 app = FastAPI(title="Air India War Room API", version="1.0.0")
@@ -82,6 +83,57 @@ def route(source: str, destination: str, stops: str):
         "stops": stops,
         **fuel_breakdown(source, destination, stops),
     }
+
+
+# ===================== OPERATIONS RESEARCH ENGINE =====================
+
+@app.get("/api/sim/fuel")
+def sim_fuel(volatility: float = 20.0):
+    """Monte Carlo fuel-cost risk under ATF price volatility."""
+    volatility = float(max(2.0, min(60.0, volatility)))
+    return optimize.monte_carlo_fuel(volatility_pct=volatility)
+
+
+@app.get("/api/optimize/pricing")
+def opt_pricing(elasticity: float = 1.4):
+    """Revenue-maximising fare curve from a constant-elasticity demand model."""
+    elasticity = float(max(1.05, min(3.0, elasticity)))
+    return optimize.optimize_pricing(elasticity=elasticity)
+
+
+@lru_cache(maxsize=1)
+def _pareto():
+    return optimize.nsga2_pareto()
+
+
+@app.get("/api/pareto")
+def pareto():
+    """NSGA-II fuel-vs-revenue Pareto front, with per-generation snapshots."""
+    return _pareto()
+
+
+@app.get("/api/fleet")
+def fleet(hours: int = 4000):
+    """Integer-program fleet frequency allocation across the network."""
+    hours = int(max(800, min(12000, hours)))
+    return optimize.fleet_milp(fleet_block_hours=hours)
+
+
+@lru_cache(maxsize=1)
+def _rl():
+    return optimize.rl_pricing()
+
+
+@app.get("/api/rl")
+def rl():
+    """Q-learning pricing agent: training history + learned policy."""
+    return _rl()
+
+
+@app.get("/api/demand")
+def demand():
+    """Gradient-boosted fare drivers + econometric price elasticity."""
+    return optimize.ml_demand()
 
 
 if __name__ == "__main__":

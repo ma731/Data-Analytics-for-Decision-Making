@@ -13,14 +13,31 @@ put fuel and revenue on the same chart, the **Efficiency Frontier**.
 
 ## What's inside
 ```
-backend/      FastAPI — serves the fuel model + findings LIVE from 300,153 flights
+backend/      FastAPI — serves the fuel model, findings, AND a live OR engine
   fuel_model.py   engineered, documented, citable fuel/CO2 model
   analysis.py     applies the model across the dataset -> strategic findings
-  app.py          API: /api/findings, /api/route/{src}/{dst}/{stops}, /api/context
-frontend/     React + Vite dashboard (Recharts). Dark "Bloomberg-meets-aviation" UI.
+  optimize.py     operations-research engine (6 modules, see below)
+  app.py          API: /api/findings, /api/route, /api/context + 6 OR endpoints
+frontend/     React + Vite dashboard (Recharts). Dark "Bloomberg-meets-aviation" UI,
+              animated flight-path background, glassmorphism, live-animating OR sections.
 data/         Flight_price.csv (real), market_context.json (real, cited), findings.json
-deck/         Executive presentation
+deck/         Executive presentation (HTML + PDF) + technical submission
 ```
+
+## Operations Research engine (`backend/optimize.py`)
+Turns the descriptive findings into prescriptive, optimal decisions — all computed live:
+
+| Module | Technique | Endpoint |
+|---|---|---|
+| Monte Carlo fuel-risk | Simulation (lognormal ATF shocks → P10/P50/P90, VaR-95) | `/api/sim/fuel` |
+| Dynamic price optimiser | Per-window linear-demand revenue maximisation | `/api/optimize/pricing` |
+| NSGA-II Pareto | Multi-objective genetic algorithm (fuel vs revenue) | `/api/pareto` |
+| Fleet MILP | Integer program — frequency allocation (scipy.milp) | `/api/fleet` |
+| RL pricing agent | Tabular Q-learning over the booking horizon | `/api/rl` |
+| ML demand engine | Gradient boosting + permutation importance + OLS elasticity | `/api/demand` |
+
+Maps to a Berkeley IEOR "decision analytics" core: optimization, simulation, risk
+modelling, reinforcement learning, machine learning.
 
 ## Run it
 ```powershell
