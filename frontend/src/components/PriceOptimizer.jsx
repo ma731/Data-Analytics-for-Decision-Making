@@ -63,8 +63,8 @@ export default function PriceOptimizer() {
             <Tooltip content={<ChartTip render={(p) => (
               <div>
                 <div className="muted">{p[0]?.payload.days_left} days out</div>
-                <div className="muted">Current <b style={{ color: "var(--data-blue-bright)" }}>₹{p[0]?.payload.current_price?.toLocaleString("en-IN")}</b></div>
-                <div className="muted">Optimal <b style={{ color: "var(--accent)" }}>₹{p[0]?.payload.optimal_price?.toLocaleString("en-IN")}</b></div>
+                <div className="muted">Current <b style={{ color: "var(--data-blue-bright)" }}>₹{p[0]?.payload.current_price?.toLocaleString("en-US")}</b></div>
+                <div className="muted">Optimal <b style={{ color: "var(--accent)" }}>₹{p[0]?.payload.optimal_price?.toLocaleString("en-US")}</b></div>
               </div>
             )} />} />
             <Legend wrapperStyle={{ fontSize: 13 }} />

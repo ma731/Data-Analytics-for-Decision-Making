@@ -10,7 +10,7 @@ export default function Recommendations({ f }) {
       <div className="panel rec r1">
         <h3>1 · Re-time the revenue curve</h3>
         <p>
-          {pc.far_out_flights.toLocaleString("en-IN")} far-out economy bookings sit{" "}
+          {pc.far_out_flights.toLocaleString("en-US")} far-out economy bookings sit{" "}
           {fmtINR(pc.gap_per_seat_inr)} below the last-minute fare. Lift early fares modestly with
           dynamic pricing instead of giving the seat away.
         </p>

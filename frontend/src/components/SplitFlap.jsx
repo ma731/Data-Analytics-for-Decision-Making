@@ -54,7 +54,7 @@ export default function SplitFlap() {
           flight: "AI" + (101 + (i % 60) * 7),
           dest: r.destination_city,
           code: codes[r.destination_city],
-          fare: "RS" + Math.round(r.avg_price).toLocaleString("en-IN").replace(/,/g, ""),
+          fare: "RS" + Math.round(r.avg_price).toLocaleString("en-US").replace(/,/g, ""),
           status: r.fuel_kg_per_seat < 25 ? "ON TIME" : r.fuel_kg_per_seat < 40 ? "BOARDING" : "FINAL CALL",
         }));
       allRef.current = deps;

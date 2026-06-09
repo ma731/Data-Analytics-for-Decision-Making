@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea,
 } from "recharts";
-import { getSimFuel } from "../api.js";
+import { getSimFuel, crToEUR } from "../api.js";
 import { ChartTip } from "./ui.jsx";
 
 export default function MonteCarlo() {
@@ -22,14 +22,14 @@ export default function MonteCarlo() {
     timer.current = setTimeout(() => run(v), 180);
   }
 
-  const cr = (n) => `₹${n.toLocaleString("en-IN")} cr`;
+  const cr = (n) => `₹${n.toLocaleString("en-US")} cr`;
   const lastX = data?.hist?.length ? data.hist[data.hist.length - 1].x : 0;
 
   return (
     <div className="panel">
       <h3 className="panel-h">Monte Carlo — fuel-bill risk under price shocks</h3>
       <p className="panel-sub">
-        Jet fuel is ~40% of cost and swung 20–40% in 2022. We simulate {data ? data.n.toLocaleString("en-IN") : "thousands of"} scenarios
+        Jet fuel is ~40% of cost and swung 20–40% in 2022. We simulate {data ? data.n.toLocaleString("en-US") : "thousands of"} scenarios
         of the annual fuel bill. Drag the volatility — the whole risk distribution recomputes live on the server. Green is a
         good year; the red tail is where it hurts.
       </p>
@@ -71,7 +71,7 @@ export default function MonteCarlo() {
             {data && <ReferenceLine x={data.var95_cr} stroke="var(--negative)" strokeWidth={1.5}
               label={{ value: "VaR 95%", fill: "var(--negative)", fontSize: 11, position: "top" }} />}
             <Tooltip content={<ChartTip render={(p) => (
-              <div className="muted">≈ ₹{(p[0].payload.x).toLocaleString("en-IN")} cr · <b style={{ color: "var(--text)" }}>{p[0].payload.count} scenarios</b></div>
+              <div className="muted">≈ ₹{(p[0].payload.x).toLocaleString("en-US")} cr · <b style={{ color: "var(--text)" }}>{p[0].payload.count} scenarios</b></div>
             )} />} />
             <Area className="glow-soft" type="monotone" dataKey="count" stroke="url(#mcRisk)" strokeWidth={3}
               fill="url(#mcRiskFill)" isAnimationActive animationDuration={550} />
@@ -81,10 +81,10 @@ export default function MonteCarlo() {
 
       {data && (
         <div className="readouts">
-          <div className="readout"><div className="l">Expected (P50)</div><div className="v">{cr(data.p50_cr)}</div></div>
-          <div className="readout"><div className="l">Best case (P10)</div><div className="v" style={{ color: "var(--positive)" }}>{cr(data.p10_cr)}</div></div>
-          <div className="readout"><div className="l">Bad case (P90)</div><div className="v" style={{ color: "var(--accent)" }}>{cr(data.p90_cr)}</div></div>
-          <div className="readout risk"><div className="l">Value-at-Risk 95%</div><div className="v" style={{ color: "var(--negative)" }}>{cr(data.var95_cr)}</div></div>
+          <div className="readout"><div className="l">Expected (P50)</div><div className="v">{cr(data.p50_cr)}</div><div className="reur">≈ {crToEUR(data.p50_cr)}</div></div>
+          <div className="readout"><div className="l">Best case (P10)</div><div className="v" style={{ color: "var(--positive)" }}>{cr(data.p10_cr)}</div><div className="reur">≈ {crToEUR(data.p10_cr)}</div></div>
+          <div className="readout"><div className="l">Bad case (P90)</div><div className="v" style={{ color: "var(--accent)" }}>{cr(data.p90_cr)}</div><div className="reur">≈ {crToEUR(data.p90_cr)}</div></div>
+          <div className="readout risk"><div className="l">Value-at-Risk 95%</div><div className="v" style={{ color: "var(--negative)" }}>{cr(data.var95_cr)}</div><div className="reur">≈ {crToEUR(data.var95_cr)}</div></div>
         </div>
       )}
       <p className="chart-caption">

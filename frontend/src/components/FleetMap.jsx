@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getFleet } from "../api.js";
+import { getFleet, crToEUR } from "../api.js";
 
 export default function FleetMap() {
   const [hours, setHours] = useState(4000);
@@ -145,7 +145,7 @@ export default function FleetMap() {
       </p>
       <div className="controls-row">
         <div className="slider">
-          <div className="lab"><span>Fleet block-hours / week</span><b>{hours.toLocaleString("en-IN")}h</b></div>
+          <div className="lab"><span>Fleet block-hours / week</span><b>{hours.toLocaleString("en-US")}h</b></div>
           <input type="range" min="1500" max="9000" step="250" value={hours} aria-label="Fleet block hours"
             onChange={(e) => onSlide(+e.target.value)} />
         </div>
@@ -155,8 +155,8 @@ export default function FleetMap() {
       </div>
       {data && (
         <div className="readouts" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-          <div className="readout"><div className="l">Weekly contribution</div><div className="v" style={{ color: "var(--positive)" }}>₹{data.total_contrib_cr.toLocaleString("en-IN")} cr</div></div>
-          <div className="readout"><div className="l">Block-hours used</div><div className="v">{data.hours_used.toLocaleString("en-IN")}h</div></div>
+          <div className="readout"><div className="l">Weekly contribution</div><div className="v" style={{ color: "var(--positive)" }}>₹{data.total_contrib_cr.toLocaleString("en-US")} cr</div><div className="reur">≈ {crToEUR(data.total_contrib_cr)}/wk</div></div>
+          <div className="readout"><div className="l">Block-hours used</div><div className="v">{data.hours_used.toLocaleString("en-US")}h</div></div>
           <div className="readout"><div className="l">Top route</div><div className="v" style={{ fontSize: 18 }}>{top[0]?.route}</div></div>
         </div>
       )}
