@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Air India War Room — Executive Summary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <style>
+      :root {
+        --bg: #0a0e1a; --surface: #161d30; --border: #1f2a44; --text: #f1f5f9; --muted: #94a3b8;
+        --blue: #3b82f6; --blue-br: #60a5fa; --accent: #fbbf24; --pos: #10b981; --neg: #ef4444;
+        --red: #da0e29; --gold: #c99a3b;
+        --fd: "Space Grotesk", sans-serif; --fb: "Inter", sans-serif; --fm: "JetBrains Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { background: #05070d; }
+      body { font-family: var(--fb); color: var(--text); }
+      .mono { font-family: var(--fm); font-variant-numeric: tabular-nums; }
+      .page {
+        width: 1280px; height: 720px; padding: 40px 48px;
+        background:
+          radial-gradient(900px 480px at 88% -10%, rgba(218, 14, 41, 0.13), transparent 60%),
+          radial-gradient(700px 360px at -5% 0%, rgba(59, 130, 246, 0.1), transparent 55%), var(--bg);
+        display: flex; flex-direction: column;
+      }
+      .top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+      .top img { height: 30px; }
+      .top .ttl { font-family: var(--fd); font-weight: 700; font-size: 20px; }
+      .top .meta { font-family: var(--fm); font-size: 12px; color: var(--muted); letter-spacing: 0.08em; }
+      .lede { font-size: 17px; line-height: 1.5; color: var(--muted); margin: 18px 0 16px; max-width: 105ch; }
+      .lede b { color: var(--text); }
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+      .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+      .kpi .v { font-family: var(--fm); font-size: 30px; font-weight: 600; line-height: 1; }
+      .kpi .l { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-top: 6px; }
+      .kpi.a .v { color: var(--accent); } .kpi.g .v { color: var(--gold); } .kpi.p .v { color: var(--pos); }
+      .mid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; flex: 1; }
+      .moves { display: flex; flex-direction: column; gap: 10px; }
+      .move { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--blue); border-radius: 10px; padding: 12px 16px; }
+      .move.m2 { border-left-color: var(--accent); } .move.m3 { border-left-color: var(--gold); }
+      .move h4 { font-family: var(--fd); font-size: 16px; margin-bottom: 3px; }
+      .move p { font-size: 13px; color: var(--muted); line-height: 1.4; }
+      .move .imp { font-family: var(--fm); font-size: 13px; color: var(--pos); font-weight: 600; margin-top: 4px; }
+      .prize { background: linear-gradient(180deg, rgba(218, 14, 41, 0.12), var(--surface)); border: 1px solid rgba(218, 14, 41, 0.35); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; justify-content: center; }
+      .prize .k { font-family: var(--fm); font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+      .prize .num { font-family: var(--fd); font-weight: 700; font-size: 56px; line-height: 1; margin: 10px 0; }
+      .prize .num span { font-size: 22px; color: var(--pos); }
+      .prize p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+      .prize p b { color: var(--text); }
+      .foot { font-family: var(--fm); font-size: 10.5px; color: var(--muted); padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px; line-height: 1.5; }
+      @page { size: 1280px 720px; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="top">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <img src="./assets/logo.svg" alt="Air India" />
+          <span class="ttl">War Room <span style="color: var(--muted); font-weight: 500; font-size: 14px">· Executive Summary</span></span>
+        </div>
+        <div class="meta">CDO BRIEFING · DATASET 3 FLIGHT PRICE · TEAM 3 · DATA FEB&ndash;MAR 2022</div>
+      </div>
+
+      <p class="lede">
+        As the new CDO of <b>Air India</b> weeks after Tata&rsquo;s acquisition, we were asked to optimize <b>fuel and price</b>.
+        The data has <b>no fuel field</b> — so we engineered one from physics, then ran six operations-research engines to turn
+        300,153 flights into an optimal decision.
+      </p>
+
+      <div class="kpis">
+        <div class="kpi a"><div class="v">2.8&times;</div><div class="l">Panic-tax fare swing (early → late)</div></div>
+        <div class="kpi g"><div class="v">8&times;</div><div class="l">Business premium · only 2 of 6 sell it</div></div>
+        <div class="kpi p"><div class="v">300K</div><div class="l">Real flights · 30 routes · 6 airlines</div></div>
+        <div class="kpi"><div class="v">63<span style="font-size: 18px">%</span></div><div class="l">Seats sold in the cheapest window</div></div>
+      </div>
+
+      <div class="mid">
+        <div class="moves">
+          <div class="move m1">
+            <h4>1 · Re-time the revenue curve</h4>
+            <p>Dynamic-pricing floor on the 129,271 under-priced far-out bookings instead of giving the seat away.</p>
+            <div class="imp">+ ₹1,378 / seat at a conservative 15% capture</div>
+          </div>
+          <div class="move m2">
+            <h4>2 · Kill the inefficient connections</h4>
+            <p>Re-route 2+ stop traffic onto nonstop / single-connection metal — cheaper fare, lower fuel, lower carbon.</p>
+            <div class="imp">− 9.9 kg fuel &amp; 31.3 kg CO₂ / seat</div>
+          </div>
+          <div class="move m3">
+            <h4>3 · Own the premium cabin</h4>
+            <p>Protect and grow business class — the merged Tata group&rsquo;s profit engine — before low-cost rivals copy it.</p>
+            <div class="imp">8&times; revenue per premium seat vs economy</div>
+          </div>
+        </div>
+
+        <div class="prize">
+          <div class="k">What it&rsquo;s worth</div>
+          <div class="num">₹780&ndash;1,550<span> cr / yr</span></div>
+          <p>
+            A <b>2&ndash;4% revenue-management uplift</b> on Air India&rsquo;s ₹38,812&nbsp;cr FY24 revenue erases a
+            <b>quarter to a third of the airline&rsquo;s ₹4,444&nbsp;cr loss</b> — in one year, from pricing discipline alone —
+            plus a structural cut in fuel and CO₂.
+          </p>
+        </div>
+      </div>
+
+      <div class="foot">
+        Flight data: EaseMyTrip (300,153 records, Feb&ndash;Mar 2022). Fuel, cost &amp; CO₂ are modeled estimates from published
+        aviation benchmarks (A320 cruise burn, ICAO LTO cycle &amp; CO₂ factor, Delhi ATF). Air India FY24 revenue &amp; loss:
+        audited Tata Group results. Market context independently sourced. Full live app &amp; technical submission accompany this page.
+      </div>
+    </div>
+  </body>
+</html>
