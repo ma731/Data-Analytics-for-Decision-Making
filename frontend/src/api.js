@@ -19,6 +19,7 @@ export const getPareto = () => get("/pareto");
 export const getFleet = (hours) => get(`/fleet?hours=${hours}`);
 export const getRL = () => get("/rl");
 export const getDemand = () => get("/demand");
+export const getLive = () => get("/live");
 
 // ---- locale-aware formatters (Web Interface Guidelines) ----
 const inr0 = new Intl.NumberFormat("en-IN", {
