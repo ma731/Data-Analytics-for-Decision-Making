@@ -221,9 +221,11 @@ export default function App() {
         </Section>
 
         <Section eyebrow="OR 05 · Revenue management" title="The fare curve we should actually fly" delay={40}>
-          <div className="grid row-2">
-            <Reveal><PriceOptimizer /></Reveal>
-            <Reveal><MLDemand /></Reveal>
+          <div className="revenue-stage">
+            <div className="grid row-2" style={{ maxWidth: 1240, margin: "0 auto" }}>
+              <Reveal><PriceOptimizer /></Reveal>
+              <Reveal><MLDemand /></Reveal>
+            </div>
           </div>
         </Section>
 
