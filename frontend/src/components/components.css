@@ -672,6 +672,128 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   transition: width 0.12s linear;
 }
 
+/* ===================== FINALE (the money number) ===================== */
+.finale {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: 72px;
+  padding: clamp(64px, 9vw, 130px) clamp(24px, 6vw, 90px);
+  background-image: url("/airindia-poster.jpg");
+  background-size: cover;
+  background-position: center 35%;
+  background-attachment: fixed;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.finale::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 120% at 18% 100%, rgba(5, 7, 13, 0.95) 0%, rgba(5, 7, 13, 0.66) 40%, rgba(5, 7, 13, 0.8) 100%),
+    radial-gradient(90% 80% at 85% 0%, rgba(218, 14, 41, 0.25), transparent 55%);
+}
+.finale-inner { position: relative; max-width: 1100px; margin: 0 auto; }
+.finale-kicker {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  margin-bottom: 18px;
+}
+.finale-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 9vw, 120px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: #fff;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.55);
+}
+.finale-num span {
+  display: inline-block;
+  font-size: 0.32em;
+  letter-spacing: 0;
+  color: var(--positive);
+  margin-left: 0.2em;
+  vertical-align: baseline;
+}
+.finale-sub {
+  margin-top: 26px;
+  max-width: 64ch;
+  font-size: clamp(17px, 1.7vw, 22px);
+  line-height: 1.55;
+  color: rgba(226, 232, 240, 0.94);
+}
+.finale-sub b { color: #fff; }
+.finale-slider {
+  margin-top: 32px;
+  max-width: 520px;
+}
+.finale-slider-lab {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: rgba(226, 232, 240, 0.9);
+  margin-bottom: 10px;
+}
+.finale-slider-lab b { color: var(--brand-gold); font-family: var(--font-mono); }
+.finale-slider input[type="range"] { width: 100%; }
+.finale-loss-bar {
+  position: relative;
+  height: 30px;
+  margin-top: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+.finale-loss-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.55), rgba(16, 185, 129, 0.3));
+  border-right: 2px solid var(--positive);
+  transition: width 0.25s ease-out;
+}
+.finale-loss-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.finale-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+.finale-moves > div {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  padding: 12px 18px;
+  border-radius: 999px;
+}
+.finale-src {
+  margin-top: 30px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
 /* ===================== SIM STAGE (Monte Carlo + NSGA-II bg) ===================== */
 .sim-stage {
   position: relative;
