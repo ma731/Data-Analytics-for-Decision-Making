@@ -14,6 +14,7 @@ import LiveMap from "./components/LiveMap.jsx";
 import SplitFlap from "./components/SplitFlap.jsx";
 import Banner from "./components/Banner.jsx";
 import Finale from "./components/Finale.jsx";
+import GuidedTour from "./components/GuidedTour.jsx";
 import MonteCarlo from "./components/MonteCarlo.jsx";
 import ParetoEvolution from "./components/ParetoEvolution.jsx";
 import FleetMap from "./components/FleetMap.jsx";
@@ -84,6 +85,7 @@ export default function App() {
       <FlightBackground />
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
+      <GuidedTour />
       <Hero />
       <CommandBar />
       <main className="shell" id="war-room">
@@ -97,6 +99,7 @@ export default function App() {
         </Section>
 
         <Section
+          id="tour-frontier"
           eyebrow="The hero view"
           title="Fuel and price are the same decision"
           sub="Plot every route by what it burns and what it earns, and the fleet sorts itself into winners and bleeders."
@@ -105,7 +108,7 @@ export default function App() {
           <Frontier frontier={f.frontier} />
         </Section>
 
-        <Section eyebrow="Finding 01 — Revenue" title="The Panic Tax" delay={60}>
+        <Section id="tour-panic" eyebrow="Finding 01 — Revenue" title="The Panic Tax" delay={60}>
           <div className="grid row-2">
             <PanicTax panic={f.panic_tax} />
             <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -184,6 +187,7 @@ export default function App() {
           align="right"
         />
         <Section
+          id="tour-live"
           eyebrow="The network"
           title="India, live"
           sub="Every route Air India flies between the six metros — animated by real traffic, with live aircraft pulled from the open skies."
