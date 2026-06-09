@@ -706,6 +706,188 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   margin-top: 12px;
 }
 
+/* ===================== CINEMATIC BANNERS / DIVIDERS ===================== */
+.banner {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  height: 300px;
+  background-size: cover;
+  background-position: center 40%;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 1s ease-out, transform 1.4s ease-out;
+}
+.banner.tall { height: 420px; }
+.banner.in {
+  opacity: 1;
+  transform: scale(1);
+}
+.banner-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 7, 13, 0.92) 0%, rgba(5, 7, 13, 0.45) 45%, rgba(5, 7, 13, 0.55) 100%),
+    radial-gradient(90% 80% at 80% 10%, rgba(218, 14, 41, 0.22), transparent 60%);
+}
+.banner-content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+.banner-content.right { text-align: right; }
+.banner-kicker {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  margin-bottom: 12px;
+}
+.banner-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(34px, 5.2vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+  max-width: 18ch;
+}
+.banner-content.right .banner-title { margin-left: auto; }
+.banner-sub {
+  margin-top: 16px;
+  font-size: 18px;
+  color: rgba(226, 232, 240, 0.9);
+  max-width: 52ch;
+}
+.banner-content.right .banner-sub { margin-left: auto; }
+@media (max-width: 720px) {
+  .banner { background-attachment: scroll; height: 240px; }
+}
+
+/* ===================== FILM GRAIN + VIGNETTE ===================== */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background: radial-gradient(125% 100% at 50% 45%, transparent 52%, rgba(0, 0, 0, 0.5) 100%);
+}
+.grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 56;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  animation: grainshift 0.5s steps(3) infinite;
+}
+@keyframes grainshift {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-6%, 4%); }
+  66% { transform: translate(4%, -5%); }
+  100% { transform: translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+}
+
+/* ===================== SPLIT-FLAP DEPARTURES BOARD ===================== */
+.board {
+  background: linear-gradient(180deg, #0c1018, #070a10);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+.board-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.board-title {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.board-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+.board-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.board-head span:nth-child(3),
+.board-head span:nth-child(4) { text-align: left; }
+.board-rows { display: flex; flex-direction: column; gap: 9px; }
+.board-line {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+}
+.flap-row { display: inline-flex; gap: 3px; }
+.flap {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 30px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 17px;
+  color: #f4f6fb;
+  background: linear-gradient(180deg, #20262f 0%, #20262f 49.5%, #161b22 50%, #11151b 100%);
+  border-radius: 4px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+  animation: flapin 0.13s ease-out;
+  transform-origin: center;
+}
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.7);
+  transform: translateY(-0.5px);
+}
+@keyframes flapin {
+  0% { transform: rotateX(-78deg); opacity: 0.4; }
+  100% { transform: rotateX(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flap { animation: none; }
+}
+@media (max-width: 720px) {
+  .flap { width: 16px; height: 24px; font-size: 13px; }
+  .board { padding: 16px; }
+}
+
 /* ===================== LIVE INDIA MAP ===================== */
 .livemap-grid {
   display: grid;

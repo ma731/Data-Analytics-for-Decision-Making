@@ -11,6 +11,8 @@ import Recommendations from "./components/Recommendations.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
 import Hero from "./components/Hero.jsx";
 import LiveMap from "./components/LiveMap.jsx";
+import SplitFlap from "./components/SplitFlap.jsx";
+import Banner from "./components/Banner.jsx";
 import MonteCarlo from "./components/MonteCarlo.jsx";
 import ParetoEvolution from "./components/ParetoEvolution.jsx";
 import FleetMap from "./components/FleetMap.jsx";
@@ -79,6 +81,8 @@ export default function App() {
   return (
     <>
       <FlightBackground />
+      <div className="vignette" aria-hidden="true" />
+      <div className="grain" aria-hidden="true" />
       <Hero />
       <CommandBar />
       <main className="shell" id="war-room">
@@ -142,6 +146,12 @@ export default function App() {
           </div>
         </Section>
 
+        <Banner
+          img="/cabin-business.jpg"
+          kicker="Finding 03 · Premium"
+          title="The cabin that prints money"
+          sub="Business class commands an 8× premium — and only Tata's two carriers sell it."
+        />
         <Section eyebrow="Finding 03 — Premium" title="The whitespace only Tata can hold" delay={60}>
           <BusinessWhitespace airlines={f.airlines} business={f.business} />
         </Section>
@@ -164,12 +174,20 @@ export default function App() {
           <Recommendations f={f} />
         </Section>
 
+        <Banner
+          img="/airindia-poster.jpg"
+          kicker="The network"
+          title="One country. Six metros. Always moving."
+          align="right"
+        />
         <Section
           eyebrow="The network"
           title="India, live"
           sub="Every route Air India flies between the six metros — animated by real traffic, with live aircraft pulled from the open skies."
           delay={50}
         >
+          <Reveal><SplitFlap /></Reveal>
+          <div style={{ height: 18 }} />
           <Reveal><LiveMap /></Reveal>
         </Section>
 
