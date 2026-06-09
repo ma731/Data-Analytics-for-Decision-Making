@@ -13,6 +13,7 @@ import Hero from "./components/Hero.jsx";
 import LiveMap from "./components/LiveMap.jsx";
 import SplitFlap from "./components/SplitFlap.jsx";
 import Banner from "./components/Banner.jsx";
+import Finale from "./components/Finale.jsx";
 import MonteCarlo from "./components/MonteCarlo.jsx";
 import ParetoEvolution from "./components/ParetoEvolution.jsx";
 import FleetMap from "./components/FleetMap.jsx";
@@ -232,6 +233,8 @@ export default function App() {
             </div>
           </div>
         </Section>
+
+        <Finale />
 
         {ctx && (
           <Section eyebrow="Context & method" title="Why this is real, and how we built it" delay={60}>
