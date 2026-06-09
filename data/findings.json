@@ -1,0 +1,695 @@
+{
+  "overview": {
+    "rows": 300153,
+    "airlines": 6,
+    "routes": 30,
+    "cities": [
+      "Bangalore",
+      "Chennai",
+      "Delhi",
+      "Hyderabad",
+      "Kolkata",
+      "Mumbai"
+    ],
+    "avg_price": 20890.0,
+    "median_price": 7425.0,
+    "total_co2_tonnes": 5748756.0
+  },
+  "panic_tax": {
+    "curve": [
+      {
+        "label": "T-1 to T-2",
+        "days": "1-2",
+        "avg_price": 14226.0,
+        "share": 2.1
+      },
+      {
+        "label": "T-3 to T-7",
+        "days": "3-7",
+        "avg_price": 10992.0,
+        "share": 8.4
+      },
+      {
+        "label": "T-8 to T-14",
+        "days": "8-14",
+        "avg_price": 10048.0,
+        "share": 14.0
+      },
+      {
+        "label": "T-15 to T-20",
+        "days": "15-20",
+        "avg_price": 6141.0,
+        "share": 13.0
+      },
+      {
+        "label": "T-21+",
+        "days": "21-49",
+        "avg_price": 5037.0,
+        "share": 62.6
+      }
+    ],
+    "daily": [
+      {
+        "days_left": 1,
+        "price": 14613.0
+      },
+      {
+        "days_left": 2,
+        "price": 13981.0
+      },
+      {
+        "days_left": 3,
+        "price": 13174.0
+      },
+      {
+        "days_left": 4,
+        "price": 10901.0
+      },
+      {
+        "days_left": 5,
+        "price": 10606.0
+      },
+      {
+        "days_left": 6,
+        "price": 10320.0
+      },
+      {
+        "days_left": 7,
+        "price": 10472.0
+      },
+      {
+        "days_left": 8,
+        "price": 10479.0
+      },
+      {
+        "days_left": 9,
+        "price": 11353.0
+      },
+      {
+        "days_left": 10,
+        "price": 11188.0
+      },
+      {
+        "days_left": 11,
+        "price": 9581.0
+      },
+      {
+        "days_left": 12,
+        "price": 9318.0
+      },
+      {
+        "days_left": 13,
+        "price": 9364.0
+      },
+      {
+        "days_left": 14,
+        "price": 9455.0
+      },
+      {
+        "days_left": 15,
+        "price": 8379.0
+      },
+      {
+        "days_left": 16,
+        "price": 6338.0
+      },
+      {
+        "days_left": 17,
+        "price": 6170.0
+      },
+      {
+        "days_left": 18,
+        "price": 5430.0
+      },
+      {
+        "days_left": 19,
+        "price": 5330.0
+      },
+      {
+        "days_left": 20,
+        "price": 5284.0
+      },
+      {
+        "days_left": 21,
+        "price": 5225.0
+      },
+      {
+        "days_left": 22,
+        "price": 5381.0
+      },
+      {
+        "days_left": 23,
+        "price": 5582.0
+      },
+      {
+        "days_left": 24,
+        "price": 5534.0
+      },
+      {
+        "days_left": 25,
+        "price": 5095.0
+      },
+      {
+        "days_left": 26,
+        "price": 5011.0
+      },
+      {
+        "days_left": 27,
+        "price": 5057.0
+      },
+      {
+        "days_left": 28,
+        "price": 5112.0
+      },
+      {
+        "days_left": 29,
+        "price": 5240.0
+      },
+      {
+        "days_left": 30,
+        "price": 5339.0
+      },
+      {
+        "days_left": 31,
+        "price": 5017.0
+      },
+      {
+        "days_left": 32,
+        "price": 4790.0
+      },
+      {
+        "days_left": 33,
+        "price": 4806.0
+      },
+      {
+        "days_left": 34,
+        "price": 4959.0
+      },
+      {
+        "days_left": 35,
+        "price": 5209.0
+      },
+      {
+        "days_left": 36,
+        "price": 5166.0
+      },
+      {
+        "days_left": 37,
+        "price": 5218.0
+      },
+      {
+        "days_left": 38,
+        "price": 5573.0
+      },
+      {
+        "days_left": 39,
+        "price": 4854.0
+      },
+      {
+        "days_left": 40,
+        "price": 4740.0
+      },
+      {
+        "days_left": 41,
+        "price": 4774.0
+      },
+      {
+        "days_left": 42,
+        "price": 4784.0
+      },
+      {
+        "days_left": 43,
+        "price": 4893.0
+      },
+      {
+        "days_left": 44,
+        "price": 4890.0
+      },
+      {
+        "days_left": 45,
+        "price": 4908.0
+      },
+      {
+        "days_left": 46,
+        "price": 4705.0
+      },
+      {
+        "days_left": 47,
+        "price": 4670.0
+      },
+      {
+        "days_left": 48,
+        "price": 4718.0
+      },
+      {
+        "days_left": 49,
+        "price": 4751.0
+      }
+    ],
+    "last_minute_avg": 14226.0,
+    "far_out_avg": 5037.0,
+    "multiplier": 2.8,
+    "far_out_share": 62.6
+  },
+  "business": {
+    "sellers": [
+      "Air_India",
+      "Vistara"
+    ],
+    "non_sellers": [
+      "SpiceJet",
+      "AirAsia",
+      "GO_FIRST",
+      "Indigo"
+    ],
+    "economy_avg": 6572.0,
+    "business_avg": 52540.0,
+    "premium_multiple": 8.0,
+    "air_india_business_avg": 47131.0,
+    "vistara_business_avg": 55477.0,
+    "air_india_business_flights": 32898,
+    "vistara_business_flights": 60589
+  },
+  "stops": [
+    {
+      "stops": "Nonstop",
+      "avg_price": 4013.0,
+      "avg_fuel_kg_per_seat": 24.2,
+      "avg_co2_kg_per_seat": 76.5,
+      "share": 13.5
+    },
+    {
+      "stops": "1 stop",
+      "avg_price": 6813.0,
+      "avg_fuel_kg_per_seat": 34.8,
+      "avg_co2_kg_per_seat": 110.0,
+      "share": 80.6
+    },
+    {
+      "stops": "2+ stops",
+      "avg_price": 9142.0,
+      "avg_fuel_kg_per_seat": 44.7,
+      "avg_co2_kg_per_seat": 141.4,
+      "share": 5.9
+    }
+  ],
+  "airlines": [
+    {
+      "airline": "AirAsia",
+      "avg_price": 4091.0,
+      "flights": 16098,
+      "fuel_kg_per_seat": 38.1,
+      "sells_business": false
+    },
+    {
+      "airline": "Indigo",
+      "avg_price": 5324.0,
+      "flights": 43120,
+      "fuel_kg_per_seat": 32.7,
+      "sells_business": false
+    },
+    {
+      "airline": "GO FIRST",
+      "avg_price": 5652.0,
+      "flights": 23173,
+      "fuel_kg_per_seat": 34.2,
+      "sells_business": false
+    },
+    {
+      "airline": "SpiceJet",
+      "avg_price": 6179.0,
+      "flights": 9011,
+      "fuel_kg_per_seat": 37.8,
+      "sells_business": false
+    },
+    {
+      "airline": "Air India",
+      "avg_price": 7314.0,
+      "flights": 80892,
+      "fuel_kg_per_seat": 33.8,
+      "sells_business": true
+    },
+    {
+      "airline": "Vistara",
+      "avg_price": 7807.0,
+      "flights": 127859,
+      "fuel_kg_per_seat": 33.4,
+      "sells_business": true
+    }
+  ],
+  "frontier": [
+    {
+      "source_city": "Bangalore",
+      "destination_city": "Chennai",
+      "avg_price": 7106.0,
+      "fuel_kg_per_seat": 14.9,
+      "co2_kg_per_seat": 47.1,
+      "gc_km": 267.9,
+      "volume": 4117,
+      "route": "Bangalore -> Chennai",
+      "rev_per_fuel_kg": 476.8
+    },
+    {
+      "source_city": "Chennai",
+      "destination_city": "Bangalore",
+      "avg_price": 7175.0,
+      "fuel_kg_per_seat": 15.2,
+      "co2_kg_per_seat": 47.9,
+      "gc_km": 267.9,
+      "volume": 3962,
+      "route": "Chennai -> Bangalore",
+      "rev_per_fuel_kg": 473.1
+    },
+    {
+      "source_city": "Bangalore",
+      "destination_city": "Hyderabad",
+      "avg_price": 6360.1,
+      "fuel_kg_per_seat": 18.5,
+      "co2_kg_per_seat": 58.6,
+      "gc_km": 456.1,
+      "volume": 5914,
+      "route": "Bangalore -> Hyderabad",
+      "rev_per_fuel_kg": 343.0
+    },
+    {
+      "source_city": "Hyderabad",
+      "destination_city": "Bangalore",
+      "avg_price": 6234.9,
+      "fuel_kg_per_seat": 18.5,
+      "co2_kg_per_seat": 58.3,
+      "gc_km": 456.1,
+      "volume": 5164,
+      "route": "Hyderabad -> Bangalore",
+      "rev_per_fuel_kg": 337.8
+    },
+    {
+      "source_city": "Hyderabad",
+      "destination_city": "Chennai",
+      "avg_price": 6049.9,
+      "fuel_kg_per_seat": 19.7,
+      "co2_kg_per_seat": 62.3,
+      "gc_km": 507.8,
+      "volume": 4154,
+      "route": "Hyderabad -> Chennai",
+      "rev_per_fuel_kg": 306.7
+    },
+    {
+      "source_city": "Chennai",
+      "destination_city": "Hyderabad",
+      "avg_price": 5960.8,
+      "fuel_kg_per_seat": 20.3,
+      "co2_kg_per_seat": 64.1,
+      "gc_km": 507.8,
+      "volume": 4011,
+      "route": "Chennai -> Hyderabad",
+      "rev_per_fuel_kg": 294.0
+    },
+    {
+      "source_city": "Hyderabad",
+      "destination_city": "Mumbai",
+      "avg_price": 5969.3,
+      "fuel_kg_per_seat": 22.4,
+      "co2_kg_per_seat": 70.7,
+      "gc_km": 622.7,
+      "volume": 6991,
+      "route": "Hyderabad -> Mumbai",
+      "rev_per_fuel_kg": 266.7
+    },
+    {
+      "source_city": "Mumbai",
+      "destination_city": "Hyderabad",
+      "avg_price": 5774.9,
+      "fuel_kg_per_seat": 22.4,
+      "co2_kg_per_seat": 70.8,
+      "gc_km": 622.7,
+      "volume": 6990,
+      "route": "Mumbai -> Hyderabad",
+      "rev_per_fuel_kg": 257.8
+    },
+    {
+      "source_city": "Mumbai",
+      "destination_city": "Bangalore",
+      "avg_price": 6432.5,
+      "fuel_kg_per_seat": 26.4,
+      "co2_kg_per_seat": 83.5,
+      "gc_km": 834.4,
+      "volume": 8706,
+      "route": "Mumbai -> Bangalore",
+      "rev_per_fuel_kg": 243.3
+    },
+    {
+      "source_city": "Bangalore",
+      "destination_city": "Mumbai",
+      "avg_price": 6381.1,
+      "fuel_kg_per_seat": 26.3,
+      "co2_kg_per_seat": 83.0,
+      "gc_km": 834.4,
+      "volume": 8743,
+      "route": "Bangalore -> Mumbai",
+      "rev_per_fuel_kg": 242.8
+    },
+    {
+      "source_city": "Chennai",
+      "destination_city": "Mumbai",
+      "avg_price": 6529.1,
+      "fuel_kg_per_seat": 30.4,
+      "co2_kg_per_seat": 95.9,
+      "gc_km": 1033.5,
+      "volume": 6287,
+      "route": "Chennai -> Mumbai",
+      "rev_per_fuel_kg": 215.1
+    },
+    {
+      "source_city": "Kolkata",
+      "destination_city": "Hyderabad",
+      "avg_price": 7489.1,
+      "fuel_kg_per_seat": 35.6,
+      "co2_kg_per_seat": 112.4,
+      "gc_km": 1207.2,
+      "volume": 5555,
+      "route": "Kolkata -> Hyderabad",
+      "rev_per_fuel_kg": 210.6
+    },
+    {
+      "source_city": "Mumbai",
+      "destination_city": "Chennai",
+      "avg_price": 6420.9,
+      "fuel_kg_per_seat": 31.2,
+      "co2_kg_per_seat": 98.6,
+      "gc_km": 1033.5,
+      "volume": 6767,
+      "route": "Mumbai -> Chennai",
+      "rev_per_fuel_kg": 205.7
+    },
+    {
+      "source_city": "Kolkata",
+      "destination_city": "Chennai",
+      "avg_price": 8011.7,
+      "fuel_kg_per_seat": 39.3,
+      "co2_kg_per_seat": 124.1,
+      "gc_km": 1385.2,
+      "volume": 4506,
+      "route": "Kolkata -> Chennai",
+      "rev_per_fuel_kg": 204.1
+    },
+    {
+      "source_city": "Kolkata",
+      "destination_city": "Delhi",
+      "avg_price": 7161.4,
+      "fuel_kg_per_seat": 36.3,
+      "co2_kg_per_seat": 114.6,
+      "gc_km": 1312.4,
+      "volume": 7816,
+      "route": "Kolkata -> Delhi",
+      "rev_per_fuel_kg": 197.5
+    },
+    {
+      "source_city": "Hyderabad",
+      "destination_city": "Kolkata",
+      "avg_price": 6881.7,
+      "fuel_kg_per_seat": 35.3,
+      "co2_kg_per_seat": 111.5,
+      "gc_km": 1207.2,
+      "volume": 5610,
+      "route": "Hyderabad -> Kolkata",
+      "rev_per_fuel_kg": 195.1
+    },
+    {
+      "source_city": "Chennai",
+      "destination_city": "Kolkata",
+      "avg_price": 7547.3,
+      "fuel_kg_per_seat": 38.8,
+      "co2_kg_per_seat": 122.5,
+      "gc_km": 1385.2,
+      "volume": 4851,
+      "route": "Chennai -> Kolkata",
+      "rev_per_fuel_kg": 194.7
+    },
+    {
+      "source_city": "Delhi",
+      "destination_city": "Mumbai",
+      "avg_price": 6059.8,
+      "fuel_kg_per_seat": 31.2,
+      "co2_kg_per_seat": 98.6,
+      "gc_km": 1137.1,
+      "volume": 9982,
+      "route": "Delhi -> Mumbai",
+      "rev_per_fuel_kg": 194.2
+    },
+    {
+      "source_city": "Delhi",
+      "destination_city": "Kolkata",
+      "avg_price": 7045.6,
+      "fuel_kg_per_seat": 37.1,
+      "co2_kg_per_seat": 117.2,
+      "gc_km": 1312.4,
+      "volume": 8654,
+      "route": "Delhi -> Kolkata",
+      "rev_per_fuel_kg": 189.9
+    },
+    {
+      "source_city": "Mumbai",
+      "destination_city": "Delhi",
+      "avg_price": 5889.3,
+      "fuel_kg_per_seat": 31.2,
+      "co2_kg_per_seat": 98.5,
+      "gc_km": 1137.1,
+      "volume": 9801,
+      "route": "Mumbai -> Delhi",
+      "rev_per_fuel_kg": 188.9
+    },
+    {
+      "source_city": "Kolkata",
+      "destination_city": "Bangalore",
+      "avg_price": 7471.6,
+      "fuel_kg_per_seat": 42.8,
+      "co2_kg_per_seat": 135.3,
+      "gc_km": 1546.8,
+      "volume": 6894,
+      "route": "Kolkata -> Bangalore",
+      "rev_per_fuel_kg": 174.6
+    },
+    {
+      "source_city": "Hyderabad",
+      "destination_city": "Delhi",
+      "avg_price": 6072.3,
+      "fuel_kg_per_seat": 34.9,
+      "co2_kg_per_seat": 110.2,
+      "gc_km": 1265.6,
+      "volume": 6017,
+      "route": "Hyderabad -> Delhi",
+      "rev_per_fuel_kg": 174.2
+    },
+    {
+      "source_city": "Bangalore",
+      "destination_city": "Kolkata",
+      "avg_price": 7375.6,
+      "fuel_kg_per_seat": 42.9,
+      "co2_kg_per_seat": 135.6,
+      "gc_km": 1546.8,
+      "volume": 6887,
+      "route": "Bangalore -> Kolkata",
+      "rev_per_fuel_kg": 171.9
+    },
+    {
+      "source_city": "Delhi",
+      "destination_city": "Hyderabad",
+      "avg_price": 6031.2,
+      "fuel_kg_per_seat": 35.2,
+      "co2_kg_per_seat": 111.1,
+      "gc_km": 1265.6,
+      "volume": 6581,
+      "route": "Delhi -> Hyderabad",
+      "rev_per_fuel_kg": 171.5
+    },
+    {
+      "source_city": "Kolkata",
+      "destination_city": "Mumbai",
+      "avg_price": 7405.8,
+      "fuel_kg_per_seat": 44.8,
+      "co2_kg_per_seat": 141.6,
+      "gc_km": 1665.7,
+      "volume": 8103,
+      "route": "Kolkata -> Mumbai",
+      "rev_per_fuel_kg": 165.3
+    },
+    {
+      "source_city": "Mumbai",
+      "destination_city": "Kolkata",
+      "avg_price": 7228.0,
+      "fuel_kg_per_seat": 45.1,
+      "co2_kg_per_seat": 142.6,
+      "gc_km": 1665.7,
+      "volume": 8774,
+      "route": "Mumbai -> Kolkata",
+      "rev_per_fuel_kg": 160.1
+    },
+    {
+      "source_city": "Bangalore",
+      "destination_city": "Delhi",
+      "avg_price": 6124.9,
+      "fuel_kg_per_seat": 44.4,
+      "co2_kg_per_seat": 140.2,
+      "gc_km": 1708.8,
+      "volume": 9959,
+      "route": "Bangalore -> Delhi",
+      "rev_per_fuel_kg": 138.1
+    },
+    {
+      "source_city": "Delhi",
+      "destination_city": "Bangalore",
+      "avg_price": 6175.6,
+      "fuel_kg_per_seat": 44.7,
+      "co2_kg_per_seat": 141.4,
+      "gc_km": 1708.8,
+      "volume": 10144,
+      "route": "Delhi -> Bangalore",
+      "rev_per_fuel_kg": 138.0
+    },
+    {
+      "source_city": "Chennai",
+      "destination_city": "Delhi",
+      "avg_price": 6076.0,
+      "fuel_kg_per_seat": 46.0,
+      "co2_kg_per_seat": 145.4,
+      "gc_km": 1759.4,
+      "volume": 7060,
+      "route": "Chennai -> Delhi",
+      "rev_per_fuel_kg": 132.0
+    },
+    {
+      "source_city": "Delhi",
+      "destination_city": "Chennai",
+      "avg_price": 6102.3,
+      "fuel_kg_per_seat": 47.5,
+      "co2_kg_per_seat": 150.1,
+      "gc_km": 1759.4,
+      "volume": 7666,
+      "route": "Delhi -> Chennai",
+      "rev_per_fuel_kg": 128.5
+    }
+  ],
+  "opportunity": {
+    "panic_capture": {
+      "far_out_flights": 129271,
+      "gap_per_seat_inr": 9189.0,
+      "capture_rate_pct": 15,
+      "uplift_per_far_seat_inr": 1378.0,
+      "note": "Per economy seat on far-out (T-21+) bookings, the most under-priced segment."
+    },
+    "stops_fuel": {
+      "multi_stop_flights": 12203,
+      "fuel_save_kg_per_seat": 9.9,
+      "co2_save_kg_per_seat": 31.3,
+      "note": "Per economy seat re-routed from 2+ stops to a single connection."
+    }
+  },
+  "assumptions": {
+    "cruise_burn_kg_per_hr": 2500,
+    "lto_fuel_per_cycle_kg": 825,
+    "cruise_speed_kmh": 800,
+    "co2_per_kg_fuel": 3.16,
+    "atf_price_inr_per_l": 100.0,
+    "seats_narrowbody": 180
+  }
+}

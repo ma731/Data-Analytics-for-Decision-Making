@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Air India · War Room — Executive Briefing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap"
+    />
+    <style>
+      :root {
+        --bg: #0a0e1a;
+        --surface: #111726;
+        --surface-2: #161d30;
+        --border: #1f2a44;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --blue: #3b82f6;
+        --blue-br: #60a5fa;
+        --accent: #fbbf24;
+        --pos: #10b981;
+        --neg: #ef4444;
+        --red: #d31145;
+        --gold: #c99a3b;
+        --font-d: "Space Grotesk", sans-serif;
+        --font-b: "Inter", sans-serif;
+        --font-m: "JetBrains Mono", monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { background: #05070d; }
+      body {
+        font-family: var(--font-b);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      .mono { font-family: var(--font-m); font-variant-numeric: tabular-nums; }
+      h1, h2, h3 { font-family: var(--font-d); letter-spacing: -0.02em; line-height: 1.08; }
+
+      /* ---- slide frame: 16:9 ---- */
+      .slide {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        margin: 24px auto;
+        padding: 64px 72px;
+        background:
+          radial-gradient(900px 500px at 88% -8%, rgba(211, 17, 69, 0.13), transparent 60%),
+          radial-gradient(800px 420px at -5% 0%, rgba(59, 130, 246, 0.1), transparent 55%),
+          var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .eyebrow {
+        font-family: var(--font-m);
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+      .slide h2 { font-size: 46px; font-weight: 700; }
+      .slide .sub { color: var(--muted); font-size: 19px; line-height: 1.55; margin-top: 14px; max-width: 64ch; }
+      .num { font-size: 12px; font-family: var(--font-m); color: var(--muted); position: absolute; bottom: 28px; right: 36px; }
+      .foot { position: absolute; bottom: 28px; left: 72px; font-size: 12px; color: var(--muted); font-family: var(--font-m); letter-spacing: 0.04em; }
+
+      /* brand chip */
+      .chip { display: inline-flex; align-items: center; gap: 12px; }
+      .mark {
+        width: 44px; height: 44px; border-radius: 11px;
+        background: linear-gradient(135deg, var(--red), var(--gold));
+        display: grid; place-items: center; font-family: var(--font-d); font-weight: 700; color: #fff;
+        box-shadow: 0 0 28px rgba(211, 17, 69, 0.5);
+      }
+
+      /* ---- cover ---- */
+      .cover { justify-content: center; }
+      .cover h1 { font-size: 72px; font-weight: 700; margin-top: 28px; }
+      .cover .tag { font-size: 22px; color: var(--blue-br); margin-top: 10px; font-family: var(--font-d); }
+      .cover .meta { margin-top: 40px; display: flex; gap: 28px; flex-wrap: wrap; }
+      .cover .meta span {
+        font-family: var(--font-m); font-size: 13px; color: var(--muted);
+        border: 1px solid var(--border); padding: 8px 14px; border-radius: 999px;
+      }
+
+      /* ---- KPI grid ---- */
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 44px; }
+      .kpi { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--border); border-radius: 14px; padding: 26px; }
+      .kpi .v { font-family: var(--font-m); font-variant-numeric: tabular-nums; font-size: 52px; font-weight: 600; line-height: 1; }
+      .kpi .l { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 12px; }
+      .kpi .n { font-size: 14px; color: var(--muted); margin-top: 10px; line-height: 1.45; }
+      .kpi.alarm .v { color: var(--accent); }
+      .kpi.good .v { color: var(--pos); }
+      .kpi.brand .v { color: var(--gold); }
+
+      /* ---- chart slides ---- */
+      .chartwrap { margin-top: 22px; flex: 1; display: flex; align-items: center; justify-content: center; }
+      .chartwrap img { width: 100%; height: auto; max-height: 430px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); }
+      .takeaway { margin-top: 18px; display: flex; gap: 14px; align-items: flex-start; }
+      .takeaway .dot { flex: none; width: 11px; height: 11px; margin-top: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px var(--accent); }
+      .takeaway p { font-size: 19px; line-height: 1.5; }
+      .takeaway b { color: var(--accent); }
+
+      /* ---- two col ---- */
+      .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 36px; flex: 1; }
+      .card { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+      .card.risk { border-top: 3px solid var(--neg); }
+      .card.opp { border-top: 3px solid var(--pos); }
+      .card h3 { font-size: 22px; margin-bottom: 18px; }
+      .card ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+      .card li { font-size: 17px; color: var(--muted); line-height: 1.45; padding-left: 24px; position: relative; }
+      .card li::before { content: ""; position: absolute; left: 0; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+      .card.risk li::before { background: var(--neg); }
+      .card.opp li::before { background: var(--pos); }
+      .card li b { color: var(--text); }
+
+      /* ---- recommendations ---- */
+      .recs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; flex: 1; }
+      .rec { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--border); border-top: 4px solid var(--blue); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; }
+      .rec.r2 { border-top-color: var(--accent); }
+      .rec.r3 { border-top-color: var(--gold); }
+      .rec .k { font-family: var(--font-m); font-size: 13px; color: var(--muted); }
+      .rec h3 { font-size: 23px; margin: 10px 0 14px; }
+      .rec p { font-size: 16px; color: var(--muted); line-height: 1.5; flex: 1; }
+      .rec .impact { margin-top: 18px; font-family: var(--font-m); font-size: 16px; font-weight: 600; color: var(--pos); }
+
+      /* ---- impact split ---- */
+      .impact-split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 36px; flex: 1; }
+      .act { background: linear-gradient(180deg, rgba(16,185,129,0.08), var(--surface)); border: 1px solid rgba(16,185,129,0.35); border-radius: 14px; padding: 32px; }
+      .fail { background: linear-gradient(180deg, rgba(239,68,68,0.08), var(--surface)); border: 1px solid rgba(239,68,68,0.35); border-radius: 14px; padding: 32px; }
+      .act h3 { color: var(--pos); font-size: 24px; margin-bottom: 18px; }
+      .fail h3 { color: var(--neg); font-size: 24px; margin-bottom: 18px; }
+      .act ul, .fail ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+      .act li, .fail li { font-size: 18px; line-height: 1.45; color: var(--text); padding-left: 26px; position: relative; }
+      .act li::before { content: "▲"; position: absolute; left: 0; color: var(--pos); font-size: 13px; top: 4px; }
+      .fail li::before { content: "▼"; position: absolute; left: 0; color: var(--neg); font-size: 13px; top: 4px; }
+
+      /* methodology */
+      .method { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+      .method .card p { font-size: 16px; color: var(--muted); line-height: 1.6; }
+      .method .card p b { color: var(--text); }
+      .tbl { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 10px; }
+      .tbl td { padding: 7px 0; border-bottom: 1px solid var(--border); color: var(--muted); }
+      .tbl td:last-child { text-align: right; font-family: var(--font-m); color: var(--text); }
+
+      .big { font-size: 30px; font-weight: 600; font-family: var(--font-d); line-height: 1.25; margin-top: 8px; }
+      .big .hl { color: var(--accent); }
+      .big .hlg { color: var(--gold); }
+      .big .hp { color: var(--pos); }
+
+      @media print {
+        html, body { background: #fff; }
+        .slide { margin: 0; border-radius: 0; border: none; page-break-after: always; box-shadow: none; }
+        .slide:last-child { page-break-after: auto; }
+      }
+      @page { size: 1280px 720px; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <!-- 1 · COVER -->
+    <section class="slide cover">
+      <div class="chip">
+        <span class="mark">AI</span>
+        <div>
+          <div style="font-family: var(--font-d); font-weight: 700; font-size: 20px">Air India</div>
+          <div style="color: var(--muted); font-size: 14px; font-family: var(--font-m); letter-spacing: 0.1em">WAR ROOM</div>
+        </div>
+      </div>
+      <h1>Two levers nobody is pulling: <span style="color: var(--accent)">fuel</span> and <span style="color: var(--blue-br)">price</span>.</h1>
+      <div class="tag">The new owner&rsquo;s opening diagnostic — 300,153 flights, decoded.</div>
+      <div class="meta">
+        <span>CDO BRIEFING TO THE BOARD</span>
+        <span>DATASET 3 · FLIGHT PRICE</span>
+        <span>TEAM 3 · IE MBDS</span>
+        <span>DATA: FEB&ndash;MAR 2022</span>
+      </div>
+      <div class="num mono">01</div>
+    </section>
+
+    <!-- 2 · CONTEXT -->
+    <section class="slide">
+      <div class="eyebrow">Why this matters now</div>
+      <h2>A national carrier, just privatised.</h2>
+      <p class="sub">
+        On <b style="color: var(--text)">27&nbsp;January&nbsp;2022</b>, Tata acquired 100% of Air India for
+        <b style="color: var(--text)">&#8377;18,000&nbsp;crore</b> &mdash; ending 69 years of state ownership.
+        This data was scraped in the weeks that followed. It is, literally, the first thing the new owner
+        should have looked at.
+      </p>
+      <div class="kpis" style="grid-template-columns: repeat(3, 1fr)">
+        <div class="kpi"><div class="l">Market leader (IndiGo)</div><div class="v">55.7<span style="font-size: 28px">%</span></div><div class="n">Air India + Vistara combined: 18.4% &mdash; the clear #2 bloc that later merged.</div></div>
+        <div class="kpi good"><div class="l">India domestic pax, 2022</div><div class="v">110<span style="font-size: 28px">M</span></div><div class="n">+52% year on year. A market rebounding hard post-COVID.</div></div>
+        <div class="kpi alarm"><div class="l">Jet fuel ≈ share of cost</div><div class="v">40<span style="font-size: 28px">%</span></div><div class="n">And ATF prices spiked through 2022 on the Ukraine shock. Fuel is the #1 controllable cost.</div></div>
+      </div>
+      <div class="foot">Sources: Tata Group · DGCA · IndianOil ATF · IATA/CAPA</div>
+      <div class="num mono">02</div>
+    </section>
+
+    <!-- 3 · THE PROBLEM -->
+    <section class="slide">
+      <div class="eyebrow">The brief, and its trap</div>
+      <h2>We were asked to optimize fuel <span style="color: var(--muted)">&amp;</span> price.<br />The data has no fuel.</h2>
+      <p class="sub">
+        The dataset records price, route, timing and stops &mdash; but not a single litre of fuel. Most teams
+        will quietly skip the fuel half of the question. We refused to.
+      </p>
+      <div class="big" style="margin-top: 36px; max-width: 70ch">
+        So we <span class="hp">engineered a fuel model from physics</span> &mdash; great-circle distance between
+        cities plus a takeoff-cycle penalty per stop, calibrated to real A320 burn rates and Feb&ndash;Mar&nbsp;2022
+        jet-fuel prices.
+      </div>
+      <p class="sub" style="margin-top: 28px">
+        That lets us answer the half of the brief the raw data cannot &mdash; and put fuel and revenue on the
+        <b style="color: var(--text)">same chart</b>. Every fuel figure is a labelled estimate, not invented data.
+      </p>
+      <div class="num mono">03</div>
+    </section>
+
+    <!-- 4 · DATA AT A GLANCE -->
+    <section class="slide">
+      <div class="eyebrow">The picture in four numbers</div>
+      <h2>What 300,153 flights revealed.</h2>
+      <div class="kpis">
+        <div class="kpi alarm"><div class="l">Panic-tax multiple</div><div class="v">2.8&times;</div><div class="n">&#8377;14,226 last-minute vs &#8377;5,037 booked early. Same seat, same cost.</div></div>
+        <div class="kpi brand"><div class="l">Business-class premium</div><div class="v">8&times;</div><div class="n">Sold by only 2 of 6 carriers &mdash; both are Tata&rsquo;s.</div></div>
+        <div class="kpi good"><div class="l">Flights analysed</div><div class="v">300K</div><div class="n">30 routes · 6 airlines · India&rsquo;s six metros.</div></div>
+        <div class="kpi"><div class="l">Under-priced backlog</div><div class="v">62.6<span style="font-size: 28px">%</span></div><div class="n">of economy seats sell in the cheapest booking window.</div></div>
+      </div>
+      <p class="sub" style="margin-top: 40px">Three of these are money left on the runway. One is a moat. We&rsquo;ll take each in turn.</p>
+      <div class="num mono">04</div>
+    </section>
+
+    <!-- 5 · HERO: FRONTIER -->
+    <section class="slide">
+      <div class="eyebrow">The hero view · fuel and price are one decision</div>
+      <h2 style="font-size: 38px">The Fuel&ndash;Revenue Efficiency Frontier</h2>
+      <div class="chartwrap"><img src="./assets/frontier.png" alt="Scatter chart of every route: fuel burned per seat against revenue per seat, coloured green (efficient) to red (inefficient)" /></div>
+      <div class="takeaway">
+        <span class="dot"></span>
+        <p><b>Price does not reflect fuel cost.</b> Bangalore&ndash;Chennai earns &#8377;7,106 on 14.9&nbsp;kg/seat; Delhi&ndash;Chennai earns <i>less</i> on 47.5&nbsp;kg &mdash; 3.7&times; worse revenue-per-fuel, priced almost identically.</p>
+      </div>
+      <div class="num mono">05</div>
+    </section>
+
+    <!-- 6 · PANIC TAX -->
+    <section class="slide">
+      <div class="eyebrow">Finding 01 · Revenue</div>
+      <h2 style="font-size: 38px">The Panic Tax</h2>
+      <div class="chartwrap"><img src="./assets/panictax.png" alt="Average economy fare by days before departure: flat and cheap until about 20 days out, then a steep climb" /></div>
+      <div class="takeaway">
+        <span class="dot"></span>
+        <p>We <b>give seats away early, then gouge late</b> &mdash; a 2.8&times; swing with zero change in cost. Yet 62.6% of demand sits in the cheap early window we under-price. That is money lost in both directions.</p>
+      </div>
+      <div class="num mono">06</div>
+    </section>
+
+    <!-- 7 · DOUBLE CRIME -->
+    <section class="slide">
+      <div class="eyebrow">Finding 02 · Fuel &amp; cost</div>
+      <h2 style="font-size: 38px">Connections cost twice</h2>
+      <div class="chartwrap"><img src="./assets/stops.png" alt="Bar chart: as stops increase, both average fare and fuel per seat rise together" /></div>
+      <div class="takeaway">
+        <span class="dot"></span>
+        <p>A rare <b>win-win-win</b>: 2+ stop trips charge passengers more (&#8377;9,142 vs &#8377;4,013) <i>and</i> burn 45&nbsp;kg/seat vs 24. Cutting them lowers fare, fuel bill, and carbon at once.</p>
+      </div>
+      <div class="num mono">07</div>
+    </section>
+
+    <!-- 8 · WHITESPACE -->
+    <section class="slide">
+      <div class="eyebrow">Finding 03 · Premium</div>
+      <h2 style="font-size: 38px">The whitespace only Tata can hold</h2>
+      <div class="chartwrap"><img src="./assets/whitespace.png" alt="Horizontal bars of average economy fare by airline; the two that also sell business class are highlighted in gold" /></div>
+      <div class="takeaway">
+        <span class="dot"></span>
+        <p>Air India and Vistara are the <b>only two carriers selling business class</b>, at an 8&times; premium. The merged group owns India&rsquo;s premium-cabin supply outright &mdash; a moat low-cost rivals can&rsquo;t cross overnight.</p>
+      </div>
+      <div class="num mono">08</div>
+    </section>
+
+    <!-- 9 · RISKS & OPPORTUNITIES -->
+    <section class="slide">
+      <div class="eyebrow">What&rsquo;s at stake</div>
+      <h2>Risks &amp; opportunities.</h2>
+      <div class="two">
+        <div class="card risk">
+          <h3>Risks of standing still</h3>
+          <ul>
+            <li><b>Revenue leakage</b> &mdash; the early-booking discount is a structural giveaway, repeated on every flight, every day.</li>
+            <li><b>Fuel &amp; ESG exposure</b> &mdash; inefficient routings burn cash and carbon as ATF prices climb and emissions reporting tightens.</li>
+            <li><b>Premium erosion</b> &mdash; if a low-cost rival adds business class, the moat narrows before integration even completes.</li>
+          </ul>
+        </div>
+        <div class="card opp">
+          <h3>Opportunities to seize</h3>
+          <ul>
+            <li><b>Smarter pricing curve</b> &mdash; lift the floor on the 62.6% of seats sold early, without the punishing last-minute spike.</li>
+            <li><b>Network re-routing</b> &mdash; move 2+ stop traffic onto nonstop/1-stop metal for a triple win.</li>
+            <li><b>Premium consolidation</b> &mdash; make the merged group&rsquo;s business cabin the default choice for corporate India.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="num mono">09</div>
+    </section>
+
+    <!-- 10 · RECOMMENDATIONS -->
+    <section class="slide">
+      <div class="eyebrow">The decision</div>
+      <h2>Three moves for day one.</h2>
+      <div class="recs">
+        <div class="rec r1">
+          <span class="k">MOVE 01</span>
+          <h3>Re-time the revenue curve</h3>
+          <p>Deploy disciplined dynamic pricing that lifts early fares modestly instead of giving the seat away. 129,271 far-out bookings sit &#8377;9,189 below the late fare.</p>
+          <div class="impact">+ &#8377;1,378 / seat at a conservative 15% capture</div>
+        </div>
+        <div class="rec r2">
+          <span class="k">MOVE 02</span>
+          <h3>Kill the inefficient connections</h3>
+          <p>Re-route 2+ stop itineraries onto nonstop and single-connection metal. Lower fare for the passenger, lower fuel bill for us.</p>
+          <div class="impact">&minus; 9.9&nbsp;kg fuel &amp; 31.3&nbsp;kg CO&#8322; / seat</div>
+        </div>
+        <div class="rec r3">
+          <span class="k">MOVE 03</span>
+          <h3>Own the premium cabin</h3>
+          <p>Protect and grow business class as the merged group&rsquo;s profit engine before low-cost rivals copy it. It already commands an 8&times; premium.</p>
+          <div class="impact">8&times; revenue per premium seat vs economy</div>
+        </div>
+      </div>
+      <div class="num mono">10</div>
+    </section>
+
+    <!-- 11 · IMPACT -->
+    <section class="slide">
+      <div class="eyebrow">What happens next</div>
+      <h2>Act, or leave it on the runway.</h2>
+      <div class="impact-split">
+        <div class="act">
+          <h3>If we act</h3>
+          <ul>
+            <li>Capture a structural pricing uplift on the majority of seats sold &mdash; every route, every day.</li>
+            <li>Cut fuel and CO&#8322; per seat on the worst-routed traffic, hedging the ATF spike.</li>
+            <li>Lock in the premium moat before integration with Vistara completes.</li>
+            <li>Turn the first data diagnostic into a repeatable revenue-management capability.</li>
+          </ul>
+        </div>
+        <div class="fail">
+          <h3>If we don&rsquo;t</h3>
+          <ul>
+            <li>The early-booking giveaway compounds across 110M+ passengers a year.</li>
+            <li>Fuel waste scales with the post-COVID traffic boom &mdash; against us.</li>
+            <li>A rival adds business class and the 8&times; premium starts to erode.</li>
+            <li>The turnaround story stalls on the metrics the market watches.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="num mono">11</div>
+    </section>
+
+    <!-- 12 · CLOSE -->
+    <section class="slide cover">
+      <div class="eyebrow">The ask</div>
+      <h1 style="font-size: 56px">Fuel and price are not two problems.<br />They are <span style="color: var(--accent)">one decision</span>.</h1>
+      <p class="sub" style="font-size: 22px; margin-top: 24px">
+        Approve a 90-day pilot: dynamic-pricing floor on early bookings, a re-routing review of multi-stop
+        traffic, and a premium-cabin growth plan. We have the engine. We have the data. We know exactly what to do.
+      </p>
+      <div class="chip" style="margin-top: 48px">
+        <span class="mark">AI</span>
+        <span style="color: var(--muted); font-family: var(--font-m); font-size: 13px; letter-spacing: 0.1em">AIR INDIA · WAR ROOM · TEAM 3</span>
+      </div>
+      <div class="num mono">12</div>
+    </section>
+
+    <!-- 13 · METHODOLOGY (Q&A defense) -->
+    <section class="slide">
+      <div class="eyebrow">Appendix · for the Q&amp;A</div>
+      <h2 style="font-size: 38px">Why this is real, and how we built it.</h2>
+      <div class="method">
+        <div class="card">
+          <h3>The data</h3>
+          <p>
+            <b>300,153 real flights</b> scraped from EaseMyTrip across India&rsquo;s six metros, Feb&ndash;Mar&nbsp;2022.
+            Zero missing values, zero duplicates. Internally coherent in ways synthetic data isn&rsquo;t &mdash; e.g.
+            business class sold only by the two full-service carriers, exactly matching the real 2022 market.
+          </p>
+        </div>
+        <div class="card">
+          <h3>The fuel model</h3>
+          <p>Estimated from first principles, every constant a published benchmark:</p>
+          <table class="tbl">
+            <tr><td>Great-circle distance (6 metros)</td><td>haversine</td></tr>
+            <tr><td>Cruise burn (A320 family)</td><td>2,400 kg/hr</td></tr>
+            <tr><td>Takeoff-cycle penalty / stop</td><td>825 kg</td></tr>
+            <tr><td>CO&#8322; factor (ICAO)</td><td>3.16&times;</td></tr>
+            <tr><td>ATF price (Delhi, Feb&ndash;Mar &rsquo;22)</td><td>&#8377;100 / L</td></tr>
+          </table>
+        </div>
+      </div>
+      <p class="sub" style="margin-top: 24px; font-size: 16px">
+        Fuel, cost and CO&#8322; are <b style="color: var(--text)">modeled estimates</b>, labelled as such throughout.
+        Everything runs live in a full-stack app &mdash; ask any route, the model computes it on the spot.
+      </p>
+      <div class="num mono">13</div>
+    </section>
+  </body>
+</html>
