@@ -1,0 +1,52 @@
+{
+  "_note": "Real, verified external data used for context & impact slides. Every figure is cited. The flight dataset itself (300,153 rows) was scraped from EaseMyTrip in Feb-Mar 2022 across India's 6 metro routes.",
+  "acquisition": {
+    "buyer": "Tata Sons (via Talace Pvt Ltd)",
+    "target": "Air India (100%) + Air India Express (100%) + Air India SATS (50%)",
+    "enterprise_value_inr_crore": 18000,
+    "debt_component_inr_crore": 15300,
+    "cash_component_inr_crore": 2700,
+    "bid_won": "2021-10-08",
+    "handover_completed": "2022-01-27",
+    "significance": "The dataset was scraped Feb-Mar 2022 -- the FIRST weeks of Air India under Tata ownership. This analysis is literally the new owner's opening diagnostic.",
+    "source": "Tata Group newsroom; india.com"
+  },
+  "market_share_2022": {
+    "as_of": "November 2022",
+    "indigo_pct": 55.7,
+    "vistara_pct": 9.3,
+    "air_india_pct": 9.1,
+    "tata_combined_pct": 18.4,
+    "note": "IndiGo dominates. Air India + Vistara combined (both Tata) is the clear #2 bloc -- the merger thesis.",
+    "source": "Zee News / DGCA; finology"
+  },
+  "vistara_merger": {
+    "announced": "November 2022",
+    "completed": "2024",
+    "structure": "Vistara (Tata + Singapore Airlines JV) merged INTO Air India; SIA holds 25.1% of enlarged Air India",
+    "relevance": "Both carriers are in our data and are the ONLY two selling business class -- the combined premium engine of the merged group.",
+    "source": "Tata Group newsroom"
+  },
+  "market_growth": {
+    "domestic_pax_2022_million": 110,
+    "yoy_growth_pct": 52.2,
+    "period": "Jan-Nov 2022",
+    "note": "India carried its highest-ever 110M+ domestic passengers in 2022, +52% YoY -- a market rebounding hard post-COVID. Every pricing/fuel point compounds across a surging base.",
+    "source": "DGCA via Zee News"
+  },
+  "fuel_cost": {
+    "atf_delhi_feb2022_inr_per_kl": 90519,
+    "atf_delhi_mar2022_inr_per_kl": 110666,
+    "atf_delhi_jun2022_record_inr_per_kl": 141232,
+    "model_period_avg_inr_per_l": 100,
+    "fuel_share_of_indian_airline_cost_pct": "~40",
+    "note": "Jet fuel is the single largest controllable cost for Indian carriers (~40% of operating cost), and ATF prices spiked hard through 2022 on the Russia-Ukraine shock -- making the fuel-efficiency thesis urgent, not academic.",
+    "source": "IndianOil ATF price history; CAPA India / IATA cost structure"
+  },
+  "fleet_2022": {
+    "air_india": "Mixed: A320 family (ceo+neo) domestic; B777/B787 widebody international",
+    "vistara": "A320neo / A321neo narrowbody domestic; B787 widebody",
+    "modelling_note": "We model domestic metro routes on A320-family narrowbody economics -- correct for the routes in this dataset.",
+    "source": "Airbus/airline fleet disclosures"
+  }
+}
