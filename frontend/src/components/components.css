@@ -695,10 +695,29 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 }
 .revenue-stage > * { position: relative; }
 
-/* glowing fare curves */
+/* glowing chart strokes */
 .glow-gold .recharts-area-curve,
 .glow-gold path.recharts-curve { filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.6)); }
 .glow-blue path { filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.55)); }
+.glow-soft path { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.35)); }
+
+/* NSGA-II knee marker pulse */
+.knee-pulse circle {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95));
+  animation: kneepulse 1.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes kneepulse {
+  0%, 100% { r: 5px; opacity: 1; }
+  50% { r: 8px; opacity: 0.75; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .knee-pulse circle { animation: none; }
+}
+
+/* risk readout accent */
+.readout.risk { border-color: rgba(239, 68, 68, 0.4); background: linear-gradient(180deg, rgba(239, 68, 68, 0.08), var(--surface-2)); }
 
 /* passenger-mix indicator under the elasticity slider */
 .mix-bar {
