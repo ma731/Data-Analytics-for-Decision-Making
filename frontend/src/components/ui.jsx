@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-export function Section({ eyebrow, title, sub, delay = 0, children }) {
+export function Section({ eyebrow, title, sub, delay = 0, id, children }) {
   return (
-    <section className="section" style={{ animationDelay: `${delay}ms` }}>
+    <section className="section" id={id} style={{ animationDelay: `${delay}ms` }}>
       {eyebrow && <div className="section-eyebrow">{eyebrow}</div>}
       {title && <h2 className="section-title">{title}</h2>}
       {sub && <p className="section-sub">{sub}</p>}
