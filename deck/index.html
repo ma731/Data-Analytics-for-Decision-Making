@@ -159,25 +159,50 @@
         .slide:last-child { page-break-after: auto; }
       }
       @page { size: 1280px 720px; margin: 0; }
+
+      /* cinematic A350 cover */
+      .hero-cover { padding: 0; }
+      .cover-bg {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; object-position: 50% 40%;
+      }
+      .cover-scrim {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(150% 130% at 12% 102%, rgba(5,7,13,0.95) 0%, rgba(5,7,13,0.5) 28%, transparent 60%),
+          linear-gradient(0deg, rgba(5,7,13,0.85) 0%, transparent 26%),
+          radial-gradient(90% 70% at 86% -10%, rgba(218,14,41,0.24), transparent 55%);
+      }
+      .cover-logo { position: absolute; top: 54px; left: 64px; height: 34px; z-index: 2; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6)); }
+      .cover-tags { position: absolute; top: 56px; right: 64px; z-index: 2; display: flex; gap: 10px; }
+      .cover-tags span {
+        font-family: var(--font-m); font-size: 12px; letter-spacing: 0.12em; color: rgba(241,245,249,0.85);
+        border: 1px solid rgba(255,255,255,0.25); padding: 6px 12px; border-radius: 999px;
+      }
+      .cover-body { position: absolute; left: 64px; bottom: 72px; z-index: 2; max-width: 900px; }
+      .cover-eyebrow { font-family: var(--font-m); font-size: 14px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+      .cover-title { font-family: var(--font-d); font-weight: 700; font-size: 104px; line-height: 0.92; letter-spacing: -0.035em; color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+      .cover-title .hl { background: linear-gradient(100deg, #fed9a0 0%, #e0b366 45%, #da0e29 110%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+      .cover-sub { margin-top: 24px; max-width: 60ch; font-size: 21px; line-height: 1.55; color: rgba(226,232,240,0.92); }
+      .cover-sub b { color: #fff; }
     </style>
   </head>
   <body>
     <!-- 1 · COVER -->
-    <section class="slide cover">
-      <div class="chip">
-        <span class="mark">AI</span>
-        <div>
-          <div style="font-family: var(--font-d); font-weight: 700; font-size: 20px">Air India</div>
-          <div style="color: var(--muted); font-size: 14px; font-family: var(--font-m); letter-spacing: 0.1em">WAR ROOM</div>
-        </div>
+    <section class="slide hero-cover">
+      <img class="cover-bg" src="./assets/hero.jpg" alt="" />
+      <div class="cover-scrim"></div>
+      <img class="cover-logo" src="./assets/logo.svg" alt="Air India" />
+      <div class="cover-tags">
+        <span>CDO BRIEFING</span><span>TEAM 3 · IE MBDS</span><span>DATA: FEB&ndash;MAR 2022</span>
       </div>
-      <h1>Two levers nobody is pulling: <span style="color: var(--accent)">fuel</span> and <span style="color: var(--blue-br)">price</span>.</h1>
-      <div class="tag">The new owner&rsquo;s opening diagnostic — 300,153 flights, decoded.</div>
-      <div class="meta">
-        <span>CDO BRIEFING TO THE BOARD</span>
-        <span>DATASET 3 · FLIGHT PRICE</span>
-        <span>TEAM 3 · IE MBDS</span>
-        <span>DATA: FEB&ndash;MAR 2022</span>
+      <div class="cover-body">
+        <div class="cover-eyebrow">A new Air India · the owner&rsquo;s opening diagnostic</div>
+        <h1 class="cover-title">TWO&nbsp;LEVERS.<br /><span class="hl">ONE&nbsp;DECISION.</span></h1>
+        <p class="cover-sub">
+          300,153 flights. Zero fuel data &mdash; so we engineered it from physics. This is what optimising
+          <b>fuel and price</b> actually looks like.
+        </p>
       </div>
       <div class="num mono">01</div>
     </section>
