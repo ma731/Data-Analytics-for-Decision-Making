@@ -91,6 +91,10 @@ export default function MonteCarlo() {
         At ±{vol}% volatility, the fuel bill could overshoot the median by{" "}
         <b style={{ color: "var(--negative)" }}>{data ? cr(data.downside_cr) : "…"}</b> in a bad year — the size of the hedge the fuel-efficiency moves are buying down.
       </p>
+      <div className="assume">
+        ATF price modelled as lognormal around the Feb–Mar 2022 average; applied to the network&rsquo;s modeled fuel
+        volume. Illustrates exposure, not Air India&rsquo;s actual hedged fuel cost.
+      </div>
     </div>
   );
 }

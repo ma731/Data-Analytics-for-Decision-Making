@@ -106,6 +106,10 @@ export default function ParetoEvolution() {
         <b style={{ color: "#fff" }}>knee</b> — the single best revenue-per-fuel plan
         {d?.knee && <> at <b style={{ color: "var(--accent)" }}>₹{d.knee.revenue} cr on ₹{d.knee.fuel} cr of fuel</b></>}.
       </p>
+      <div className="assume">
+        Candidate plans are capacity-share vectors across the 30 routes; revenue and fuel are modeled totals over a fixed
+        weekly frequency budget. Shows the trade-off frontier, not a committed schedule.
+      </div>
     </div>
   );
 }

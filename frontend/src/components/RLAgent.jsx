@@ -119,6 +119,10 @@ export default function RLAgent() {
         when the plane is empty and far out, escalate hard as seats fill and departure nears. Final policy earns{" "}
         <b style={{ color: "var(--accent)" }}>{d ? `+${d.uplift_pct}%` : "…"}</b> over the discount-to-fill instinct.
       </p>
+      <div className="assume">
+        Trained on a stylised, fixed-inventory demand model for illustration — it shows that RL <i>rediscovers</i> revenue
+        management, not a forecast of Air India&rsquo;s actual bookings.
+      </div>
     </div>
   );
 }
