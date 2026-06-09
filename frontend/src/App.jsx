@@ -209,12 +209,16 @@ export default function App() {
           </p>
         </div>
 
-        <div className="sim-stage">
+        <div className="sim-stage mc-stage">
           <div className="sim-stage-inner">
             <Section eyebrow="OR 01 · Simulation" title="How risky is the fuel bill?" delay={40}>
               <Reveal><MonteCarlo /></Reveal>
             </Section>
+          </div>
+        </div>
 
+        <div className="sim-stage">
+          <div className="sim-stage-inner">
             <Section eyebrow="OR 02 · Genetic optimisation" title="The provably-best fuel–revenue trade-offs" delay={40}>
               <Reveal><ParetoEvolution /></Reveal>
             </Section>

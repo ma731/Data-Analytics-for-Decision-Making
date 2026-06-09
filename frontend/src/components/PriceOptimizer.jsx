@@ -79,6 +79,10 @@ export default function PriceOptimizer() {
         The gold envelope is the revenue-maximising fare; the dashed blue line is what we charge today. Where today&rsquo;s
         fare sits <i>below</i> the envelope, we&rsquo;re leaving money on the table — most of it in the inelastic last-minute window.
       </p>
+      <div className="assume">
+        Per-window linear-demand model; elasticity is the slider input, not a fitted constant. Directional — it sizes the
+        opportunity, it is not a committed fare table.
+      </div>
     </div>
   );
 }

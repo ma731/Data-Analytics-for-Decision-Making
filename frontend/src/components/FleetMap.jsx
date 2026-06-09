@@ -164,6 +164,10 @@ export default function FleetMap() {
         The optimiser concentrates capacity on the highest contribution-per-block-hour routes first — the same efficiency
         logic as the frontier, now turned into an actual flying schedule.
       </p>
+      <div className="assume">
+        Contribution = avg fare × seats − modeled fuel cost. It is <i>not</i> full margin (it excludes crew, ownership,
+        airport and overhead costs), and uses the engineered fuel estimate.
+      </div>
     </div>
   );
 }
