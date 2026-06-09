@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getFindings, getContext } from "./api.js";
-import { Section } from "./components/ui.jsx";
+import { Section, useReveal } from "./components/ui.jsx";
 import KpiBand from "./components/KpiBand.jsx";
 import Frontier from "./components/Frontier.jsx";
 import PanicTax from "./components/PanicTax.jsx";
@@ -8,7 +8,19 @@ import StopsCrime from "./components/StopsCrime.jsx";
 import BusinessWhitespace from "./components/BusinessWhitespace.jsx";
 import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
+import FlightBackground from "./components/FlightBackground.jsx";
+import MonteCarlo from "./components/MonteCarlo.jsx";
+import ParetoEvolution from "./components/ParetoEvolution.jsx";
+import FleetMap from "./components/FleetMap.jsx";
+import RLAgent from "./components/RLAgent.jsx";
+import PriceOptimizer from "./components/PriceOptimizer.jsx";
+import MLDemand from "./components/MLDemand.jsx";
 import "./components/components.css";
+
+function Reveal({ children }) {
+  const ref = useReveal();
+  return <div ref={ref}>{children}</div>;
+}
 
 function CommandBar() {
   return (
@@ -66,6 +78,7 @@ export default function App() {
 
   return (
     <>
+      <FlightBackground />
       <CommandBar />
       <main className="shell">
         <Section
@@ -148,6 +161,40 @@ export default function App() {
           delay={60}
         >
           <Recommendations f={f} />
+        </Section>
+
+        {/* ===================== OPERATIONS RESEARCH ACT ===================== */}
+        <div className="or-hero">
+          <div className="kicker">From insight to action · the optimisation engine</div>
+          <h2>We don&rsquo;t just see the problem. We compute the answer.</h2>
+          <p>
+            Descriptive analytics tells you what happened. Operations research tells you exactly what to do. Six live
+            engines — simulation, genetic optimisation, integer programming, reinforcement learning and machine learning —
+            turn every finding above into a prescribed, optimal decision. Everything below runs live on the server.
+          </p>
+        </div>
+
+        <Section eyebrow="OR 01 · Simulation" title="How risky is the fuel bill?" delay={40}>
+          <Reveal><MonteCarlo /></Reveal>
+        </Section>
+
+        <Section eyebrow="OR 02 · Genetic optimisation" title="The provably-best fuel–revenue trade-offs" delay={40}>
+          <Reveal><ParetoEvolution /></Reveal>
+        </Section>
+
+        <Section eyebrow="OR 03 · Integer programming" title="The optimal route network" delay={40}>
+          <Reveal><FleetMap /></Reveal>
+        </Section>
+
+        <Section eyebrow="OR 04 · Reinforcement learning" title="An agent that teaches itself to price" delay={40}>
+          <Reveal><RLAgent /></Reveal>
+        </Section>
+
+        <Section eyebrow="OR 05 · Revenue management" title="The fare curve we should actually fly" delay={40}>
+          <div className="grid row-2">
+            <Reveal><PriceOptimizer /></Reveal>
+            <Reveal><MLDemand /></Reveal>
+          </div>
         </Section>
 
         {ctx && (

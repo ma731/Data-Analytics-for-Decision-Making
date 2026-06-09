@@ -140,6 +140,27 @@ premium-cabin supply outright.
 
 ---
 
+## 6b. Operations Research engine (prescriptive layer)
+
+The findings above are *descriptive*. We add an OR layer that turns each into a
+*prescribed, optimal* decision — every module runs live in `backend/optimize.py`.
+This maps to a Berkeley IEOR "decision analytics" core: optimization, simulation,
+risk modelling, reinforcement learning, ML.
+
+| Module | Method | What it answers |
+|---|---|---|
+| **Monte Carlo fuel-risk** | Simulate the annual fuel bill under lognormal ATF price shocks (~6,000 draws) → P10/P50/P90 + 95% Value-at-Risk | "How exposed are we to a fuel-price spike, and how big a hedge do the efficiency moves buy?" |
+| **Dynamic price optimiser** | Per booking-window linear-demand revenue maximisation with elasticity rising over the horizon (early leisure elastic, late business inelastic) | "What fare should we charge in each window?" |
+| **NSGA-II Pareto** | Multi-objective genetic algorithm over capacity-share vectors; non-dominated sorting + crowding distance, 40 generations | "What is the *provably* best set of fuel-vs-revenue network trade-offs?" |
+| **Fleet MILP** | Integer program (`scipy.optimize.milp`): maximise contribution s.t. a fleet block-hour budget and service bounds | "Exactly how many flights should we fly on each route?" |
+| **RL pricing agent** | Tabular Q-learning; state = (days-left, seats-left), reward = realised fare revenue, 4,000 episodes | "Can an agent *learn* the optimal pricing ladder from scratch?" (it rediscovers revenue management) |
+| **ML demand engine** | Gradient-boosted fare model on 40k flights + permutation importance; econometric price elasticity via log-log OLS | "What actually drives the fare, and how price-sensitive are flyers?" |
+
+All optimisers are seeded (reproducible) and return per-generation / per-episode
+snapshots so the dashboard animates the optimiser working. The RL agent and NSGA-II
+are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
+efficiency frontier into its provably-optimal form.
+
 ## 7. Reproducibility
 
 Full-stack application; nothing is pre-baked.

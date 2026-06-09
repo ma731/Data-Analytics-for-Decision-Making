@@ -72,6 +72,8 @@ a {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 24px 96px;
+  position: relative;
+  z-index: 1;
 }
 
 .section {
@@ -117,7 +119,9 @@ a {
 
 /* ---- panels / cards ---- */
 .panel {
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  background: linear-gradient(180deg, rgba(22, 29, 48, 0.82), rgba(17, 23, 38, 0.86));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;

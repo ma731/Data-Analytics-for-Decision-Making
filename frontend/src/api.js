@@ -12,6 +12,14 @@ export const getContext = () => get("/context");
 export const getRoute = (s, d, stops) =>
   get(`/route/${encodeURIComponent(s)}/${encodeURIComponent(d)}/${stops}`);
 
+// ---- operations research engine ----
+export const getSimFuel = (volatility) => get(`/sim/fuel?volatility=${volatility}`);
+export const getPricing = (elasticity) => get(`/optimize/pricing?elasticity=${elasticity}`);
+export const getPareto = () => get("/pareto");
+export const getFleet = (hours) => get(`/fleet?hours=${hours}`);
+export const getRL = () => get("/rl");
+export const getDemand = () => get("/demand");
+
 // ---- locale-aware formatters (Web Interface Guidelines) ----
 const inr0 = new Intl.NumberFormat("en-IN", {
   style: "currency",

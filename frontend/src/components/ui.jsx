@@ -35,6 +35,30 @@ export function useCountUp(target, { duration = 1100, format = (v) => v } = {}) 
   return format(val);
 }
 
+// Scroll-reveal: returns a ref; adds class "in" when the element scrolls into view.
+export function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.classList.add("reveal");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            el.classList.add("in");
+            io.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return ref;
+}
+
 // Dark themed tooltip body for Recharts
 export function ChartTip({ active, payload, label, render }) {
   if (!active || !payload?.length) return null;
