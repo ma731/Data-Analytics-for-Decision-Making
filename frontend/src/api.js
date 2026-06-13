@@ -19,6 +19,10 @@ export const getPareto = () => get("/pareto");
 export const getFleet = (hours) => get(`/fleet?hours=${hours}`);
 export const getRL = () => get("/rl");
 export const getDemand = () => get("/demand");
+export const getEmsr = () => get("/emsr");
+export const getShadow = () => get("/shadow");
+export const getDea = () => get("/dea");
+export const getSensitivity = () => get("/sensitivity");
 export const getLive = () => get("/live");
 
 // ---- formatters: Western grouping (en-US) for a European/international audience ----

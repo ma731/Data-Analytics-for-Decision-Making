@@ -16,8 +16,8 @@ put fuel and revenue on the same chart, the **Efficiency Frontier**.
 backend/      FastAPI — serves the fuel model, findings, AND a live OR engine
   fuel_model.py   engineered, documented, citable fuel/CO2 model
   analysis.py     applies the model across the dataset -> strategic findings
-  optimize.py     operations-research engine (6 modules, see below)
-  app.py          API: /api/findings, /api/route, /api/context + 6 OR endpoints
+  optimize.py     operations-research engine (9 modules, see below)
+  app.py          API: /api/findings, /api/route, /api/context + 9 OR endpoints
 frontend/     React + Vite dashboard (Recharts). Dark "Bloomberg-meets-aviation" UI,
               animated flight-path background, glassmorphism, live-animating OR sections.
 data/         Flight_price.csv (real), market_context.json (real, cited), findings.json
@@ -34,10 +34,14 @@ Turns the descriptive findings into prescriptive, optimal decisions — all comp
 | NSGA-II Pareto | Multi-objective genetic algorithm (fuel vs revenue) | `/api/pareto` |
 | Fleet MILP | Integer program — frequency allocation (scipy.milp) | `/api/fleet` |
 | RL pricing agent | Tabular Q-learning over the booking horizon | `/api/rl` |
-| ML demand engine | Gradient boosting + permutation importance + OLS elasticity | `/api/demand` |
+| ML demand engine | Gradient boosting + permutation importance + OLS gradient | `/api/demand` |
+| EMSR seat protection | Littlewood's rule — exact fare-class protection level | `/api/emsr` |
+| LP shadow prices | LP relaxation + duality — marginal value of a block-hour | `/api/shadow` |
+| DEA route efficiency | Data envelopment analysis — one CCR linear program per route | `/api/dea` |
 
-Covers the full decision-analytics toolkit: optimization, simulation, risk
-modelling, reinforcement learning, and machine learning.
+Covers the full decision-analytics toolkit: linear & integer programming, LP
+duality, multi-objective optimisation, simulation, risk modelling, reinforcement
+learning, machine learning, exact revenue management, and efficiency analysis.
 
 ## Run it
 ```powershell
