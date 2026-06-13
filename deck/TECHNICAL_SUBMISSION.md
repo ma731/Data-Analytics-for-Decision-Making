@@ -144,8 +144,9 @@ premium-cabin supply outright.
 
 The findings above are *descriptive*. We add an OR layer that turns each into a
 *prescribed, optimal* decision — every module runs live in `backend/optimize.py`.
-It covers the full decision-analytics toolkit: optimization, simulation, risk
-modelling, reinforcement learning, and machine learning.
+It covers the full decision-analytics toolkit: linear & integer programming, LP
+duality, multi-objective optimisation, simulation, risk modelling, reinforcement
+learning, machine learning, exact revenue management, and efficiency analysis.
 
 | Module | Method | What it answers |
 |---|---|---|
@@ -154,12 +155,26 @@ modelling, reinforcement learning, and machine learning.
 | **NSGA-II Pareto** | Multi-objective genetic algorithm over capacity-share vectors; non-dominated sorting + crowding distance, 40 generations | "What is the *provably* best set of fuel-vs-revenue network trade-offs?" |
 | **Fleet MILP** | Integer program (`scipy.optimize.milp`): maximise contribution s.t. a fleet block-hour budget and service bounds | "Exactly how many flights should we fly on each route?" |
 | **RL pricing agent** | Tabular Q-learning; state = (days-left, seats-left), reward = realised fare revenue, 4,000 episodes | "Can an agent *learn* the optimal pricing ladder from scratch?" (it rediscovers revenue management) |
-| **ML demand engine** | Gradient-boosted fare model on 40k flights + permutation importance; econometric price elasticity via log-log OLS | "What actually drives the fare, and how price-sensitive are flyers?" |
+| **ML demand engine** | Gradient-boosted fare model on 40k flights, validated on a leakage-proof flight-grouped split (out-of-sample R², MAPE, calibrated P10–P90 intervals, skill vs baseline) + permutation importance | "What drives the fare, how accurately can we predict it, and how reliable is that prediction?" |
+| **EMSR seat protection** | Littlewood's rule — the exact two-class fare protection level (the optimum the RL agent only approximates) | "How many seats should we protect for Business instead of selling cheap early?" |
+| **LP shadow prices** | LP relaxation of the fleet program; the dual of the block-hour budget prices capacity | "What is one more aircraft-hour — or one more jet — actually worth?" |
+| **DEA route efficiency** | Input-oriented CCR data envelopment analysis, one linear program per route | "Which routes are on the efficiency frontier, and exactly which peer should each laggard copy?" |
+
+We also **stress-test the fuel model itself**: every engineered constant is swung
+±20% and the conclusions are recomputed (`/api/sensitivity`). The route efficiency
+ranking holds at Spearman ≈ 0.997 and the nonstop-vs-2-stop fuel gap stays in a tight
+band — the findings do not depend on the exact value of any single constant.
+
+Note on the demand "elasticity": the log-log OLS slope is reported as a *descriptive
+fare/volume gradient along the booking horizon*, not a causal price elasticity (price
+and volume both move with days-to-departure, so it is confounded) — labelled as such
+throughout.
 
 All optimisers are seeded (reproducible) and return per-generation / per-episode
 snapshots so the dashboard animates the optimiser working. The RL agent and NSGA-II
 are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
-efficiency frontier into its provably-optimal form.
+efficiency frontier into its provably-optimal form — and EMSR/LP/DEA add the
+exact-optimal, marginal-value, and efficiency-scoring lenses alongside them.
 
 ## 7. Reproducibility
 
