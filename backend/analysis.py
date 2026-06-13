@@ -10,12 +10,14 @@ Run directly to export findings.json + a numbers summary:
 
 import json
 import os
+from functools import lru_cache
+
 import pandas as pd
 
 from fuel_model import (
-    fuel_breakdown, estimate_fuel_kg, great_circle_km,
+    fuel_breakdown, estimate_fuel_kg, great_circle_km, fuel_cost_inr,
     CO2_PER_KG_FUEL, JET_A_DENSITY_KG_L, ATF_PRICE_INR_PER_L,
-    SEATS_NARROWBODY, CITY_COORDS,
+    SEATS_NARROWBODY, CITY_COORDS, ASSUMPTIONS,
 )
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "Flight_price.csv")
@@ -24,16 +26,30 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "Flight_price.
 TATA_GROUP = ["Air_India", "Vistara"]
 
 
+@lru_cache(maxsize=1)
 def load() -> pd.DataFrame:
+    """Load the dataset with the engineered fuel layer attached.
+
+    The fuel model only depends on (source, destination, stops), and there are
+    just ~90 such combinations in the data — so we evaluate the model once per
+    combination and map the result onto all 300k rows, instead of calling it per
+    row. ~100x faster than the naive loop, and the result is cached for the
+    process lifetime (read-only; callers that mutate must .copy() first).
+    """
     df = pd.read_csv(DATA_PATH, index_col=0)
-    # attach the engineered fuel layer to every flight
-    df["fuel_kg"] = [
+
+    combos = df[["source_city", "destination_city", "stops"]].drop_duplicates()
+    combos["fuel_kg"] = [
         estimate_fuel_kg(s, d, st)
-        for s, d, st in zip(df.source_city, df.destination_city, df.stops)
+        for s, d, st in zip(combos.source_city, combos.destination_city, combos.stops)
     ]
-    df["gc_km"] = [great_circle_km(s, d) for s, d in zip(df.source_city, df.destination_city)]
+    combos["gc_km"] = [
+        great_circle_km(s, d) for s, d in zip(combos.source_city, combos.destination_city)
+    ]
+    df = df.merge(combos, on=["source_city", "destination_city", "stops"], how="left")
+
     df["fuel_litres"] = df.fuel_kg / JET_A_DENSITY_KG_L
-    df["fuel_cost_inr"] = df.fuel_litres * ATF_PRICE_INR_PER_L
+    df["fuel_cost_inr"] = fuel_cost_inr(df.fuel_kg)
     df["co2_kg"] = df.fuel_kg * CO2_PER_KG_FUEL
     df["fuel_kg_per_seat"] = df.fuel_kg / SEATS_NARROWBODY
     # contribution proxy: price minus fuel cost per seat (NOT full margin, but a
@@ -190,6 +206,91 @@ def opportunity_sizing(df, pt, bw):
     }
 
 
+@lru_cache(maxsize=1)
+def fuel_sensitivity(pct=0.20):
+    """
+    Stress-test the engineered fuel model against its own assumptions.
+
+    Every conclusion rests on a handful of published constants (cruise burn, LTO
+    cycle fuel, cruise speed, the routing detour penalty). The obvious attack is
+    "you made those numbers up". This swings each constant +/-20% and re-derives
+    the two findings that matter — the route Efficiency RANKING and the
+    nonstop-vs-2-stop fuel gap — to show they barely move. Robust conclusions
+    from transparent assumptions.
+    """
+    import numpy as np
+    from scipy.stats import spearmanr
+    from fuel_model import (
+        CRUISE_BURN_KG_PER_HR, LTO_FUEL_PER_CYCLE_KG, CRUISE_SPEED_KMH,
+        ROUTING_FACTOR, TAKEOFFS,
+    )
+
+    df = load()
+    eco = df[df["class"] == "Economy"]
+    gc = eco.gc_km.to_numpy()
+    stops = eco.stops.to_numpy()
+    price = eco.price.to_numpy()
+    takeoffs = np.array([TAKEOFFS[s] for s in stops], dtype=float)
+    is_zero = stops == "zero"
+    is_two = stops == "two_or_more"
+    routes = (eco.source_city + "→" + eco.destination_city).to_numpy()
+    uniq = sorted(set(routes))
+    ridx = {r: i for i, r in enumerate(uniq)}
+    rid = np.array([ridx[r] for r in routes])
+
+    def metrics(cruise_burn, lto, cruise_speed, routing):
+        rf = np.array([routing[s] for s in stops], dtype=float)
+        fuel_kg = lto * takeoffs + cruise_burn * (gc * rf) / cruise_speed
+        fps = fuel_kg / SEATS_NARROWBODY
+        # per-route revenue-per-fuel-kg (the frontier metric)
+        rpf = np.array([price[rid == i].mean() / fps[rid == i].mean()
+                        for i in range(len(uniq))])
+        spread = float(rpf.max() / rpf.min())
+        stops_gap = float(fps[is_two].mean() / fps[is_zero].mean())
+        return spread, stops_gap, rpf
+
+    base = dict(cruise_burn=CRUISE_BURN_KG_PER_HR, lto=LTO_FUEL_PER_CYCLE_KG,
+                cruise_speed=CRUISE_SPEED_KMH, routing=dict(ROUTING_FACTOR))
+    b_spread, b_gap, b_rpf = metrics(**base)
+
+    params = [("Cruise burn (kg/hr)", "cruise_burn"),
+              ("LTO cycle fuel (kg)", "lto"),
+              ("Cruise speed (km/h)", "cruise_speed"),
+              ("Routing detour penalty", "routing")]
+    bars, spearmans, gaps = [], [], [b_gap]
+    for label, key in params:
+        vals = {}
+        for sign, tag in [(-pct, "low"), (pct, "high")]:
+            kw = dict(base)
+            if key == "routing":
+                kw["routing"] = {k: (1.0 if k == "zero" else v * (1 + sign))
+                                 for k, v in ROUTING_FACTOR.items()}
+            else:
+                kw[key] = base[key] * (1 + sign)
+            spread, gap, rpf = metrics(**kw)
+            vals[tag] = spread
+            spearmans.append(float(spearmanr(b_rpf, rpf).statistic))
+            gaps.append(gap)
+        bars.append({"param": f"{label} ±{int(pct*100)}%",
+                     "low": round(vals["low"], 2), "high": round(vals["high"], 2)})
+    bars.sort(key=lambda d: -abs(d["high"] - d["low"]))
+
+    return {
+        "metric_label": "Efficiency spread — best ÷ worst route (×)",
+        "baseline_value": round(b_spread, 2),
+        "bars": bars,
+        "pct": int(pct * 100),
+        "rank_stability": {"min_spearman": round(min(spearmans), 3),
+                           "scenarios": len(spearmans)},
+        "stops_gap": {"baseline": round(b_gap, 2),
+                      "min": round(min(gaps), 2), "max": round(max(gaps), 2)},
+        "note": ("Each constant swung ±20%; the frontier ranking (Spearman vs "
+                 "baseline) and the 2-stop-vs-nonstop fuel gap are recomputed. "
+                 "Near-1.0 correlation = the conclusions don't depend on the exact "
+                 "constants."),
+    }
+
+
 def build_findings():
     df = load()
     pt = panic_tax(df)
@@ -202,14 +303,8 @@ def build_findings():
         "airlines": airline_economics(df),
         "frontier": efficiency_frontier(df),
         "opportunity": opportunity_sizing(df, pt, bw),
-        "assumptions": {
-            "cruise_burn_kg_per_hr": 2500,
-            "lto_fuel_per_cycle_kg": 825,
-            "cruise_speed_kmh": 800,
-            "co2_per_kg_fuel": CO2_PER_KG_FUEL,
-            "atf_price_inr_per_l": ATF_PRICE_INR_PER_L,
-            "seats_narrowbody": SEATS_NARROWBODY,
-        },
+        # Pulled straight from the model's own constants — the panel can't drift.
+        "assumptions": ASSUMPTIONS,
     }
     return findings
 

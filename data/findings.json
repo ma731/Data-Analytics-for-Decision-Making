@@ -685,11 +685,16 @@
     }
   },
   "assumptions": {
-    "cruise_burn_kg_per_hr": 2500,
-    "lto_fuel_per_cycle_kg": 825,
-    "cruise_speed_kmh": 800,
+    "cruise_burn_kg_per_hr": 2400.0,
+    "lto_fuel_per_cycle_kg": 825.0,
+    "cruise_speed_kmh": 800.0,
     "co2_per_kg_fuel": 3.16,
     "atf_price_inr_per_l": 100.0,
-    "seats_narrowbody": 180
+    "seats_narrowbody": 180,
+    "routing_factor": {
+      "zero": 1.0,
+      "one": 1.3,
+      "two_or_more": 1.6
+    }
   }
 }

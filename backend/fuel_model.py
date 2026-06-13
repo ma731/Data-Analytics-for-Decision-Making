@@ -56,6 +56,18 @@ SEATS_NARROWBODY = 180
 ROUTING_FACTOR = {"zero": 1.00, "one": 1.30, "two_or_more": 1.60}
 TAKEOFFS = {"zero": 1, "one": 2, "two_or_more": 3}
 
+# Single source of truth for the dashboard/deck "assumptions" panel. Built from
+# the constants above so the panel can NEVER drift from the model that runs.
+ASSUMPTIONS = {
+    "cruise_burn_kg_per_hr": CRUISE_BURN_KG_PER_HR,
+    "lto_fuel_per_cycle_kg": LTO_FUEL_PER_CYCLE_KG,
+    "cruise_speed_kmh": CRUISE_SPEED_KMH,
+    "co2_per_kg_fuel": CO2_PER_KG_FUEL,
+    "atf_price_inr_per_l": ATF_PRICE_INR_PER_L,
+    "seats_narrowbody": SEATS_NARROWBODY,
+    "routing_factor": ROUTING_FACTOR,
+}
+
 # Airport coordinates for the six metros in the dataset (lat, lon)
 CITY_COORDS = {
     "Delhi":     (28.5562, 77.1000),
@@ -85,6 +97,15 @@ def estimate_fuel_kg(source_city: str, destination_city: str, stops: str) -> flo
     return LTO_FUEL_PER_CYCLE_KG * TAKEOFFS[stops] + CRUISE_BURN_KG_PER_HR * airborne_hours
 
 
+def fuel_cost_inr(fuel_kg):
+    """Convert fuel mass (kg) to INR at the model's density + ATF price.
+
+    Accepts a scalar or a numpy/pandas vector — the single canonical place this
+    conversion happens, so every optimiser and finding stays consistent.
+    """
+    return fuel_kg / JET_A_DENSITY_KG_L * ATF_PRICE_INR_PER_L
+
+
 def fuel_breakdown(source_city: str, destination_city: str, stops: str) -> dict:
     """Full per-flight fuel economics for one route/config."""
     gc = great_circle_km(source_city, destination_city)
@@ -97,7 +118,7 @@ def fuel_breakdown(source_city: str, destination_city: str, stops: str) -> dict:
         "takeoffs": TAKEOFFS[stops],
         "fuel_kg": round(fuel_kg, 1),
         "fuel_litres": round(fuel_litres, 1),
-        "fuel_cost_inr": round(fuel_litres * ATF_PRICE_INR_PER_L, 0),
+        "fuel_cost_inr": round(fuel_cost_inr(fuel_kg), 0),
         "co2_kg": round(fuel_kg * CO2_PER_KG_FUEL, 1),
         "fuel_kg_per_seat": round(fuel_kg / SEATS_NARROWBODY, 2),
         "co2_kg_per_seat": round(fuel_kg * CO2_PER_KG_FUEL / SEATS_NARROWBODY, 2),

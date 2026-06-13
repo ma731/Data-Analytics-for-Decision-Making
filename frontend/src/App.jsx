@@ -21,6 +21,10 @@ import FleetMap from "./components/FleetMap.jsx";
 import RLAgent from "./components/RLAgent.jsx";
 import PriceOptimizer from "./components/PriceOptimizer.jsx";
 import MLDemand from "./components/MLDemand.jsx";
+import EmsrProtection from "./components/EmsrProtection.jsx";
+import ShadowPrices from "./components/ShadowPrices.jsx";
+import DeaEfficiency from "./components/DeaEfficiency.jsx";
+import SensitivityTornado from "./components/SensitivityTornado.jsx";
 import "./components/components.css";
 
 function Reveal({ children }) {
@@ -206,9 +210,10 @@ export default function App() {
           <div className="kicker">From insight to action · the optimisation engine</div>
           <h2>We don&rsquo;t just see the problem. We compute the answer.</h2>
           <p>
-            Descriptive analytics tells you what happened. Operations research tells you exactly what to do. Six live
-            engines — simulation, genetic optimisation, integer programming, reinforcement learning and machine learning —
-            turn every finding above into a prescribed, optimal decision. Everything below runs live on the server.
+            Descriptive analytics tells you what happened. Operations research tells you exactly what to do. Nine live
+            engines — simulation, genetic optimisation, integer &amp; linear programming, LP duality, reinforcement
+            learning, machine learning, exact revenue management and data envelopment analysis — turn every finding above
+            into a prescribed, optimal decision. Everything below runs live on the server.
           </p>
         </div>
 
@@ -243,6 +248,42 @@ export default function App() {
               <Reveal><MLDemand /></Reveal>
             </div>
           </div>
+        </Section>
+
+        <Section
+          eyebrow="OR 06 · Revenue management, solved exactly"
+          title="How many seats to protect for Business"
+          sub="The RL agent learns toward this; Littlewood's rule lands on it in one line of optimisation."
+          delay={40}
+        >
+          <Reveal><EmsrProtection /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="OR 07 · Linear programming & duality"
+          title="What one more aircraft is worth"
+          sub="The same fleet problem, relaxed to an LP — so its shadow prices put an exact rupee value on capacity."
+          delay={40}
+        >
+          <Reveal><ShadowPrices /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="OR 08 · Data envelopment analysis"
+          title="Every route scored, every laggard given a target"
+          sub="The hero frontier turned into a rigorous LP: who's efficient, who isn't, and exactly who to copy."
+          delay={40}
+        >
+          <Reveal><DeaEfficiency /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="Defensibility · pressure-testing the model"
+          title="The findings survive being wrong about the numbers"
+          sub="Our fuel model rests on engineered constants. So we attacked it: swing every constant ±20% and the conclusions barely move."
+          delay={40}
+        >
+          <Reveal><SensitivityTornado /></Reveal>
         </Section>
 
         <Finale />
