@@ -9,6 +9,9 @@ dataset. Nothing is pre-baked: /api/findings recomputes on demand, and
 from functools import lru_cache
 import json
 import os
+import threading
+import time
+import urllib.request
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +21,11 @@ import optimize
 from fuel_model import fuel_breakdown, CITY_COORDS, ROUTING_FACTOR
 
 app = FastAPI(title="Air India War Room API", version="1.0.0")
+
+# Readiness flag: the heavy live computations (findings + the slow OR modules)
+# are warmed in a background thread at startup so the FIRST demo click is instant
+# instead of triggering a multi-second compute on stage. /api/health reports it.
+_WARM = {"ready": False, "warming": [], "done": []}
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,9 +49,46 @@ def _context():
         return json.load(fh)
 
 
+def _warm_caches():
+    """Precompute the expensive endpoints once at startup (background thread)."""
+    jobs = [
+        ("findings", _findings),
+        ("pareto", _pareto),
+        ("rl", _rl),
+        ("demand", optimize.ml_demand),
+        ("emsr", optimize.emsr_protection),
+        ("shadow", optimize.fleet_shadow_prices),
+        ("dea", optimize.dea_efficiency),
+        ("sensitivity", analysis.fuel_sensitivity),
+    ]
+    for name, fn in jobs:
+        _WARM["warming"].append(name)
+        try:
+            fn()
+            _WARM["done"].append(name)
+        except Exception as exc:  # never let a warm-up failure kill the server
+            print(f"[warm] {name} failed: {exc}")
+        finally:
+            _WARM["warming"].remove(name)
+    _WARM["ready"] = True
+    print("[warm] all caches ready")
+
+
+@app.on_event("startup")
+def _on_startup():
+    threading.Thread(target=_warm_caches, daemon=True).start()
+
+
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "service": "air-india-war-room"}
+    """Liveness + warm-up readiness, so the launcher can wait for a hot server."""
+    return {
+        "status": "ok",
+        "service": "air-india-war-room",
+        "ready": _WARM["ready"],
+        "warming": list(_WARM["warming"]),
+        "done": list(_WARM["done"]),
+    }
 
 
 @app.get("/api/findings")
@@ -136,11 +181,31 @@ def demand():
     return optimize.ml_demand()
 
 
-# ---- real live air traffic over India (OpenSky Network, free, no key) ----
-import time as _time
-import json as _json
-import urllib.request as _url
+@app.get("/api/emsr")
+def emsr():
+    """Littlewood/EMSR exact fare-class seat-protection optimum."""
+    return optimize.emsr_protection()
 
+
+@app.get("/api/shadow")
+def shadow():
+    """LP shadow prices: marginal value of a block-hour / one more aircraft."""
+    return optimize.fleet_shadow_prices()
+
+
+@app.get("/api/dea")
+def dea():
+    """DEA route-efficiency scores (one LP per route) with peers + fuel targets."""
+    return optimize.dea_efficiency()
+
+
+@app.get("/api/sensitivity")
+def sensitivity():
+    """Fuel-model stress test: swing each constant ±20%, show findings hold."""
+    return analysis.fuel_sensitivity()
+
+
+# ---- real live air traffic over India (OpenSky Network, free, no key) ----
 _osky = {"t": 0.0, "data": None}
 
 
@@ -150,14 +215,14 @@ def live():
     Live count of aircraft currently over India from the OpenSky Network.
     Cached ~45s; fails gracefully (live=false) so the UI never breaks on stage.
     """
-    now = _time.time()
+    now = time.time()
     if _osky["data"] and now - _osky["t"] < 45:
         return _osky["data"]
     try:
         u = "https://opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=98"
-        req = _url.Request(u, headers={"User-Agent": "AirIndiaWarRoom/1.0"})
-        with _url.urlopen(req, timeout=6) as r:
-            j = _json.load(r)
+        req = urllib.request.Request(u, headers={"User-Agent": "AirIndiaWarRoom/1.0"})
+        with urllib.request.urlopen(req, timeout=6) as r:
+            j = json.load(r)
         states = j.get("states") or []
         sample = []
         for s in states[:80]:

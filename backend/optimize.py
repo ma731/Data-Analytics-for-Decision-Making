@@ -1,19 +1,23 @@
 """
 Air India War Room — Operations Research engine.
 
-Six modules, all computed live from the dataset + engineered fuel model:
-  1. monte_carlo_fuel   — fuel-cost risk under ATF price volatility (simulation)
-  2. optimize_pricing   — revenue-maximising fare curve from estimated elasticity
-  3. nsga2_pareto       — multi-objective fuel-vs-revenue Pareto front (genetic algo)
-  4. fleet_milp         — integer program allocating frequencies across routes
-  5. rl_pricing         — tabular Q-learning agent that learns a booking-horizon policy
-  6. ml_demand          — gradient-boosted fare drivers + econometric price elasticity
+Nine modules, all computed live from the dataset + engineered fuel model:
+  1. monte_carlo_fuel     — fuel-cost risk under ATF price volatility (simulation)
+  2. optimize_pricing     — revenue-maximising fare curve from estimated elasticity
+  3. nsga2_pareto         — multi-objective fuel-vs-revenue Pareto front (genetic algo)
+  4. fleet_milp           — integer program allocating frequencies across routes
+  5. rl_pricing           — tabular Q-learning agent that learns a booking-horizon policy
+  6. ml_demand            — gradient-boosted fare drivers + observed fare/volume gradient
+  7. emsr_protection      — Littlewood's rule, exact fare-class seat protection
+  8. fleet_shadow_prices  — LP relaxation + duality: marginal value of fleet capacity
+  9. dea_efficiency       — data envelopment analysis, one CCR LP per route
 
 Animation-friendly: NSGA-II and RL return per-generation / per-episode snapshots so
 the frontend can animate the optimiser working.
 
-Covers the full decision-analytics toolkit: optimization, simulation, risk
-modelling, reinforcement learning, and machine learning.
+Covers the full decision-analytics toolkit: linear & integer programming, LP duality,
+multi-objective optimisation, simulation, risk modelling, reinforcement learning,
+machine learning, exact revenue management, and efficiency analysis.
 """
 
 from functools import lru_cache
@@ -21,7 +25,10 @@ import numpy as np
 import pandas as pd
 
 import analysis
-from fuel_model import CRUISE_SPEED_KMH, ATF_PRICE_INR_PER_L, JET_A_DENSITY_KG_L, SEATS_NARROWBODY
+from fuel_model import (
+    CRUISE_SPEED_KMH, ATF_PRICE_INR_PER_L, JET_A_DENSITY_KG_L, SEATS_NARROWBODY,
+    fuel_cost_inr,
+)
 
 RNG = np.random.default_rng(42)  # fixed seed -> reproducible for Q&A
 
@@ -42,7 +49,7 @@ def route_table():
     # block hours per flight (airborne proxy) and per-flight economics for a full cabin
     g["block_hours"] = g.gc_km / CRUISE_SPEED_KMH
     g["rev_per_flight"] = g.avg_price * SEATS_NARROWBODY
-    g["fuel_cost_per_flight"] = g.fuel_kg / JET_A_DENSITY_KG_L * ATF_PRICE_INR_PER_L
+    g["fuel_cost_per_flight"] = fuel_cost_inr(g.fuel_kg)
     g["contrib_per_flight"] = g.rev_per_flight - g.fuel_cost_per_flight
     return g.reset_index(drop=True)
 
@@ -117,9 +124,13 @@ def optimize_pricing(elasticity=1.4):
         opt_rev += p_opt * d_opt
         rows.append({"days_left": int(dl), "current_price": round(p0, 0), "optimal_price": round(p_opt, 0)})
     rows.sort(key=lambda x: -x["days_left"])
+    # Report the TRUE uplift. Under a per-window linear demand model each fare is
+    # moved toward its own revenue-maximising point, so this is >= 0 by
+    # construction — but we no longer floor it, so if the clamps ever bite the
+    # number stays honest instead of being silently rounded up to 0.
     uplift = (opt_rev - cur_rev) / cur_rev * 100 if cur_rev else 0
     return {"elasticity": round(float(elasticity), 2), "curve": rows,
-            "revenue_uplift_pct": round(float(max(uplift, 0.0)), 1)}
+            "revenue_uplift_pct": round(float(uplift), 1)}
 
 
 # ----------------------------------------------------------------------------
@@ -178,7 +189,7 @@ def nsga2_pareto(pop_size=60, generations=40):
     rt = route_table()
     R = len(rt)
     rev = rt.rev_per_flight.to_numpy()
-    fuel = (rt.fuel_kg / JET_A_DENSITY_KG_L * ATF_PRICE_INR_PER_L).to_numpy()  # fuel cost INR/flight
+    fuel = fuel_cost_inr(rt.fuel_kg).to_numpy()  # fuel cost INR/flight
     cap = 1000  # total weekly frequencies to distribute across the network
 
     def evaluate(P):
@@ -378,33 +389,324 @@ def rl_pricing(episodes=4000):
 def ml_demand():
     from sklearn.ensemble import HistGradientBoostingRegressor
     from sklearn.inspection import permutation_importance
+    from sklearn.model_selection import GroupShuffleSplit
     df = analysis.load()
     s = df.sample(n=min(40000, len(df)), random_state=0).copy()
+
+    # ---- leakage-proof split: group by FLIGHT so no flight is in both sets ----
+    # A random split would let near-duplicate rows of the same flight (different
+    # days_left) leak train->test and inflate the score. Grouping fixes that, so
+    # the reported R²/MAPE are honest out-of-sample numbers.
+    groups = s["flight"].astype(str).to_numpy()
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=0)
+    tr_idx, te_idx = next(gss.split(s, groups=groups))
+
     cat = ["airline", "source_city", "departure_time", "stops", "arrival_time",
            "destination_city", "class"]
     for c in cat:
         s[c] = s[c].astype("category").cat.codes
     feats = cat + ["duration", "days_left", "gc_km"]
     X, y = s[feats], np.log(s["price"])
+    Xtr, Xte = X.iloc[tr_idx], X.iloc[te_idx]
+    ytr, yte = y.iloc[tr_idx], y.iloc[te_idx]
+    price_te = s["price"].iloc[te_idx].to_numpy()
+
     model = HistGradientBoostingRegressor(max_iter=180, max_depth=7, random_state=0)
-    model.fit(X, y)
-    r2 = float(model.score(X, y))
-    pi = permutation_importance(model, X, y, n_repeats=4, random_state=0, n_jobs=1)
+    model.fit(Xtr, ytr)
+    r2_train = float(model.score(Xtr, ytr))
+    r2_test = float(model.score(Xte, yte))          # the honest, out-of-sample R²
+
+    # ---- point error in rupees + skill vs a naive route×class×stops baseline ----
+    pred_price = np.exp(model.predict(Xte))
+    mae = float(np.mean(np.abs(pred_price - price_te)))
+    mape = float(np.mean(np.abs(pred_price - price_te) / price_te) * 100)
+    base_key = ["source_city", "destination_city", "class", "stops"]
+    base_map = s.iloc[tr_idx].groupby(base_key)["price"].median()
+    base_pred = s.iloc[te_idx].set_index(base_key).index.map(base_map)
+    base_pred = np.where(np.isnan(base_pred.astype(float)),
+                         float(s["price"].iloc[tr_idx].median()), base_pred.astype(float))
+    base_mae = float(np.mean(np.abs(base_pred - price_te)))
+    skill = float(1 - mae / base_mae) if base_mae else 0.0
+
+    # ---- calibrated prediction interval: P10–P90 quantile models + coverage ----
+    cov_lo, cov_hi = [], []
+    for alpha, store in [(0.1, cov_lo), (0.9, cov_hi)]:
+        qm = HistGradientBoostingRegressor(loss="quantile", quantile=alpha,
+                                           max_iter=120, max_depth=7, random_state=0)
+        qm.fit(Xtr, ytr)
+        store.append(qm.predict(Xte))
+    lo, hi = cov_lo[0], cov_hi[0]
+    coverage = float(np.mean((yte.to_numpy() >= lo) & (yte.to_numpy() <= hi)) * 100)
+
+    pi = permutation_importance(model, Xte, yte, n_repeats=4, random_state=0, n_jobs=1)
     imp = sorted([{"feature": f, "importance": round(float(v), 4)}
                   for f, v in zip(feats, pi.importances_mean)],
                  key=lambda d: -d["importance"])
-    # econometric price elasticity per route via log-log OLS (statsmodels)
+    # Log-log OLS of bookings vs fare across the booking horizon (statsmodels).
+    # NB: this is the OBSERVED fare/volume gradient along the booking curve, not a
+    # causal price elasticity — price and volume are both driven by days-left, so
+    # the slope is confounded. We report it (and label it) as a descriptive
+    # gradient and flag the caveat, rather than overclaiming a demand elasticity.
     import statsmodels.api as sm
     eco = df[df["class"] == "Economy"]
     el = eco.groupby("days_left").agg(price=("price", "mean"), q=("price", "size"))
     Xe = sm.add_constant(np.log(el["price"]))
     ols = sm.OLS(np.log(el["q"]), Xe).fit()
-    elasticity = float(ols.params.iloc[1])
+    gradient = float(ols.params.iloc[1])
     return {
-        "r2": round(r2, 3),
+        "r2": round(r2_test, 3),                       # out-of-sample (what the UI shows)
         "importance": imp,
-        "elasticity": round(elasticity, 2),
-        "elasticity_note": "Log-log OLS of bookings vs fare across the booking horizon.",
+        "reliability": {
+            "test_r2": round(r2_test, 3),
+            "train_r2": round(r2_train, 3),
+            "mae_inr": round(mae, 0),
+            "mape_pct": round(mape, 1),
+            "baseline_mae_inr": round(base_mae, 0),
+            "skill_score": round(skill, 3),
+            "interval_coverage_pct": round(coverage, 1),
+            "interval_nominal_pct": 80,
+            "n_train": int(len(tr_idx)),
+            "n_test": int(len(te_idx)),
+            "split": "grouped by flight (no leakage)",
+        },
+        "elasticity": round(gradient, 2),  # kept key for the frontend
+        "fare_volume_gradient": round(gradient, 2),
+        "gradient_r2": round(float(ols.rsquared), 3),
+        "elasticity_note": (
+            "Observed fare/volume gradient (log-log OLS along the booking horizon). "
+            "Descriptive, not a causal elasticity — price and volume both move with "
+            "days-to-departure, so this is confounded by the booking curve."
+        ),
+    }
+
+
+# ----------------------------------------------------------------------------
+# 7. EMSR / LITTLEWOOD — exact fare-class seat protection (revenue management)
+# ----------------------------------------------------------------------------
+@lru_cache(maxsize=1)
+def emsr_protection():
+    """
+    The canonical airline revenue-management decision, solved EXACTLY (not learned).
+
+    Two nested fare classes share one cabin: high-fare (Business) and low-fare
+    (Economy). Economy demand is plentiful and books early; the question is how
+    many seats to PROTECT for late, high-fare Business demand instead of selling
+    them cheap now. Littlewood's rule gives the optimal protection level y*:
+
+        P(Business demand > y*) = fare_low / fare_high
+
+    The high/low FARE RATIO is taken straight from the data (~8x — real, and the
+    whole reason protection pays). Premium DEMAND is an explicit, labelled
+    assumption (fare listings aren't bookings, so we do NOT infer demand from row
+    counts): premium demand ~ Normal with mean = 12% of the cabin, CV 0.4 —
+    industry-typical for a domestic narrowbody. We then sweep the protection level
+    to show the concave revenue curve peaking at the analytical optimum, and the
+    uplift over a cabin that never protects a premium seat.
+
+    This is the exact optimum the RL pricing agent only approximates.
+    """
+    from scipy.stats import norm
+
+    df = analysis.load()
+    fare_high = float(df[df["class"] == "Business"].price.mean())   # data-driven
+    fare_low = float(df[df["class"] == "Economy"].price.mean())     # data-driven
+
+    C = int(SEATS_NARROWBODY)                       # 180-seat narrowbody cabin
+    premium_share = 0.12                            # assumed premium demand share (labelled)
+    mu = premium_share * C                          # mean premium demand / departure
+    cv = 0.4                                         # assumed demand variability (labelled)
+    sigma = cv * mu
+
+    ratio = fare_low / fare_high                     # Littlewood critical ratio
+    # closed-form optimum: protect up to the (1 - ratio) quantile of premium demand
+    y_star = float(norm.ppf(1 - ratio, loc=mu, scale=sigma))
+    y_star = int(min(max(round(y_star), 0), C))
+
+    def expected_min(p):                             # E[min(D_high, p)], D~N(mu,sigma)
+        z = (p - mu) / sigma
+        e_excess = (mu - p) * (1 - norm.cdf(z)) + sigma * norm.pdf(z)  # E[(D-p)+]
+        return mu - e_excess
+
+    def revenue(p):                                  # per-departure expected revenue
+        return fare_low * (C - p) + fare_high * expected_min(p)
+
+    curve = [{"protection": p, "revenue": round(revenue(p), 0)} for p in range(0, 61)]
+    rev_opt = revenue(y_star)
+    rev_naive = revenue(0)                            # FCFS: economy fills the cabin
+    uplift = (rev_opt - rev_naive) / rev_naive * 100 if rev_naive else 0.0
+
+    return {
+        "fare_high": round(fare_high, 0),
+        "fare_low": round(fare_low, 0),
+        "fare_ratio": round(fare_high / fare_low, 1),
+        "capacity": C,
+        "mean_premium_demand": round(mu, 1),
+        "sd_premium_demand": round(sigma, 1),
+        "premium_share": premium_share,
+        "cv": cv,
+        "littlewood_ratio": round(ratio, 3),
+        "protection_optimal": y_star,
+        "booking_limit_economy": C - y_star,
+        "curve": curve,
+        "rev_optimal": round(rev_opt, 0),
+        "rev_naive": round(rev_naive, 0),
+        "uplift_pct": round(uplift, 1),
+        "note": ("Fares are data-driven; premium demand is an assumption "
+                 "(~12% of cabin, CV 0.4 — listings aren't bookings). Uplift is vs a "
+                 "cabin that never protects a premium seat. Protection is exact "
+                 "(Littlewood's rule)."),
+    }
+
+
+# ----------------------------------------------------------------------------
+# 8. LP SHADOW PRICES — marginal value of fleet capacity (LP duality)
+# ----------------------------------------------------------------------------
+@lru_cache(maxsize=1)
+def fleet_shadow_prices(weekly_hours_per_aircraft=42):
+    """
+    The integer fleet program tells you WHAT to fly. Its LP relaxation tells you
+    WHAT ONE MORE HOUR IS WORTH. We solve the continuous LP
+
+        max  sum contrib_r * x_r
+        s.t. sum block_hours_r * x_r <= H        (the fleet block-hour budget)
+             1 <= x_r <= 20
+
+    and read the DUAL of the budget constraint: the shadow price = the extra
+    weekly contribution unlocked by one more block-hour of fleet capacity. Scale
+    by a typical aircraft's weekly hours and you get the marginal value of one
+    more aircraft — the exact 'should we lease another jet?' number a board wants.
+    """
+    from scipy.optimize import linprog
+
+    rt = route_table()
+    contrib = rt.contrib_per_flight.to_numpy()
+    bh = rt.block_hours.to_numpy()
+    R = len(rt)
+    # Capacity must be SCARCE for a shadow price to mean anything. Flying every
+    # route at the frequency cap needs ~sum(bh*20) hours; we set the budget below
+    # that so the constraint binds and the dual is informative (the realistic case
+    # — an airline never has spare aircraft sitting idle).
+    H = float(round(0.55 * (bh * 20).sum(), -1))
+
+    c = -contrib                                     # linprog minimises
+    A_ub = bh.reshape(1, -1)
+    b_ub = [H]
+    bounds = [(1, 20)] * R
+    res = linprog(c=c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method="highs")
+
+    # dual (marginal) of the block-hour budget; HiGHS returns it on ineqlin
+    shadow = float(-res.ineqlin.marginals[0]) if res.success else 0.0  # ₹/block-hour
+    hours_used = float(bh @ res.x) if res.success else 0.0
+    binding = abs(hours_used - H) < 1e-3
+    total_contrib = float(contrib @ res.x) if res.success else 0.0
+
+    # routes pinned at the upper frequency cap want more service than allowed
+    at_cap = [rt.iloc[i]["route"] for i in range(R)
+              if res.success and res.x[i] > 19.999]
+
+    # sweep H to show the (piecewise-linear) value-of-capacity curve: contribution
+    # rises with capacity, then flattens once every route hits its frequency cap.
+    h_lo = float((bh * 1).sum())                     # all routes at min service
+    h_hi = float((bh * 20).sum())                    # all routes at the cap
+    sweep = []
+    for k in range(13):
+        h = round(h_lo + (h_hi - h_lo) * k / 12, 0)
+        r2 = linprog(c=c, A_ub=bh.reshape(1, -1), b_ub=[h], bounds=bounds, method="highs")
+        sweep.append({"hours": round(h, 0),
+                      "contrib_cr": round(float(contrib @ r2.x) / 1e7, 2) if r2.success else None})
+
+    value_per_aircraft = shadow * weekly_hours_per_aircraft
+    return {
+        "block_hours": H,
+        "total_contrib_cr": round(total_contrib / 1e7, 2),
+        "hours_used": round(hours_used, 1),
+        "budget_binding": bool(binding),
+        "shadow_price_per_block_hour": round(shadow, 0),
+        "assumed_aircraft_weekly_hours": weekly_hours_per_aircraft,
+        "value_per_aircraft_cr": round(value_per_aircraft / 1e7, 2),
+        "routes_at_cap": at_cap,
+        "sweep": sweep,
+        "note": ("Shadow price = dual of the block-hour budget in the LP relaxation: "
+                 "the marginal weekly contribution of one more hour of fleet capacity. "
+                 "Binding budget => every freed hour is worth exactly this much."),
+    }
+
+
+# ----------------------------------------------------------------------------
+# 9. DEA — Data Envelopment Analysis: route efficiency as an LP (one per route)
+# ----------------------------------------------------------------------------
+@lru_cache(maxsize=1)
+def dea_efficiency():
+    """
+    Turns the Efficiency Frontier from a ratio into a RIGOROUS LP score. Each
+    route is a decision-making unit consuming an input (fuel per seat) to produce
+    outputs (revenue per seat, passenger volume). The input-oriented CCR model
+    solves, for every route o, one LP:
+
+        min  theta
+        s.t. sum_j lambda_j * input_j   <= theta * input_o
+             sum_j lambda_j * output_rj >= output_ro   (each output r)
+             lambda_j >= 0
+
+    theta in (0,1]: 1.0 = on the efficiency frontier; 0.8 = could deliver the same
+    revenue & volume on 80% of the fuel. We also return each route's PEERS (the
+    benchmark routes it's measured against) and its fuel target.
+    """
+    from scipy.optimize import linprog
+
+    rt = route_table().copy()
+    rt["rev_per_seat"] = rt.avg_price                  # output 1
+    inp = rt.fuel_kg_per_seat.to_numpy(dtype=float)    # input
+    out1 = rt.rev_per_seat.to_numpy(dtype=float)       # output: revenue/seat
+    out2 = rt.volume.to_numpy(dtype=float)             # output: passengers served
+    R = len(rt)
+
+    results = []
+    for o in range(R):
+        # variables: [theta, lambda_1..lambda_R]; minimise theta
+        c = np.zeros(R + 1); c[0] = 1.0
+        A_ub, b_ub = [], []
+        # input:  sum lambda_j inp_j - theta*inp_o <= 0
+        row = np.zeros(R + 1); row[0] = -inp[o]; row[1:] = inp
+        A_ub.append(row); b_ub.append(0.0)
+        # outputs: -(sum lambda_j out_j) <= -out_o
+        for out in (out1, out2):
+            row = np.zeros(R + 1); row[1:] = -out
+            A_ub.append(row); b_ub.append(-out[o])
+        bounds = [(0, None)] * (R + 1)
+        res = linprog(c=c, A_ub=np.array(A_ub), b_ub=np.array(b_ub), bounds=bounds, method="highs")
+        theta = float(res.x[0]) if res.success else 1.0
+        lam = res.x[1:] if res.success else np.zeros(R)
+        peers = sorted(
+            [{"route": rt.iloc[j]["route"], "weight": round(float(lam[j]), 2)}
+             for j in range(R) if lam[j] > 1e-4 and j != o],
+            key=lambda d: -d["weight"])[:3]
+        results.append({
+            "route": rt.iloc[o]["route"],
+            "src": rt.iloc[o]["source_city"],
+            "dst": rt.iloc[o]["destination_city"],
+            "efficiency": round(theta, 3),
+            "fuel_kg_per_seat": round(float(inp[o]), 1),
+            "target_fuel_kg_per_seat": round(float(theta * inp[o]), 1),
+            "fuel_savings_pct": round((1 - theta) * 100, 1),
+            "rev_per_seat": round(float(out1[o]), 0),
+            "volume": int(out2[o]),
+            "on_frontier": theta > 0.999,
+            "peers": peers,
+        })
+
+    results.sort(key=lambda d: -d["efficiency"])
+    effs = [r["efficiency"] for r in results]
+    return {
+        "inputs": ["fuel_kg_per_seat"],
+        "outputs": ["rev_per_seat", "volume"],
+        "n_routes": R,
+        "n_efficient": int(sum(1 for r in results if r["on_frontier"])),
+        "mean_efficiency": round(float(np.mean(effs)), 3),
+        "routes": results,
+        "note": ("Input-oriented CCR DEA, one LP per route. Efficiency 1.0 = on the "
+                 "frontier; below 1.0 = same revenue & volume achievable on less fuel. "
+                 "Peers are the benchmark routes defining each target."),
     }
 
 
@@ -413,7 +715,10 @@ if __name__ == "__main__":
     for name, fn in [("monte_carlo", lambda: monte_carlo_fuel()),
                      ("pricing", lambda: optimize_pricing()),
                      ("fleet", lambda: fleet_milp()),
-                     ("ml", lambda: ml_demand())]:
+                     ("ml", lambda: ml_demand()),
+                     ("emsr", lambda: emsr_protection()),
+                     ("shadow", lambda: fleet_shadow_prices()),
+                     ("dea", lambda: dea_efficiency())]:
         t = time.time()
         out = fn()
         keys = list(out.keys())

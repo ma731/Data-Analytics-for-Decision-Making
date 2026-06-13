@@ -19,9 +19,34 @@ export default function MLDemand() {
     <div className="panel">
       <h3 className="panel-h">ML demand engine — what actually drives the fare</h3>
       <p className="panel-sub">
-        A gradient-boosted model learns the fare from 40,000 flights ({d ? `R² = ${d.r2}` : "training…"}). The bars rank
-        what moves price most — the levers a revenue team can actually pull.
+        A gradient-boosted model predicts the fare, validated on a held-out{" "}
+        {d ? `${d.reliability?.split}` : "flight-grouped"} split ({d ? `out-of-sample R² = ${d.r2}` : "training…"}). The
+        bars rank what moves price most — the levers a revenue team can actually pull.
       </p>
+      {d?.reliability && (
+        <div className="readouts" style={{ gridTemplateColumns: "repeat(4, 1fr)", marginTop: 0, marginBottom: 4 }}>
+          <div className="readout">
+            <div className="l">Out-of-sample error</div>
+            <div className="v" style={{ fontSize: 22 }}>{d.reliability.mape_pct}%</div>
+            <div className="reur">MAPE · ±₹{d.reliability.mae_inr.toLocaleString("en-US")} MAE</div>
+          </div>
+          <div className="readout">
+            <div className="l">Skill vs naive baseline</div>
+            <div className="v" style={{ fontSize: 22, color: "var(--positive)" }}>+{Math.round(d.reliability.skill_score * 100)}%</div>
+            <div className="reur">vs route×class median fare</div>
+          </div>
+          <div className="readout">
+            <div className="l">80% interval coverage</div>
+            <div className="v" style={{ fontSize: 22 }}>{d.reliability.interval_coverage_pct}%</div>
+            <div className="reur">P10–P90, target {d.reliability.interval_nominal_pct}%</div>
+          </div>
+          <div className="readout">
+            <div className="l">Overfit gap</div>
+            <div className="v" style={{ fontSize: 22 }}>{(d.reliability.train_r2 - d.reliability.test_r2).toFixed(3)}</div>
+            <div className="reur">train {d.reliability.train_r2} → test {d.reliability.test_r2}</div>
+          </div>
+        </div>
+      )}
       <div style={{ width: "100%", height: 330 }}>
         <ResponsiveContainer>
           <BarChart layout="vertical" data={data} margin={{ top: 6, right: 24, bottom: 6, left: 10 }}>
@@ -40,9 +65,10 @@ export default function MLDemand() {
         </ResponsiveContainer>
       </div>
       <p className="chart-caption">
-        {d && <>Cabin class and timing dominate; and the econometric price-elasticity comes out at{" "}
-        <b style={{ color: "var(--accent)" }}>{Math.abs(d.elasticity)}</b> — flyers are{" "}
-        {Math.abs(d.elasticity) > 1 ? "elastic" : "inelastic"}, which is exactly what the price optimiser exploits.</>}
+        {d && <>Cabin class and timing dominate. The fare/volume gradient along the booking curve is{" "}
+        <b style={{ color: "var(--accent)" }}>{Math.abs(d.elasticity)}</b> (log-log OLS, descriptive — not a
+        causal elasticity), confirming fares climb steeply as departure nears: exactly the panic-tax curve the
+        price optimiser exploits.</>}
       </p>
     </div>
   );
