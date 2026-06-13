@@ -132,9 +132,11 @@ premium-cabin supply outright.
 
 | Move | Action | Conservative impact |
 |---|---|---|
-| **1 · Re-time the revenue curve** | Dynamic-pricing floor lifting early fares | **+₹1,378 / seat** at 15% capture, across 129,271 far-out bookings |
-| **2 · Kill inefficient connections** | Re-route 2+ stop traffic to nonstop/1-stop | **−9.9 kg fuel & −31.3 kg CO₂ / seat** |
-| **3 · Own the premium cabin** | Protect & grow business class pre-merger | Defends an **8×** revenue-per-seat segment |
+| **1 · Re-time the revenue curve** | Dynamic-pricing floor lifting early fares | **+₹1,378 (≈ €15) / seat** at 15% capture, across 129,271 far-out bookings |
+| **2 · Kill inefficient connections** | Re-route 2+ stop traffic to nonstop/1-stop | **−9.9 kg fuel & −31.3 kg CO₂ / seat** (≈ ₹1,238 / €14 fuel saved) |
+| **3 · Own the premium cabin** | Protect & grow business class pre-merger | Defends an **8×** segment (**€584 vs €73** / seat) |
+
+*Currency note: ₹90 ≈ €1 throughout; 1 crore = ₹10M ≈ €110K.*
 
 **The ask:** a 90-day pilot across all three moves.
 
