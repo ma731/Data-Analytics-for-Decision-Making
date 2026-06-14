@@ -253,6 +253,164 @@
   font-weight: 600;
 }
 
+/* ===================== STRATEGIC RATIONALE (the board memo) ===================== */
+.strat-grid {
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+}
+@media (max-width: 1000px) {
+  .strat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.strat {
+  display: flex;
+  flex-direction: column;
+  border-top: 3px solid var(--data-blue);
+  --accent-c: var(--data-blue-bright);
+}
+.strat.s2 {
+  border-top-color: var(--accent);
+  --accent-c: var(--accent);
+}
+.strat.s3 {
+  border-top-color: var(--brand-gold);
+  --accent-c: var(--brand-gold);
+}
+.strat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.strat-num {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--accent-c);
+  font-variant-numeric: tabular-nums;
+}
+.strat-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.15;
+}
+/* the wager — set apart like a memo subject line */
+.strat-bet {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  border-left: 2px solid var(--accent-c);
+  padding-left: 13px;
+  margin: 0 0 18px;
+}
+/* the two-sided ledger with a connecting spine */
+.strat-ledger {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-left: 22px;
+  flex: 1;
+}
+.strat-ledger::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--positive), var(--neg, var(--brand-red)) 55%, var(--brand-gold));
+  opacity: 0.45;
+}
+.strat-row {
+  position: relative;
+}
+.strat-row::before {
+  position: absolute;
+  left: -22px;
+  top: 1px;
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+}
+.strat-row.edge::before {
+  content: "▲";
+  color: var(--positive);
+  font-size: 9px;
+  top: 3px;
+}
+.strat-row.catch::before {
+  content: "▼";
+  color: var(--brand-red);
+  font-size: 9px;
+  top: 3px;
+}
+.strat-row.hedge::before {
+  content: "→";
+  color: var(--brand-gold);
+  top: 0;
+}
+.strat-k {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.strat-row.edge .strat-k {
+  color: var(--positive);
+}
+.strat-row.catch .strat-k {
+  color: var(--brand-red);
+}
+.strat-row.hedge .strat-k {
+  color: var(--brand-gold);
+}
+.strat-row p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+/* execution-profile chips: capex / reversibility / timeframe at a glance */
+.strat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 18px 0 14px;
+}
+.strat-chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+/* the quantified tie-back to the recommendation */
+.strat-payoff {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--positive);
+  border-top: 1px solid var(--border);
+  padding-top: 13px;
+}
+
 /* ===================== CINEMATIC HERO ===================== */
 .hero {
   position: relative;

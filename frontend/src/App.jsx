@@ -8,6 +8,7 @@ import StopsCrime from "./components/StopsCrime.jsx";
 import BusinessWhitespace from "./components/BusinessWhitespace.jsx";
 import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
+import StrategicRationale from "./components/StrategicRationale.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
 import Hero from "./components/Hero.jsx";
 import LiveMap from "./components/LiveMap.jsx";
@@ -185,6 +186,15 @@ export default function App() {
           delay={60}
         >
           <Recommendations f={f} />
+        </Section>
+
+        <Section
+          eyebrow="The business case"
+          title="Why these are the right bets — and what we give up"
+          sub="Every move is a wager with a downside. Here is the upside, the honest catch, and how we de-risk each one before a rupee is committed."
+          delay={60}
+        >
+          <StrategicRationale f={f} />
         </Section>
 
         <Banner
