@@ -227,13 +227,23 @@
   }
 }
 .rec {
-  border-top: 3px solid var(--data-blue);
+  position: relative;
 }
-.rec.r2 {
-  border-top-color: var(--accent);
+.rec::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  width: 46px;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: var(--data-blue);
 }
-.rec.r3 {
-  border-top-color: var(--brand-gold);
+.rec.r2::before {
+  background: var(--accent);
+}
+.rec.r3::before {
+  background: var(--brand-gold);
 }
 .rec h3 {
   font-size: 17px;
@@ -264,17 +274,25 @@
   }
 }
 .strat {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-top: 3px solid var(--data-blue);
   --accent-c: var(--data-blue-bright);
 }
+.strat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  width: 46px;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: var(--accent-c);
+}
 .strat.s2 {
-  border-top-color: var(--accent);
   --accent-c: var(--accent);
 }
 .strat.s3 {
-  border-top-color: var(--brand-gold);
   --accent-c: var(--brand-gold);
 }
 .strat-head {
@@ -411,6 +429,124 @@
   padding-top: 13px;
 }
 
+/* ===================== ASIDE PULL-STATS (fills tall commentary panels) ===================== */
+.aside-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.aside-stat .v {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(30px, 3.2vw, 42px);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--accent);
+}
+.aside-stat .l {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 9px;
+  line-height: 1.4;
+}
+@media (max-width: 520px) {
+  .aside-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================== TAM / SAM / SOM FUNNEL ===================== */
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+.funnel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) 1fr;
+  gap: 20px;
+  align-items: center;
+}
+.funnel-track {
+  width: 100%;
+}
+.funnel-bar {
+  height: 56px;
+  min-width: 70px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.funnel-key {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: 0.04em;
+  color: #08111f;
+}
+.funnel-meta {
+  min-width: 0;
+}
+.funnel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.funnel-head b {
+  font-size: 15px;
+}
+.funnel-eur {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-gold);
+}
+.funnel-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.45;
+}
+@media (max-width: 720px) {
+  .funnel-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+/* ===================== ACT DIVIDERS ===================== */
+.act-hero {
+  position: relative;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+}
+.act-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 58px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(201, 154, 59, 0.5);
+  margin-bottom: 10px;
+}
+.act-hero .kicker {
+  color: var(--brand-gold);
+}
+@media (max-width: 720px) {
+  .act-num {
+    font-size: 44px;
+  }
+}
+
 /* ===================== CINEMATIC HERO ===================== */
 .hero {
   position: relative;
@@ -507,8 +643,8 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(48px, 8.4vw, 112px);
-  line-height: 0.92;
-  letter-spacing: -0.035em;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
   color: #fff;
   text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
   margin: 0;
@@ -700,13 +836,12 @@
   color: var(--accent);
 }
 .or-hero h2 {
-  font-size: clamp(34px, 5vw, 60px);
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
   margin: 14px auto 12px;
   max-width: 18ch;
-  background: linear-gradient(120deg, #fff 20%, var(--data-blue-bright) 60%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f7f4ee;
 }
 .or-hero p {
   color: var(--text-muted);
@@ -936,8 +1071,8 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(48px, 9vw, 120px);
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
   color: #fff;
   text-shadow: 0 6px 40px rgba(0, 0, 0, 0.55);
 }
@@ -1304,8 +1439,8 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(34px, 5.2vw, 68px);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
+  line-height: 1.0;
+  letter-spacing: -0.015em;
   color: #fff;
   text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
   max-width: 18ch;

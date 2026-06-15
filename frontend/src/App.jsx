@@ -9,6 +9,9 @@ import BusinessWhitespace from "./components/BusinessWhitespace.jsx";
 import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
 import StrategicRationale from "./components/StrategicRationale.jsx";
+import DecisionTree from "./components/DecisionTree.jsx";
+import McdmRanking from "./components/McdmRanking.jsx";
+import MarketSizing from "./components/MarketSizing.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
 import Hero from "./components/Hero.jsx";
 import LiveMap from "./components/LiveMap.jsx";
@@ -31,6 +34,18 @@ import "./components/components.css";
 function Reveal({ children }) {
   const ref = useReveal();
   return <div ref={ref}>{children}</div>;
+}
+
+// Top-level act divider — the three movements of the story (Diagnosis → OR → Strategy).
+function ActHero({ num, kicker, title, sub, id }) {
+  return (
+    <div className="or-hero act-hero" id={id}>
+      <div className="act-num" aria-hidden="true">{num}</div>
+      <div className="kicker">{kicker}</div>
+      <h2>{title}</h2>
+      {sub && <p>{sub}</p>}
+    </div>
+  );
 }
 
 function CommandBar() {
@@ -97,6 +112,13 @@ export default function App() {
       <Hero />
       <CommandBar />
       <main className="shell" id="war-room">
+        <ActHero
+          num="I"
+          kicker="Act I · The Diagnosis"
+          title="What the data reveals"
+          sub="Descriptive analytics: read 300,153 flights and the engineered fuel model to find where the money and the carbon are leaking — before prescribing anything."
+        />
+
         <Section
           eyebrow="The opening diagnostic · January 2022, Tata takes the controls"
           title="A national carrier, just privatised. Two levers nobody is pulling: fuel and price."
@@ -133,6 +155,16 @@ export default function App() {
                 <b style={{ color: "var(--text)" }}>{f.panic_tax.far_out_share}%</b> of demand sits —
                 without needing the punishing last-minute spike that erodes trust.
               </p>
+              <div className="aside-stats">
+                <div className="aside-stat">
+                  <div className="v">{f.panic_tax.multiplier}×</div>
+                  <div className="l">fare swing, early → last-minute (same seat, same cost)</div>
+                </div>
+                <div className="aside-stat">
+                  <div className="v" style={{ color: "var(--brand-gold)" }}>{f.panic_tax.far_out_share}%</div>
+                  <div className="l">of seats sell in the cheapest, most under-priced window</div>
+                </div>
+              </div>
             </div>
           </div>
         </Section>
@@ -154,6 +186,20 @@ export default function App() {
                 takeoff cycle of fuel saved — which is why our model penalises stops directly rather
                 than trusting gate-to-gate duration.
               </p>
+              <div className="aside-stats">
+                <div className="aside-stat">
+                  <div className="v" style={{ color: "var(--data-blue-bright)" }}>
+                    {(f.stops[2].avg_price / f.stops[0].avg_price).toFixed(1)}×
+                  </div>
+                  <div className="l">the fare of a nonstop, for a 2+ stop itinerary</div>
+                </div>
+                <div className="aside-stat">
+                  <div className="v">
+                    {(f.stops[2].avg_fuel_kg_per_seat / f.stops[0].avg_fuel_kg_per_seat).toFixed(1)}×
+                  </div>
+                  <div className="l">the fuel per seat, for the same 2+ stop trip</div>
+                </div>
+              </div>
             </div>
           </div>
         </Section>
@@ -179,24 +225,6 @@ export default function App() {
           <RouteExplorer />
         </Section>
 
-        <Section
-          eyebrow="The decision"
-          title="Three moves, quantified"
-          sub="What the new owner should do on day one — and the upside of acting."
-          delay={60}
-        >
-          <Recommendations f={f} />
-        </Section>
-
-        <Section
-          eyebrow="The business case"
-          title="Why these are the right bets — and what we give up"
-          sub="Every move is a wager with a downside. Here is the upside, the honest catch, and how we de-risk each one before a rupee is committed."
-          delay={60}
-        >
-          <StrategicRationale f={f} />
-        </Section>
-
         <Banner
           img="/airindia-poster.jpg"
           kicker="The network"
@@ -215,9 +243,10 @@ export default function App() {
           <Reveal><LiveMap /></Reveal>
         </Section>
 
-        {/* ===================== OPERATIONS RESEARCH ACT ===================== */}
-        <div className="or-hero" id="or">
-          <div className="kicker">From insight to action · the optimisation engine</div>
+        {/* ===================== ACT II · OPERATIONS RESEARCH ===================== */}
+        <div className="or-hero act-hero" id="or">
+          <div className="act-num" aria-hidden="true">II</div>
+          <div className="kicker">Act II · Operations Research</div>
           <h2>We don&rsquo;t just see the problem. We compute the answer.</h2>
           <p>
             Descriptive analytics tells you what happened. Operations research tells you exactly what to do. Nine live
@@ -294,6 +323,59 @@ export default function App() {
           delay={40}
         >
           <Reveal><SensitivityTornado /></Reveal>
+        </Section>
+
+        {/* ===================== ACT III · BUSINESS STRATEGY ===================== */}
+        <ActHero
+          num="III"
+          kicker="Act III · Business Strategy"
+          title="From the optimum to the boardroom"
+          sub="The maths is settled. Now the decision: what to do, what we trade away, which move comes first, how hard to push under uncertainty — and how big the prize really is."
+        />
+
+        <Section
+          eyebrow="The decision"
+          title="Three moves, quantified"
+          sub="What the new owner should do on day one — and the upside of acting."
+          delay={60}
+        >
+          <Recommendations f={f} />
+        </Section>
+
+        <Section
+          eyebrow="The business case"
+          title="Why these are the right bets — and what we give up"
+          sub="Every move is a wager with a downside. Here is the upside, the honest catch, and how we de-risk each one before a rupee is committed."
+          delay={60}
+        >
+          <StrategicRationale f={f} />
+        </Section>
+
+        <Section
+          eyebrow="Decision analysis · under uncertainty"
+          title="How hard to push — and what certainty is worth"
+          sub="We can't know how demand reacts, so we weigh each option by expected value across both futures, and ask how confident we'd need to be for the answer to change."
+          delay={40}
+        >
+          <Reveal><DecisionTree /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="Multi-criteria decision · what comes first"
+          title="Three good moves, one running order"
+          sub="Six competing criteria, no move that wins on all of them. TOPSIS collapses the trade-off into a defensible sequence."
+          delay={40}
+        >
+          <Reveal><McdmRanking /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="Market sizing · the prize"
+          title="How big is the opportunity, really?"
+          sub="Top-down from the whole domestic market to the share Tata serves today — the base every move grows from."
+          delay={40}
+        >
+          <Reveal><MarketSizing /></Reveal>
         </Section>
 
         <Finale />
