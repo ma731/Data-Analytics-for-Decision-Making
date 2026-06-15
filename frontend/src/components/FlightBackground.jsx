@@ -16,6 +16,7 @@ export default function FlightBackground() {
     let arcs = [];
     let t = 0;
     let running = true;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -118,15 +119,15 @@ export default function FlightBackground() {
         ctx.fill();
       }
 
-      raf = requestAnimationFrame(frame);
+      if (!reduce && running) raf = requestAnimationFrame(frame);
     }
 
     resize();
-    frame();
+    frame(); // paints once; under reduced-motion it stops here (static frame)
     window.addEventListener("resize", resize);
     const onVis = () => {
       running = !document.hidden;
-      if (running) frame();
+      if (running && !reduce) frame();
     };
     document.addEventListener("visibilitychange", onVis);
     return () => {

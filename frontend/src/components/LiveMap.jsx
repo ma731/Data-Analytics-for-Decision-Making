@@ -207,7 +207,7 @@ export default function LiveMap() {
       </p>
       <div className="livemap-grid">
         <div className="livemap-canvas-wrap">
-          <canvas ref={canvasRef} aria-label="Animated live map of flights across India" />
+          <canvas ref={canvasRef} role="img" aria-label="Animated live map of flights across India" />
           <div className={`live-badge ${live?.live ? "on" : "off"}`}>
             <span className="dot" />
             {live?.live ? `LIVE · ${live.count} aircraft over India` : "LIVE feed reconnecting…"}

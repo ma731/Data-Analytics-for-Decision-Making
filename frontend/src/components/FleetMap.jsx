@@ -147,11 +147,12 @@ export default function FleetMap() {
         <div className="slider">
           <div className="lab"><span>Fleet block-hours / week</span><b>{hours.toLocaleString("en-US")}h</b></div>
           <input type="range" min="1500" max="9000" step="250" value={hours} aria-label="Fleet block hours"
+            aria-valuetext={`${hours.toLocaleString("en-US")} block hours per week`}
             onChange={(e) => onSlide(+e.target.value)} />
         </div>
       </div>
       <div className="map-wrap">
-        <canvas ref={canvasRef} style={{ width: "100%", height: "100%" }} aria-label="Animated map of optimised flight network across India" />
+        <canvas ref={canvasRef} role="img" style={{ width: "100%", height: "100%" }} aria-label="Animated map of optimised flight network across India" />
       </div>
       {data && (
         <div className="readouts" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>

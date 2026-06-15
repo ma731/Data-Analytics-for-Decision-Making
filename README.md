@@ -18,7 +18,7 @@ backend/      FastAPI — serves the fuel model, findings, AND a live OR engine
   analysis.py     applies the model across the dataset -> strategic findings
   optimize.py     operations-research engine (9 modules, see below)
   business.py     decision analysis + business case (decision tree, MCDM, TAM/SAM/SOM)
-  app.py          API: /api/findings, /api/route, /api/context + 12 live endpoints
+  app.py          API: /api/findings, /api/route, /api/context + 9 OR + 3 decision endpoints
 frontend/     React + Vite dashboard (Recharts), Fraunces editorial type on a dark
               cinematic theme. Organised as three acts: Diagnosis -> Operations
               Research -> Business Strategy, ending on the money number.

@@ -12,13 +12,16 @@ export default function Recommendations({ f }) {
       <div className="panel rec r1">
         <h3>1 · Re-time the revenue curve</h3>
         <p>
-          {pc.far_out_flights.toLocaleString("en-US")} far-out economy bookings sit{" "}
+          {pc.far_out_flights.toLocaleString("en-US")} far-out economy fares sit{" "}
           {fmtINR(pc.gap_per_seat_inr)} ({inrToEUR(pc.gap_per_seat_inr)}) below the last-minute
           fare. Lift early fares modestly with dynamic pricing instead of giving the seat away.
         </p>
         <div className="impact">
           + {fmtINR(pc.uplift_per_far_seat_inr)} ({inrToEUR(pc.uplift_per_far_seat_inr)}) / seat at a
           conservative {pc.capture_rate_pct}% capture
+        </div>
+        <div className="rec-invest">
+          <b>Invest:</b> RM / dynamic-pricing tooling, software-only · payback in weeks
         </div>
       </div>
 
@@ -33,6 +36,9 @@ export default function Recommendations({ f }) {
           − {fmtNum1(sf.fuel_save_kg_per_seat)} kg fuel &amp; {fmtNum1(sf.co2_save_kg_per_seat)} kg
           CO₂ / seat &nbsp;·&nbsp; ≈ {fmtINR(fuelSaveInr)} ({inrToEUR(fuelSaveInr)}) saved
         </div>
+        <div className="rec-invest">
+          <b>Invest:</b> schedule &amp; network re-banking, no fleet capex · payback 1–2 seasons
+        </div>
       </div>
 
       <div className="panel rec r3">
@@ -45,6 +51,9 @@ export default function Recommendations({ f }) {
         <div className="impact">
           {f.business.premium_multiple}× revenue per premium seat —{" "}
           {inrToEUR(f.business.business_avg)} vs {inrToEUR(f.business.economy_avg)}
+        </div>
+        <div className="rec-invest">
+          <b>Invest:</b> protect first (zero capex via EMSR), then cabins &amp; lounges · payback in years
         </div>
       </div>
     </div>

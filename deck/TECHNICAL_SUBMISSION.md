@@ -178,7 +178,23 @@ are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
 efficiency frontier into its provably-optimal form — and EMSR/LP/DEA add the
 exact-optimal, marginal-value, and efficiency-scoring lenses alongside them.
 
-## 6c. Threats to validity (what a skeptic should attack first)
+## 6c. Decision analysis & business case (`backend/business.py`)
+
+The OR engine finds what's optimal; a thin decision-analysis layer turns it into a
+board-level call — all computed live from the findings:
+
+| Module | Method | What it answers |
+|---|---|---|
+| **Decision tree** | Expected monetary value across demand-response states, with EVPI and the probability flip-point | "How aggressively do we roll out dynamic pricing?" EMV favours the aggressive rollout (~₹151 cr/yr vs ₹94 cr); EVPI is small (~₹12 cr), and the recommendation only flips if you believe demand softens >75% of the time. |
+| **MCDM (TOPSIS)** | Six weighted criteria ranked by closeness to the ideal, cross-checked with a weighted sum and a 4,000-draw weight-stability test | "Which move first?" Re-time pricing ranks #1 (stable in ~66% of perturbed weightings, mean rank 1.4), premium #2, connections #3. |
+| **Market sizing** | TAM / SAM / SOM funnel from one cited macro figure + labelled assumptions | "How big is the prize?" ≈ €7.3B domestic → €2.2B six-metro → €405M Tata served base the moves grow. |
+
+The live app is organised as three acts — **Diagnosis** (descriptive), **Operations
+Research** (prescriptive), **Business Strategy** (the decision) — ending on the money number.
+
+---
+
+## 6d. Threats to validity (what a skeptic should attack first)
 
 We hold the project to a research standard: a limitation you **scope and own** is
 defensible; one you hide is a finding waiting to be demolished. The honest threats:
@@ -206,10 +222,15 @@ defensible; one you hide is a finding waiting to be demolished. The honest threa
    sweep and flip-point**; the MCDM ships a **weight-stability check** (re-ranking
    across 4,000 Gaussian-perturbed weightings). A ranking that survives the weights
    is a finding; one that flips is an opinion. We report which.
-4. **The fuel model is robust, not validated.** The ±20% sensitivity (Spearman ≈
-   0.997) shows the conclusions don't depend on any single constant — it does **not**
-   prove accuracy, because there is no fuel ground truth in this dataset to validate
-   against. It is a transparent engineered estimate, labelled as such everywhere.
+4. **The fuel model is robust, and now has one external anchor.** The ±20%
+   sensitivity (Spearman ≈ 0.997) shows the conclusions don't depend on any single
+   constant — but note it holds great-circle distance *fixed* (distance is geometric,
+   not assumed), so it stress-tests the engineered constants, not the dominant
+   distance driver. There is no per-flight fuel ground truth in the dataset; as a
+   sanity check the model's **Delhi–Mumbai nonstop estimate (~4.2 t)** lands inside
+   the published **A320 trip-fuel range (~3.5–4.5 t** for a ~1.4 h sector) — one
+   external check (enforced by a unit test), not a full calibration. Every figure is
+   still a labelled estimate.
 5. **Staleness & seasonality.** Data is Feb–Mar 2022; annual figures scale the
    two-month sample ×6, which ignores seasonality. The Vistara merger (completed 2024)
    post-dates the data, so "pre-merger" framing is a narrative device for the 2022
