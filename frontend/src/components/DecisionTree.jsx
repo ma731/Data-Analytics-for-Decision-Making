@@ -40,7 +40,7 @@ export default function DecisionTree() {
         </div>
         <div className="readout">
           <div className="l">Decision flips below</div>
-          <div className="v">{d ? `${Math.round(d.flip_probability * 100)}%` : "—"}</div>
+          <div className="v">{d && d.flip_probability != null ? `${Math.round(d.flip_probability * 100)}%` : "—"}</div>
           {d && <div className="reur">we believe {Math.round(d.current_p_hold * 100)}% — comfortably clear</div>}
         </div>
       </div>
@@ -104,8 +104,9 @@ export default function DecisionTree() {
         more research wouldn&rsquo;t change much.
       </p>
       <div className="assume">
-        Payoffs from the panic-capture finding (capture × gap × far-out listings, ×6). Probabilities and capture rates are
-        labelled assumptions; the flip-line shows how little the conclusion depends on them.
+        Payoffs = capture × gap × the far-out economy <b style={{ color: "var(--text-muted)" }}>passenger</b> base
+        ({d ? `~${d.far_out_eco_pax_m}M` : "~3.3M"}, anchored to the cited 110M DGCA pax — not scrape rows). Probabilities
+        and capture rates are labelled assumptions; the flip-line shows how little the conclusion depends on them.
       </div>
     </div>
   );

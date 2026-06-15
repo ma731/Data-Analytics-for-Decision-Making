@@ -12,11 +12,15 @@ import {
 import { ChartTip } from "./ui.jsx";
 import { fmtINR, fmtNum1 } from "../api.js";
 
-// green (efficient) -> red (inefficient) by revenue-per-fuel-kg
+// Efficiency by revenue-per-fuel-kg, encoded on a single warm hue via LIGHTNESS
+// (dark = bleeder, bright gold = winner). A lightness ramp is colour-blind-safe —
+// red->green hue alone fails for ~8% of men. Position on the chart + the tooltip
+// carry the value too, so the encoding is never colour-only.
 function colorFor(rev, min, max) {
   const t = (rev - min) / (max - min || 1); // 0 worst .. 1 best
-  const hue = 0 + t * 140; // 0=red -> 140=green
-  return `hsl(${hue}, 70%, 55%)`;
+  const light = 30 + t * 38; // 30% (bleeder) -> 68% (winner)
+  const sat = 38 + t * 44; // muted when low, saturated when high
+  return `hsl(43, ${sat}%, ${light}%)`;
 }
 
 export default function Frontier({ frontier }) {

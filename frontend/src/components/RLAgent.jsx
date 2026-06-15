@@ -120,7 +120,8 @@ export default function RLAgent() {
         <b style={{ color: "var(--accent)" }}>{d ? `+${d.uplift_pct}%` : "…"}</b> over the discount-to-fill instinct.
       </p>
       <div className="assume">
-        Stylised fixed-inventory demand model — it shows RL <i>rediscovers</i> revenue management, not a booking forecast.
+        Stylised fixed-inventory demand model; uplift is vs an always-cheapest baseline (a deliberate worst case). It shows
+        RL <i>rediscovers</i> revenue management, not a booking forecast.
       </div>
     </div>
   );

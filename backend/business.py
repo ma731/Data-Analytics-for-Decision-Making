@@ -26,14 +26,36 @@ import analysis
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
-# The dataset is a ~2-month scrape (Feb-Mar 2022); annualise sample totals x6.
-SAMPLE_MONTHS = 2
-ANNUALISE = 12 / SAMPLE_MONTHS
+# Labelled segment assumptions used to size the served base (see _served_base).
+METRO_TRUNK_SHARE = 0.30     # six-metro O&D as a share of domestic pax (assumption)
+ECONOMY_SHARE = 0.88         # economy share of the cabin (assumption)
 
 
 def _context():
     with open(os.path.join(DATA_DIR, "market_context.json")) as fh:
         return json.load(fh)
+
+
+def _served_base():
+    """
+    Annual passenger base, anchored to the CITED 110M DGCA domestic figure — NOT to
+    scrape-row counts. A fare listing is not a booking, so we never multiply listing
+    rows by a per-seat rupee figure; instead we size the prize off real passengers:
+
+        SOM pax       = 110M x six-metro-trunk-share x Tata-served-share
+        far-out eco   = SOM pax x economy-share x far-out booking-share (observed)
+
+    All shares are labelled assumptions except the far-out share (from the data) and
+    the two cited DGCA figures. Returns (som_pax, far_out_eco_pax) per year.
+    """
+    ctx = _context()
+    f = analysis.build_findings()
+    tam_pax = float(ctx["market_growth"]["domestic_pax_2022_million"]) * 1e6   # 110M cited
+    tata_share = float(ctx["market_share_2022"]["tata_combined_pct"]) / 100.0  # 0.184 cited
+    far_out_share = float(f["panic_tax"]["far_out_share"]) / 100.0             # 0.626 observed
+    som_pax = tam_pax * METRO_TRUNK_SHARE * tata_share
+    far_out_eco_pax = som_pax * ECONOMY_SHARE * far_out_share
+    return som_pax, far_out_eco_pax
 
 
 # ----------------------------------------------------------------------------
@@ -54,10 +76,11 @@ def decision_tree():
         - Holds   : passengers accept the higher early fare (the inelastic case)
         - Softens : price-sensitive leisure defects to IndiGo, eroding volume
 
-    PAYOFFS = incremental annual contribution (Rs cr), built LIVE from the panic-
-    capture finding: uplift = capture_rate x gap_per_seat x far_out_bookings,
-    annualised. When demand SOFTENS only a fraction is realised (heavy defection
-    hits the aggressive play hardest; the gentle pilot mostly survives).
+    PAYOFFS = incremental annual contribution (Rs cr): uplift = capture_rate x
+    gap_per_seat x the annual far-out economy PASSENGER base (anchored to the cited
+    110M DGCA figure via _served_base, NOT to scrape-row counts). When demand SOFTENS
+    only a fraction is realised (heavy defection hits the aggressive play hardest; the
+    gentle pilot mostly survives).
 
     We then compute EMV per act, the EVPI (value of perfect demand research) and
     the probability of 'holds' at which the recommended act flips — i.e. how sure
@@ -66,12 +89,12 @@ def decision_tree():
     f = analysis.build_findings()
     pc = f["opportunity"]["panic_capture"]
     gap = float(pc["gap_per_seat_inr"])             # Rs / seat, far-out vs late
-    far_seats = float(pc["far_out_flights"])        # far-out economy bookings (sample)
+    _som_pax, far_out_eco_pax = _served_base()      # annual passengers, NOT listing rows
     cons_capture = float(pc["capture_rate_pct"]) / 100.0   # 0.15, the recommended pilot
     aggr_capture = 0.30                              # ASSUMPTION: aggressive push
 
     def annual_cr(capture):
-        return capture * gap * far_seats * ANNUALISE / 1e7   # Rs cr / yr
+        return capture * gap * far_out_eco_pax / 1e7   # Rs cr / yr (pax-anchored, annual)
 
     cons_hold = annual_cr(cons_capture)
     aggr_hold = annual_cr(aggr_capture)
@@ -137,6 +160,7 @@ def decision_tree():
         "evpi_cr": round(evpi, 1),
         "flip_probability": round(flip_p, 3) if flip_p is not None else None,
         "current_p_hold": P_HOLD,
+        "far_out_eco_pax_m": round(far_out_eco_pax / 1e6, 2),
         "sweep": sweep,
         "assumptions": {
             "conservative_capture": cons_capture,
@@ -144,13 +168,14 @@ def decision_tree():
             "p_hold": P_HOLD,
             "aggr_realised_if_soften": AGGR_SOFTEN_KEEP,
             "cons_realised_if_soften": CONS_SOFTEN_KEEP,
-            "annualisation_factor": ANNUALISE,
+            "far_out_eco_pax_m": round(far_out_eco_pax / 1e6, 2),
         },
-        "note": ("Payoffs built live from the panic-capture finding "
-                 "(uplift = capture x gap x far-out bookings, annualised x6). "
+        "note": ("Payoffs = capture x gap x the annual far-out economy passenger base "
+                 "(~%.1fM pax, anchored to the cited 110M DGCA figure — not scrape rows). "
                  "State probabilities and realised-fractions are labelled assumptions. "
-                 "EVPI = the most you'd rationally pay for perfect demand research. "
-                 "Flip-probability = the P(holds) at which the recommended act changes."),
+                 "EVPI = the most you'd rationally pay for perfect demand research; "
+                 "flip-probability = the P(holds) at which the recommended act changes."
+                 % (far_out_eco_pax / 1e6)),
     }
 
 
@@ -281,9 +306,10 @@ def market_sizing():
     tam_pax_m = float(ctx["market_growth"]["domestic_pax_2022_million"])   # 110, cited
     tata_share = float(ctx["market_share_2022"]["tata_combined_pct"]) / 100.0  # 0.184, cited
 
-    # labelled assumptions
-    AVG_FARE_INR = 6000          # representative one-way domestic fare
-    METRO_TRUNK_SHARE = 0.30     # six-metro O&D as a share of domestic pax
+    # Rs6,000 is a deliberately conservative ALL-INDIA blended one-way fare: the
+    # six-metro trunk runs pricier (dataset median Rs7,425), but TAM spans the whole
+    # country incl. thinner, cheaper markets. Labelled assumption either way.
+    AVG_FARE_INR = 6000
 
     def cr(pax_m, fare):
         return pax_m * 1e6 * fare / 1e7   # Rs cr
@@ -294,10 +320,15 @@ def market_sizing():
     som_pax_m = sam_pax_m * tata_share
     som_cr = cr(som_pax_m, AVG_FARE_INR)
 
-    # the strategic-moves uplift on top of today's served share (annualised, live)
+    # the pricing-move uplift on the served base — pax-anchored (NOT scrape rows)
     pc = f["opportunity"]["panic_capture"]
-    panic_uplift_cr = (float(pc["uplift_per_far_seat_inr"]) * float(pc["far_out_flights"])
-                       * ANNUALISE / 1e7)
+    _som_pax, far_out_eco_pax = _served_base()
+    panic_uplift_cr = float(pc["uplift_per_far_seat_inr"]) * far_out_eco_pax / 1e7
+
+    # sensitivity band: swing fare AND trunk share +/-25% -> SOM revenue range, so
+    # the funnel is shown as a range, not a single fragile point.
+    som_low = cr(tam_pax_m * (METRO_TRUNK_SHARE * 0.75) * tata_share, AVG_FARE_INR * 0.75)
+    som_high = cr(tam_pax_m * (METRO_TRUNK_SHARE * 1.25) * tata_share, AVG_FARE_INR * 1.25)
 
     levels = [
         {"key": "TAM", "label": "Total Addressable Market",
@@ -318,12 +349,14 @@ def market_sizing():
         "avg_fare_inr": AVG_FARE_INR,
         "panic_uplift_cr": round(panic_uplift_cr, 0),
         "som_plus_uplift_cr": round(som_cr + panic_uplift_cr, 0),
+        "som_range_cr": [round(som_low, 0), round(som_high, 0)],
         "cited": ["domestic_pax_2022_million (DGCA)", "tata_combined_pct (DGCA)"],
         "assumptions": {"avg_fare_inr": AVG_FARE_INR, "metro_trunk_share": METRO_TRUNK_SHARE,
-                        "annualisation_factor": ANNUALISE},
-        "note": ("Order-of-magnitude market sizing. Cited: 110M domestic pax and the "
-                 "18.4% Tata combined share (DGCA 2022). Labelled assumptions: a Rs6,000 "
-                 "average fare and a 30% six-metro trunk share. Not a bottom-up forecast."),
+                        "economy_share": ECONOMY_SHARE},
+        "note": ("Order-of-magnitude sizing. Cited: 110M domestic pax + 18.4% Tata share "
+                 "(DGCA 2022). Assumed: a conservative Rs6,000 blended fare (vs the Rs7,425 "
+                 "six-metro median) and a 30% trunk share; SOM range swings both +/-25%. "
+                 "The pricing uplift is on the far-out economy passenger base, not scrape rows."),
     }
 
 

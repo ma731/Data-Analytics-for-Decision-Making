@@ -222,10 +222,15 @@ defensible; one you hide is a finding waiting to be demolished. The honest threa
    sweep and flip-point**; the MCDM ships a **weight-stability check** (re-ranking
    across 4,000 Gaussian-perturbed weightings). A ranking that survives the weights
    is a finding; one that flips is an opinion. We report which.
-4. **The fuel model is robust, not validated.** The ±20% sensitivity (Spearman ≈
-   0.997) shows the conclusions don't depend on any single constant — it does **not**
-   prove accuracy, because there is no fuel ground truth in this dataset to validate
-   against. It is a transparent engineered estimate, labelled as such everywhere.
+4. **The fuel model is robust, and now has one external anchor.** The ±20%
+   sensitivity (Spearman ≈ 0.997) shows the conclusions don't depend on any single
+   constant — but note it holds great-circle distance *fixed* (distance is geometric,
+   not assumed), so it stress-tests the engineered constants, not the dominant
+   distance driver. There is no per-flight fuel ground truth in the dataset; as a
+   sanity check the model's **Delhi–Mumbai nonstop estimate (~4.2 t)** lands inside
+   the published **A320 trip-fuel range (~3.5–4.5 t** for a ~1.4 h sector) — one
+   external check (enforced by a unit test), not a full calibration. Every figure is
+   still a labelled estimate.
 5. **Staleness & seasonality.** Data is Feb–Mar 2022; annual figures scale the
    two-month sample ×6, which ignores seasonality. The Vistara merger (completed 2024)
    post-dates the data, so "pre-merger" framing is a narrative device for the 2022

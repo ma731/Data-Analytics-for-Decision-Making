@@ -63,8 +63,9 @@ export default function MarketSizing() {
         the routes where Tata already has the metal and the only two business cabins.
       </p>
       <div className="assume">
-        Cited: 110M pax, 18.4% Tata share (DGCA 2022). Assumed: ₹{d?.avg_fare_inr ?? 6000} fare,{" "}
-        {d?.metro_trunk_share_pct ?? 30}% trunk share. Order-of-magnitude, not a forecast.
+        Cited: 110M pax, 18.4% Tata share (DGCA 2022). Assumed: a conservative ₹{d?.avg_fare_inr ?? 6000} blended fare (vs
+        the ₹7,425 six-metro median), {d?.metro_trunk_share_pct ?? 30}% trunk share — SOM swings ±25%. Pricing uplift is on
+        the passenger base, not scrape rows.
       </div>
     </div>
   );

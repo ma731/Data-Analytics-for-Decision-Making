@@ -38,6 +38,7 @@ export default function MonteCarlo() {
         <div className="slider" style={{ flex: 1 }}>
           <div className="lab"><span>ATF price volatility</span><b>±{vol}%</b></div>
           <input type="range" min="5" max="50" value={vol} aria-label="ATF price volatility"
+            aria-valuetext={`plus or minus ${vol} percent`}
             onChange={(e) => onSlide(+e.target.value)} />
         </div>
         {busy && <span className="muted mono" style={{ fontSize: 13 }}>simulating…</span>}

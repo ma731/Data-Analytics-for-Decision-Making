@@ -18,7 +18,7 @@ export default function StrategicRationale({ f }) {
       catch:
         "Push too hard and price-sensitive leisure flyers defect to IndiGo; early load factors can soften, and “Air India got expensive” is a real optic.",
       hedge:
-        "Pilot at a conservative 15% capture, A/B-test by route, and keep nonstop economy visibly competitive on the corridors IndiGo owns.",
+        "Segment by corridor: raise only where Air India has pricing power, hold the line where IndiGo (55.7%) dominates. Pilot at 15% capture, A/B by route, and set a tripwire — roll back any corridor a rival matches within two weeks.",
       chips: ["Software-only", "Fully reversible", "Cash in weeks"],
       payoff: (
         <>
