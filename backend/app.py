@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import analysis
 import optimize
+import business
 from fuel_model import fuel_breakdown, CITY_COORDS, ROUTING_FACTOR
 
 app = FastAPI(title="Air India War Room API", version="1.0.0")
@@ -60,6 +61,9 @@ def _warm_caches():
         ("shadow", optimize.fleet_shadow_prices),
         ("dea", optimize.dea_efficiency),
         ("sensitivity", analysis.fuel_sensitivity),
+        ("decision", business.decision_tree),
+        ("mcdm", business.mcdm_moves),
+        ("market", business.market_sizing),
     ]
     for name, fn in jobs:
         _WARM["warming"].append(name)
@@ -203,6 +207,26 @@ def dea():
 def sensitivity():
     """Fuel-model stress test: swing each constant ±20%, show findings hold."""
     return analysis.fuel_sensitivity()
+
+
+# ===================== DECISION ANALYSIS & BUSINESS CASE =====================
+
+@app.get("/api/decision")
+def decision():
+    """Decision tree: EMV, EVPI and the probability flip-point for Move 1."""
+    return business.decision_tree()
+
+
+@app.get("/api/mcdm")
+def mcdm():
+    """TOPSIS multi-criteria ranking of the three strategic moves."""
+    return business.mcdm_moves()
+
+
+@app.get("/api/market")
+def market():
+    """TAM / SAM / SOM market-sizing funnel for the domestic metro market."""
+    return business.market_sizing()
 
 
 # ---- real live air traffic over India (OpenSky Network, free, no key) ----

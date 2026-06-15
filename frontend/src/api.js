@@ -25,6 +25,11 @@ export const getDea = () => get("/dea");
 export const getSensitivity = () => get("/sensitivity");
 export const getLive = () => get("/live");
 
+// ---- decision analysis & business case ----
+export const getDecision = () => get("/decision");
+export const getMcdm = () => get("/mcdm");
+export const getMarket = () => get("/market");
+
 // ---- formatters: Western grouping (en-US) for a European/international audience ----
 const inr0 = new Intl.NumberFormat("en-US", {
   style: "currency",

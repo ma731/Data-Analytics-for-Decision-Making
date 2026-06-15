@@ -8,15 +8,16 @@
   --border: #1f2a44;
   --text: #f1f5f9;
   --text-muted: #94a3b8;
-  --data-blue: #3b82f6;
-  --data-blue-bright: #60a5fa;
-  --accent: #fbbf24;
-  --positive: #10b981;
-  --negative: #ef4444;
+  /* data accents — hand-tuned, intentionally off the stock framework hexes */
+  --data-blue: #356fd6;
+  --data-blue-bright: #7bb0f2;
+  --accent: #f3b431;
+  --positive: #1ba47c;
+  --negative: #e2453d;
   --brand-red: #da0e29;
   --brand-gold: #c99a3b;
 
-  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
@@ -54,7 +55,8 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
   text-wrap: balance;
   margin: 0;
 }
