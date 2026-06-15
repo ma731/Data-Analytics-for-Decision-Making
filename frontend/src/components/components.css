@@ -57,19 +57,19 @@
 .chart-caption {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 12px;
-  line-height: 1.5;
+  margin-top: 18px;
+  line-height: 1.65;
   border-left: 2px solid var(--accent);
-  padding-left: 12px;
+  padding-left: 14px;
 }
 .assume {
   display: flex;
-  gap: 7px;
+  gap: 9px;
   align-items: baseline;
-  margin-top: 12px;
+  margin-top: 18px;
   font-family: var(--font-mono);
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.65;
   color: rgba(148, 163, 184, 0.78);
 }
 .assume::before {
@@ -88,8 +88,10 @@
 }
 .panel-sub {
   font-size: 13px;
+  line-height: 1.6;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  max-width: 72ch;
 }
 
 /* ---- insight callout ---- */
@@ -522,6 +524,31 @@
   }
 }
 
+/* ===================== ACT ATMOSPHERES (color temperature per chapter) ===================== */
+/* Each act carries its own ambient wash + eyebrow accent so scrolling through the
+   three chapters shifts the light: cool/diagnostic -> charged/red -> warm/gold. */
+.act {
+  position: relative;
+}
+.act--diagnosis {
+  background:
+    radial-gradient(1500px 1000px at 80% -4%, rgba(53, 111, 214, 0.26), transparent 55%),
+    radial-gradient(1200px 900px at 8% 78%, rgba(53, 111, 214, 0.12), transparent 60%);
+  --eyebrow: var(--data-blue-bright);
+}
+.act--or {
+  background:
+    radial-gradient(1500px 1000px at 12% -4%, rgba(218, 14, 41, 0.24), transparent 55%),
+    radial-gradient(1200px 900px at 92% 72%, rgba(245, 180, 49, 0.12), transparent 60%);
+  --eyebrow: var(--accent);
+}
+.act--strategy {
+  background:
+    radial-gradient(1500px 1050px at 85% -4%, rgba(201, 154, 59, 0.28), transparent 58%),
+    radial-gradient(1200px 900px at 6% 80%, rgba(218, 14, 41, 0.12), transparent 60%);
+  --eyebrow: var(--brand-gold);
+}
+
 /* ===================== ACT DIVIDERS ===================== */
 .act-hero {
   position: relative;
@@ -650,10 +677,78 @@
   margin: 0;
 }
 .hero-title .hl {
-  background: linear-gradient(100deg, #fed9a0 0%, #e0b366 45%, #da0e29 110%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #e8bd5e; /* solid warm gold — no gradient-clip text */
+}
+/* signature entrance: headline rises from behind a mask, line by line (plays once) */
+.hero-title .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+.hero-title .line-in {
+  display: inline-block;
+  transform: translateY(115%);
+  animation: heroLineUp 0.95s var(--ease-out-expo) forwards;
+}
+.hero-title .line:nth-child(1) .line-in {
+  animation-delay: 0.15s;
+}
+.hero-title .line:nth-child(2) .line-in {
+  animation-delay: 0.32s;
+}
+@keyframes heroLineUp {
+  to {
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-title .line-in {
+    transform: none;
+    animation: none;
+  }
+}
+/* the supporting copy fades up after the headline, choreographed */
+.hero-eyebrow,
+.hero-sub,
+.hero-cta,
+.hero-stats {
+  opacity: 0;
+  animation: heroFade 0.85s var(--ease-out-expo) forwards;
+}
+.hero-eyebrow {
+  animation-delay: 0.05s;
+}
+.hero-sub {
+  animation-delay: 0.52s;
+}
+.hero-cta {
+  animation-delay: 0.66s;
+}
+.hero-stats {
+  animation-delay: 0.8s;
+}
+@keyframes heroFade {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-title .line-in {
+    transform: none;
+    animation: none;
+  }
+  .hero-eyebrow,
+  .hero-sub,
+  .hero-cta,
+  .hero-stats {
+    opacity: 1;
+    animation: none;
+  }
 }
 .hero-sub {
   margin: 20px 0 0;
@@ -953,6 +1048,7 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 }
 .readout .l {
   font-size: 12px;
+  line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
@@ -967,8 +1063,9 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .readout .reur {
   font-family: var(--font-mono);
   font-size: 12px;
+  line-height: 1.45;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 7px;
 }
 
 /* progress / generation tag */
@@ -1329,8 +1426,8 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 /* reveal on scroll */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(24px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
 }
 .reveal.in {
   opacity: 1;
@@ -1341,6 +1438,55 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ===================== CARD MICRO-INTERACTIONS ===================== */
+.kpi,
+.rec,
+.strat {
+  transition:
+    transform 0.22s var(--ease-out-quart),
+    border-color 0.22s var(--ease-out-quart),
+    box-shadow 0.22s var(--ease-out-quart);
+}
+.kpi:hover,
+.rec:hover,
+.strat:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.38);
+}
+@media (prefers-reduced-motion: reduce) {
+  .kpi:hover,
+  .rec:hover,
+  .strat:hover {
+    transform: none;
+  }
+}
+
+/* ===================== SCROLL PROGRESS (the deck's reading line) ===================== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 60;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--brand-red), var(--brand-gold));
+  pointer-events: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scrollProgress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes scrollProgress {
+  to {
+    transform: scaleX(1);
   }
 }
 

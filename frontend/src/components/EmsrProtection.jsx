@@ -72,9 +72,8 @@ export default function EmsrProtection() {
         away cheap; protect too many and they fly empty. The peak is the exact Littlewood optimum.
       </p>
       <div className="assume">
-        Fares are real (dataset). Premium demand is an explicit assumption (~{d ? Math.round(d.premium_share * 100) : 12}% of
-        cabin, CV {d?.cv ?? 0.4}); uplift is measured against a cabin that never protects a premium seat. Listings are
-        not bookings — so demand is assumed, not inferred from row counts.
+        Fares from the data; premium demand assumed (~{d ? Math.round(d.premium_share * 100) : 12}% of cabin, CV{" "}
+        {d?.cv ?? 0.4}). Listings aren&rsquo;t bookings — demand is assumed, not counted.
       </div>
     </div>
   );

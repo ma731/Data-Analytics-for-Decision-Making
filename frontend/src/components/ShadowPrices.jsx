@@ -72,8 +72,7 @@ export default function ShadowPrices() {
         where it flattens, growth must come from new routes, not more frequency.
       </p>
       <div className="assume">
-        LP relaxation of the integer fleet program; the budget is set in the scarce regime (it binds) so the dual is
-        informative. Contribution = fare revenue minus modelled fuel cost — directional, not a full P&amp;L.
+        LP relaxation; the budget binds, so the dual is meaningful. Contribution is directional, not a full P&amp;L.
       </div>
     </div>
   );

@@ -104,9 +104,8 @@ export default function DecisionTree() {
         more research wouldn&rsquo;t change much.
       </p>
       <div className="assume">
-        Payoffs built live from the panic-capture finding (uplift = capture × gap × far-out itineraries — listing rows,
-        a demand proxy — annualised ×6). State probabilities, the aggressive capture rate, and softening loss-fractions
-        are labelled assumptions, not estimates; the flip-line shows how little the conclusion depends on them.
+        Payoffs from the panic-capture finding (capture × gap × far-out listings, ×6). Probabilities and capture rates are
+        labelled assumptions; the flip-line shows how little the conclusion depends on them.
       </div>
     </div>
   );

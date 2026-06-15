@@ -115,8 +115,7 @@ export default function McdmRanking() {
         {d ? `${d.weight_stability_pct}%` : ""} of the time — not just an opinion about weights.
       </p>
       <div className="assume">
-        Each criterion scored 1–5 (higher = better), calibrated to the findings and the business-case chips. Weights are
-        a labelled judgement summing to 100%. Ranked by TOPSIS closeness coefficient, cross-checked vs a weighted sum.
+        Criteria scored 1–5 (calibrated to the findings); weights a labelled judgement. TOPSIS, cross-checked vs weighted sum.
       </div>
     </div>
   );

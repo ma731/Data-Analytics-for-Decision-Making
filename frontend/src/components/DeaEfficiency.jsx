@@ -87,8 +87,7 @@ export default function DeaEfficiency() {
         action list.
       </p>
       <div className="assume">
-        Input-oriented CCR DEA. Input: modelled fuel/seat. Outputs: revenue/seat and passenger volume. One LP solved
-        per route ({d?.n_routes ?? 30} routes) — efficiency is relative to the observed best, not an absolute ideal.
+        Input-oriented CCR DEA, one LP per route; efficiency is relative to the observed best, not an absolute ideal.
       </div>
     </div>
   );

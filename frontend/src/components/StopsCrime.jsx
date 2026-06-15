@@ -86,10 +86,6 @@ export default function StopsCrime({ stops }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="chart-caption">
-        Nonstop is cheapest for the passenger and lightest on fuel. Two-plus-stop itineraries are
-        the worst on both — a rare case where the customer-friendly move is also the green move.
-      </p>
     </div>
   );
 }

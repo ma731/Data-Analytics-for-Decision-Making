@@ -106,12 +106,14 @@ export default function App() {
   return (
     <>
       <FlightBackground />
+      <div className="scroll-progress" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
       <GuidedTour />
       <Hero />
       <CommandBar />
       <main className="shell" id="war-room">
+        <div className="act act--diagnosis">
         <ActHero
           num="I"
           kicker="Act I · The Diagnosis"
@@ -243,7 +245,10 @@ export default function App() {
           <Reveal><LiveMap /></Reveal>
         </Section>
 
+        </div>{/* /act--diagnosis */}
+
         {/* ===================== ACT II · OPERATIONS RESEARCH ===================== */}
+        <div className="act act--or">
         <div className="or-hero act-hero" id="or">
           <div className="act-num" aria-hidden="true">II</div>
           <div className="kicker">Act II · Operations Research</div>
@@ -292,7 +297,6 @@ export default function App() {
         <Section
           eyebrow="OR 06 · Revenue management, solved exactly"
           title="How many seats to protect for Business"
-          sub="The RL agent learns toward this; Littlewood's rule lands on it in one line of optimisation."
           delay={40}
         >
           <Reveal><EmsrProtection /></Reveal>
@@ -301,7 +305,6 @@ export default function App() {
         <Section
           eyebrow="OR 07 · Linear programming & duality"
           title="What one more aircraft is worth"
-          sub="The same fleet problem, relaxed to an LP — so its shadow prices put an exact rupee value on capacity."
           delay={40}
         >
           <Reveal><ShadowPrices /></Reveal>
@@ -310,7 +313,6 @@ export default function App() {
         <Section
           eyebrow="OR 08 · Data envelopment analysis"
           title="Every route scored, every laggard given a target"
-          sub="The hero frontier turned into a rigorous LP: who's efficient, who isn't, and exactly who to copy."
           delay={40}
         >
           <Reveal><DeaEfficiency /></Reveal>
@@ -319,13 +321,15 @@ export default function App() {
         <Section
           eyebrow="Defensibility · pressure-testing the model"
           title="The findings survive being wrong about the numbers"
-          sub="Our fuel model rests on engineered constants. So we attacked it: swing every constant ±20% and the conclusions barely move."
           delay={40}
         >
           <Reveal><SensitivityTornado /></Reveal>
         </Section>
 
+        </div>{/* /act--or */}
+
         {/* ===================== ACT III · BUSINESS STRATEGY ===================== */}
+        <div className="act act--strategy">
         <ActHero
           num="III"
           kicker="Act III · Business Strategy"
@@ -336,7 +340,6 @@ export default function App() {
         <Section
           eyebrow="The decision"
           title="Three moves, quantified"
-          sub="What the new owner should do on day one — and the upside of acting."
           delay={60}
         >
           <Recommendations f={f} />
@@ -345,7 +348,6 @@ export default function App() {
         <Section
           eyebrow="The business case"
           title="Why these are the right bets — and what we give up"
-          sub="Every move is a wager with a downside. Here is the upside, the honest catch, and how we de-risk each one before a rupee is committed."
           delay={60}
         >
           <StrategicRationale f={f} />
@@ -354,7 +356,6 @@ export default function App() {
         <Section
           eyebrow="Decision analysis · under uncertainty"
           title="How hard to push — and what certainty is worth"
-          sub="We can't know how demand reacts, so we weigh each option by expected value across both futures, and ask how confident we'd need to be for the answer to change."
           delay={40}
         >
           <Reveal><DecisionTree /></Reveal>
@@ -363,7 +364,6 @@ export default function App() {
         <Section
           eyebrow="Multi-criteria decision · what comes first"
           title="Three good moves, one running order"
-          sub="Six competing criteria, no move that wins on all of them. TOPSIS collapses the trade-off into a defensible sequence."
           delay={40}
         >
           <Reveal><McdmRanking /></Reveal>
@@ -372,11 +372,11 @@ export default function App() {
         <Section
           eyebrow="Market sizing · the prize"
           title="How big is the opportunity, really?"
-          sub="Top-down from the whole domestic market to the share Tata serves today — the base every move grows from."
           delay={40}
         >
           <Reveal><MarketSizing /></Reveal>
         </Section>
+        </div>{/* /act--strategy */}
 
         <Finale />
 
