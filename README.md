@@ -17,9 +17,11 @@ backend/      FastAPI — serves the fuel model, findings, AND a live OR engine
   fuel_model.py   engineered, documented, citable fuel/CO2 model
   analysis.py     applies the model across the dataset -> strategic findings
   optimize.py     operations-research engine (9 modules, see below)
-  app.py          API: /api/findings, /api/route, /api/context + 9 OR endpoints
-frontend/     React + Vite dashboard (Recharts). Dark "Bloomberg-meets-aviation" UI,
-              animated flight-path background, glassmorphism, live-animating OR sections.
+  business.py     decision analysis + business case (decision tree, MCDM, TAM/SAM/SOM)
+  app.py          API: /api/findings, /api/route, /api/context + 12 live endpoints
+frontend/     React + Vite dashboard (Recharts), Fraunces editorial type on a dark
+              cinematic theme. Organised as three acts: Diagnosis -> Operations
+              Research -> Business Strategy, ending on the money number.
 data/         Flight_price.csv (real), market_context.json (real, cited), findings.json
 deck/         Executive presentation (HTML + PDF) + technical submission
 ```
@@ -42,6 +44,15 @@ Turns the descriptive findings into prescriptive, optimal decisions — all comp
 Covers the full decision-analytics toolkit: linear & integer programming, LP
 duality, multi-objective optimisation, simulation, risk modelling, reinforcement
 learning, machine learning, exact revenue management, and efficiency analysis.
+
+## Decision analysis & business case (`backend/business.py`)
+The OR engine says what's optimal; this layer turns it into a boardroom decision — also live:
+
+| Module | Technique | Endpoint |
+|---|---|---|
+| Decision tree | Expected monetary value, **EVPI**, and the probability flip-point for the pricing rollout under demand uncertainty | `/api/decision` |
+| MCDM ranking | **TOPSIS** over six weighted criteria (+ weighted-sum cross-check + a weight-stability test) — what to do first | `/api/mcdm` |
+| Market sizing | **TAM / SAM / SOM** funnel from cited macro figures + labelled assumptions | `/api/market` |
 
 ## Run it
 ```powershell
@@ -71,3 +82,11 @@ Fuel, cost and CO₂ are **modeled estimates** from published benchmarks, clearl
 such throughout. The flight data is real (EaseMyTrip, Feb–Mar 2022). Market context (Tata
 acquisition, market shares, ATF prices) is independently sourced and cited in
 `data/market_context.json`.
+
+We hold it to a research standard. A **Threats to Validity** section
+(`deck/TECHNICAL_SUBMISSION.md`) names what a skeptic should attack first — listings are not
+bookings, the pricing uplift is not causally identified, and the decision/MCDM modules rest on
+labelled assumptions. Where those assumptions bite, we stress-test them: the fuel model is
+swung ±20% (route rankings hold at Spearman ≈ 0.997), the MCDM ranking is re-run across 4,000
+perturbed weightings, and the decision tree reports the exact probability at which its
+recommendation flips.

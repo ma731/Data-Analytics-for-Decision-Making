@@ -12,27 +12,55 @@ export function Section({ eyebrow, title, sub, delay = 0, id, children }) {
 }
 
 // Count-up for KPI numbers. Respects reduced-motion. `format` maps value -> string.
-export function useCountUp(target, { duration = 1100, format = (v) => v } = {}) {
+// Pass `start: false` to hold at 0 until it flips true (e.g. scroll-into-view) so
+// below-the-fold numbers tick up when the reader actually reaches them.
+export function useCountUp(target, { duration = 1100, format = (v) => v, start = true } = {}) {
   const [val, setVal] = useState(0);
   const raf = useRef(0);
   useEffect(() => {
+    if (!start) return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setVal(target);
       return;
     }
-    let start;
+    let from;
     const tick = (t) => {
-      if (start === undefined) start = t;
-      const p = Math.min((t - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+      if (from === undefined) from = t;
+      const p = Math.min((t - from) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 4); // ease-out quart
       setVal(target * eased);
       if (p < 1) raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current);
-  }, [target, duration]);
+  }, [target, duration, start]);
   return format(val);
+}
+
+// Fires once when the attached element scrolls into view. Returns [ref, inView].
+// Use it to gate count-ups / heavy reveals on actual visibility.
+export function useInView({ threshold = 0.3, once = true } = {}) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setInView(true);
+            if (once) io.unobserve(el);
+          }
+        });
+      },
+      { threshold }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [threshold, once]);
+  return [ref, inView];
 }
 
 // Scroll-reveal: returns a ref; adds class "in" when the element scrolls into view.

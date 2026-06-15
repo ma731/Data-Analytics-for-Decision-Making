@@ -132,9 +132,11 @@ premium-cabin supply outright.
 
 | Move | Action | Conservative impact |
 |---|---|---|
-| **1 · Re-time the revenue curve** | Dynamic-pricing floor lifting early fares | **+₹1,378 / seat** at 15% capture, across 129,271 far-out bookings |
-| **2 · Kill inefficient connections** | Re-route 2+ stop traffic to nonstop/1-stop | **−9.9 kg fuel & −31.3 kg CO₂ / seat** |
-| **3 · Own the premium cabin** | Protect & grow business class pre-merger | Defends an **8×** revenue-per-seat segment |
+| **1 · Re-time the revenue curve** | Dynamic-pricing floor lifting early fares | **+₹1,378 (≈ €15) / seat** at 15% capture, across 129,271 far-out bookings |
+| **2 · Kill inefficient connections** | Re-route 2+ stop traffic to nonstop/1-stop | **−9.9 kg fuel & −31.3 kg CO₂ / seat** (≈ ₹1,238 / €14 fuel saved) |
+| **3 · Own the premium cabin** | Protect & grow business class pre-merger | Defends an **8×** segment (**€584 vs €73** / seat) |
+
+*Currency note: ₹90 ≈ €1 throughout; 1 crore = ₹10M ≈ €110K.*
 
 **The ask:** a 90-day pilot across all three moves.
 
@@ -175,6 +177,48 @@ snapshots so the dashboard animates the optimiser working. The RL agent and NSGA
 are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
 efficiency frontier into its provably-optimal form — and EMSR/LP/DEA add the
 exact-optimal, marginal-value, and efficiency-scoring lenses alongside them.
+
+## 6c. Threats to validity (what a skeptic should attack first)
+
+We hold the project to a research standard: a limitation you **scope and own** is
+defensible; one you hide is a finding waiting to be demolished. The honest threats:
+
+1. **Listings ≠ bookings ≠ demand (the load-bearing threat).** The EaseMyTrip data
+   is *quoted fares*, not transactions. Row counts are listing frequency, not
+   passengers; `far_out_flights` is itineraries, not confirmed bookings. Every
+   revenue figure inherits this. We therefore frame the panic-tax and market-sizing
+   numbers as **directional opportunity estimates on a demand proxy**, not a P&L. The
+   *structural* findings (fuel rises with stops; only Tata sells business; price ≠
+   fuel cost) do not depend on volume and are unaffected.
+2. **No causal identification of the pricing uplift.** "Raise early fares to capture
+   the gap" is a causal claim resting on a cross-sectional pattern, and the booking
+   curve confounds it (price and volume both move with days-to-departure — which is
+   exactly why we relabel the demand "elasticity" as a *descriptive gradient*, not a
+   causal one). We do **not** claim the uplift is identified. The decision tree makes
+   the demand-response uncertainty explicit (a "demand softens" state) and its
+   flip-probability shows how robust the recommendation is to being wrong — but this
+   is decision analysis under uncertainty, not a causal estimate. A clean test would
+   need an A/B fare experiment or a natural experiment we don't have.
+3. **Assumption-driven decision modules — mitigated by sensitivity, not eliminated.**
+   The decision tree's state probabilities and the MCDM's 1–5 scores and weights are
+   *labelled judgements*, not estimates. We attack each with the same tornado
+   discipline as the fuel model: the decision tree ships its **EMV-vs-probability
+   sweep and flip-point**; the MCDM ships a **weight-stability check** (re-ranking
+   across 4,000 Gaussian-perturbed weightings). A ranking that survives the weights
+   is a finding; one that flips is an opinion. We report which.
+4. **The fuel model is robust, not validated.** The ±20% sensitivity (Spearman ≈
+   0.997) shows the conclusions don't depend on any single constant — it does **not**
+   prove accuracy, because there is no fuel ground truth in this dataset to validate
+   against. It is a transparent engineered estimate, labelled as such everywhere.
+5. **Staleness & seasonality.** Data is Feb–Mar 2022; annual figures scale the
+   two-month sample ×6, which ignores seasonality. The Vistara merger (completed 2024)
+   post-dates the data, so "pre-merger" framing is a narrative device for the 2022
+   persona, not a 2026 operational claim.
+6. **Competitive response unmodeled.** We do not model IndiGo reacting to an Air India
+   fare move (no game-theoretic equilibrium). The "demand softens" branch is a
+   reduced-form proxy for defection, not a strategic best-response.
+
+---
 
 ## 7. Reproducibility
 

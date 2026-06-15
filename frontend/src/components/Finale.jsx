@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCountUp } from "./ui.jsx";
+import { useCountUp, useInView } from "./ui.jsx";
 import { crToEUR } from "../api.js";
 
 const AI_REVENUE_CR = 38812; // Air India standalone FY24 revenue (Tata, +23% YoY)
@@ -7,13 +7,15 @@ const AI_LOSS_CR = 4444; // Air India standalone FY24 loss
 
 export default function Finale() {
   const [uplift, setUplift] = useState(3.0); // revenue-management uplift %
+  const [ref, inView] = useInView({ threshold: 0.45 });
   const gain = (AI_REVENUE_CR * uplift) / 100;
   const lossErased = Math.min(100, (gain / AI_LOSS_CR) * 100);
-  const gainShown = useCountUp(gain, { duration: 500, format: (v) => Math.round(v).toLocaleString("en-US") });
-  const erasedShown = useCountUp(lossErased, { duration: 500, format: (v) => Math.round(v) });
+  // The money number is the climax — hold it until the section is reached, then count up.
+  const gainShown = useCountUp(gain, { duration: 900, start: inView, format: (v) => Math.round(v).toLocaleString("en-US") });
+  const erasedShown = useCountUp(lossErased, { duration: 900, start: inView, format: (v) => Math.round(v) });
 
   return (
-    <div className="finale" id="finale">
+    <div className="finale" id="finale" ref={ref}>
       <div className="finale-inner">
         <div className="finale-kicker">What this is worth · drag to model execution</div>
         <h2 className="finale-num">₹{gainShown}<span>cr / yr&nbsp;&nbsp;≈&nbsp;{crToEUR(gain)}</span></h2>

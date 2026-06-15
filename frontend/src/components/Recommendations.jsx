@@ -1,9 +1,11 @@
-import { fmtINR, fmtNum, fmtNum1 } from "../api.js";
+import { fmtINR, fmtNum, fmtNum1, inrToEUR } from "../api.js";
 
 export default function Recommendations({ f }) {
   const opp = f.opportunity;
   const pc = opp.panic_capture;
   const sf = opp.stops_fuel;
+  // fuel saving expressed in money (model constants: 0.8 kg/L, ₹100/L ATF)
+  const fuelSaveInr = Math.round((sf.fuel_save_kg_per_seat / 0.8) * 100);
 
   return (
     <div className="grid recs">
@@ -11,12 +13,12 @@ export default function Recommendations({ f }) {
         <h3>1 · Re-time the revenue curve</h3>
         <p>
           {pc.far_out_flights.toLocaleString("en-US")} far-out economy bookings sit{" "}
-          {fmtINR(pc.gap_per_seat_inr)} below the last-minute fare. Lift early fares modestly with
-          dynamic pricing instead of giving the seat away.
+          {fmtINR(pc.gap_per_seat_inr)} ({inrToEUR(pc.gap_per_seat_inr)}) below the last-minute
+          fare. Lift early fares modestly with dynamic pricing instead of giving the seat away.
         </p>
         <div className="impact">
-          + {fmtINR(pc.uplift_per_far_seat_inr)} / seat at a conservative {pc.capture_rate_pct}%
-          capture
+          + {fmtINR(pc.uplift_per_far_seat_inr)} ({inrToEUR(pc.uplift_per_far_seat_inr)}) / seat at a
+          conservative {pc.capture_rate_pct}% capture
         </div>
       </div>
 
@@ -29,7 +31,7 @@ export default function Recommendations({ f }) {
         </p>
         <div className="impact">
           − {fmtNum1(sf.fuel_save_kg_per_seat)} kg fuel &amp; {fmtNum1(sf.co2_save_kg_per_seat)} kg
-          CO₂ / seat
+          CO₂ / seat &nbsp;·&nbsp; ≈ {fmtINR(fuelSaveInr)} ({inrToEUR(fuelSaveInr)}) saved
         </div>
       </div>
 
@@ -41,7 +43,8 @@ export default function Recommendations({ f }) {
           engine before low-cost rivals copy it.
         </p>
         <div className="impact">
-          {f.business.premium_multiple}× revenue per premium seat vs economy
+          {f.business.premium_multiple}× revenue per premium seat —{" "}
+          {inrToEUR(f.business.business_avg)} vs {inrToEUR(f.business.economy_avg)}
         </div>
       </div>
     </div>

@@ -8,6 +8,10 @@ import StopsCrime from "./components/StopsCrime.jsx";
 import BusinessWhitespace from "./components/BusinessWhitespace.jsx";
 import RouteExplorer from "./components/RouteExplorer.jsx";
 import Recommendations from "./components/Recommendations.jsx";
+import StrategicRationale from "./components/StrategicRationale.jsx";
+import DecisionTree from "./components/DecisionTree.jsx";
+import McdmRanking from "./components/McdmRanking.jsx";
+import MarketSizing from "./components/MarketSizing.jsx";
 import FlightBackground from "./components/FlightBackground.jsx";
 import Hero from "./components/Hero.jsx";
 import LiveMap from "./components/LiveMap.jsx";
@@ -30,6 +34,18 @@ import "./components/components.css";
 function Reveal({ children }) {
   const ref = useReveal();
   return <div ref={ref}>{children}</div>;
+}
+
+// Top-level act divider — the three movements of the story (Diagnosis → OR → Strategy).
+function ActHero({ num, kicker, title, sub, id }) {
+  return (
+    <div className="or-hero act-hero" id={id}>
+      <div className="act-num" aria-hidden="true">{num}</div>
+      <div className="kicker">{kicker}</div>
+      <h2>{title}</h2>
+      {sub && <p>{sub}</p>}
+    </div>
+  );
 }
 
 function CommandBar() {
@@ -90,12 +106,21 @@ export default function App() {
   return (
     <>
       <FlightBackground />
+      <div className="scroll-progress" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
       <GuidedTour />
       <Hero />
       <CommandBar />
       <main className="shell" id="war-room">
+        <div className="act act--diagnosis">
+        <ActHero
+          num="I"
+          kicker="Act I · The Diagnosis"
+          title="What the data reveals"
+          sub="Descriptive analytics: read 300,153 flights and the engineered fuel model to find where the money and the carbon are leaking — before prescribing anything."
+        />
+
         <Section
           eyebrow="The opening diagnostic · January 2022, Tata takes the controls"
           title="A national carrier, just privatised. Two levers nobody is pulling: fuel and price."
@@ -132,6 +157,16 @@ export default function App() {
                 <b style={{ color: "var(--text)" }}>{f.panic_tax.far_out_share}%</b> of demand sits —
                 without needing the punishing last-minute spike that erodes trust.
               </p>
+              <div className="aside-stats">
+                <div className="aside-stat">
+                  <div className="v">{f.panic_tax.multiplier}×</div>
+                  <div className="l">fare swing, early → last-minute (same seat, same cost)</div>
+                </div>
+                <div className="aside-stat">
+                  <div className="v" style={{ color: "var(--brand-gold)" }}>{f.panic_tax.far_out_share}%</div>
+                  <div className="l">of seats sell in the cheapest, most under-priced window</div>
+                </div>
+              </div>
             </div>
           </div>
         </Section>
@@ -153,6 +188,20 @@ export default function App() {
                 takeoff cycle of fuel saved — which is why our model penalises stops directly rather
                 than trusting gate-to-gate duration.
               </p>
+              <div className="aside-stats">
+                <div className="aside-stat">
+                  <div className="v" style={{ color: "var(--data-blue-bright)" }}>
+                    {(f.stops[2].avg_price / f.stops[0].avg_price).toFixed(1)}×
+                  </div>
+                  <div className="l">the fare of a nonstop, for a 2+ stop itinerary</div>
+                </div>
+                <div className="aside-stat">
+                  <div className="v">
+                    {(f.stops[2].avg_fuel_kg_per_seat / f.stops[0].avg_fuel_kg_per_seat).toFixed(1)}×
+                  </div>
+                  <div className="l">the fuel per seat, for the same 2+ stop trip</div>
+                </div>
+              </div>
             </div>
           </div>
         </Section>
@@ -178,15 +227,6 @@ export default function App() {
           <RouteExplorer />
         </Section>
 
-        <Section
-          eyebrow="The decision"
-          title="Three moves, quantified"
-          sub="What the new owner should do on day one — and the upside of acting."
-          delay={60}
-        >
-          <Recommendations f={f} />
-        </Section>
-
         <Banner
           img="/airindia-poster.jpg"
           kicker="The network"
@@ -205,9 +245,13 @@ export default function App() {
           <Reveal><LiveMap /></Reveal>
         </Section>
 
-        {/* ===================== OPERATIONS RESEARCH ACT ===================== */}
-        <div className="or-hero" id="or">
-          <div className="kicker">From insight to action · the optimisation engine</div>
+        </div>{/* /act--diagnosis */}
+
+        {/* ===================== ACT II · OPERATIONS RESEARCH ===================== */}
+        <div className="act act--or">
+        <div className="or-hero act-hero" id="or">
+          <div className="act-num" aria-hidden="true">II</div>
+          <div className="kicker">Act II · Operations Research</div>
           <h2>We don&rsquo;t just see the problem. We compute the answer.</h2>
           <p>
             Descriptive analytics tells you what happened. Operations research tells you exactly what to do. Nine live
@@ -253,7 +297,6 @@ export default function App() {
         <Section
           eyebrow="OR 06 · Revenue management, solved exactly"
           title="How many seats to protect for Business"
-          sub="The RL agent learns toward this; Littlewood's rule lands on it in one line of optimisation."
           delay={40}
         >
           <Reveal><EmsrProtection /></Reveal>
@@ -262,7 +305,6 @@ export default function App() {
         <Section
           eyebrow="OR 07 · Linear programming & duality"
           title="What one more aircraft is worth"
-          sub="The same fleet problem, relaxed to an LP — so its shadow prices put an exact rupee value on capacity."
           delay={40}
         >
           <Reveal><ShadowPrices /></Reveal>
@@ -271,7 +313,6 @@ export default function App() {
         <Section
           eyebrow="OR 08 · Data envelopment analysis"
           title="Every route scored, every laggard given a target"
-          sub="The hero frontier turned into a rigorous LP: who's efficient, who isn't, and exactly who to copy."
           delay={40}
         >
           <Reveal><DeaEfficiency /></Reveal>
@@ -280,11 +321,62 @@ export default function App() {
         <Section
           eyebrow="Defensibility · pressure-testing the model"
           title="The findings survive being wrong about the numbers"
-          sub="Our fuel model rests on engineered constants. So we attacked it: swing every constant ±20% and the conclusions barely move."
           delay={40}
         >
           <Reveal><SensitivityTornado /></Reveal>
         </Section>
+
+        </div>{/* /act--or */}
+
+        {/* ===================== ACT III · BUSINESS STRATEGY ===================== */}
+        <div className="act act--strategy">
+        <ActHero
+          num="III"
+          kicker="Act III · Business Strategy"
+          title="From the optimum to the boardroom"
+          sub="The maths is settled. Now the decision: what to do, what we trade away, which move comes first, how hard to push under uncertainty — and how big the prize really is."
+        />
+
+        <Section
+          eyebrow="The decision"
+          title="Three moves, quantified"
+          delay={60}
+        >
+          <Recommendations f={f} />
+        </Section>
+
+        <Section
+          eyebrow="The business case"
+          title="Why these are the right bets — and what we give up"
+          delay={60}
+        >
+          <StrategicRationale f={f} />
+        </Section>
+
+        <Section
+          eyebrow="Decision analysis · under uncertainty"
+          title="How hard to push — and what certainty is worth"
+          delay={40}
+        >
+          <Reveal><DecisionTree /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="Multi-criteria decision · what comes first"
+          title="Three good moves, one running order"
+          delay={40}
+        >
+          <Reveal><McdmRanking /></Reveal>
+        </Section>
+
+        <Section
+          eyebrow="Market sizing · the prize"
+          title="How big is the opportunity, really?"
+          delay={40}
+        >
+          <Reveal><MarketSizing /></Reveal>
+        </Section>
+        </div>{/* /act--strategy */}
 
         <Finale />
 

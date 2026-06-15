@@ -24,26 +24,22 @@ export default function MLDemand() {
         bars rank what moves price most — the levers a revenue team can actually pull.
       </p>
       {d?.reliability && (
-        <div className="readouts" style={{ gridTemplateColumns: "repeat(4, 1fr)", marginTop: 0, marginBottom: 4 }}>
+        <div className="readouts" style={{ gridTemplateColumns: "repeat(2, 1fr)", marginTop: 0, marginBottom: 4 }}>
           <div className="readout">
-            <div className="l">Out-of-sample error</div>
+            <div className="l">Test error · MAPE</div>
             <div className="v" style={{ fontSize: 22 }}>{d.reliability.mape_pct}%</div>
-            <div className="reur">MAPE · ±₹{d.reliability.mae_inr.toLocaleString("en-US")} MAE</div>
           </div>
           <div className="readout">
-            <div className="l">Skill vs naive baseline</div>
+            <div className="l">Skill vs baseline</div>
             <div className="v" style={{ fontSize: 22, color: "var(--positive)" }}>+{Math.round(d.reliability.skill_score * 100)}%</div>
-            <div className="reur">vs route×class median fare</div>
           </div>
           <div className="readout">
-            <div className="l">80% interval coverage</div>
+            <div className="l">P10–P90 coverage</div>
             <div className="v" style={{ fontSize: 22 }}>{d.reliability.interval_coverage_pct}%</div>
-            <div className="reur">P10–P90, target {d.reliability.interval_nominal_pct}%</div>
           </div>
           <div className="readout">
             <div className="l">Overfit gap</div>
             <div className="v" style={{ fontSize: 22 }}>{(d.reliability.train_r2 - d.reliability.test_r2).toFixed(3)}</div>
-            <div className="reur">train {d.reliability.train_r2} → test {d.reliability.test_r2}</div>
           </div>
         </div>
       )}
