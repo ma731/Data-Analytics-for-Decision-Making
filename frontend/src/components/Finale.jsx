@@ -35,6 +35,7 @@ export default function Finale() {
             type="range" min="1" max="5" step="0.1" value={uplift}
             onChange={(e) => setUplift(+e.target.value)}
             aria-label="Revenue-management uplift percentage"
+            aria-valuetext={`${uplift.toFixed(1)} percent uplift`}
           />
           <div className="finale-loss-bar" aria-hidden="true">
             <div className="finale-loss-fill" style={{ width: `${lossErased}%` }} />

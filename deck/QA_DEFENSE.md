@@ -7,8 +7,8 @@ The questions a sharp examiner *will* ask, with tight answers. Read it once befo
 ## 1. Data & validity (the most likely attacks)
 
 **Q: Your data is quoted fares, not bookings — aren't you modeling listings, not demand?**
-Yes, and we say so explicitly. Row counts are listing frequency, not passengers. So we frame the panic-tax and market-sizing numbers as *directional opportunity estimates on a demand proxy*, not a P&L. The **structural** findings (fuel rises with stops, only Tata sells business, price ≠ fuel cost) don't depend on volume at all, so they're unaffected.
-*(If pressed: it's in §6d Threats to Validity. We'd want transaction data to firm up the revenue numbers; we didn't have it, so we scoped the claims to what listings support.)*
+Right on the data, but not on the money. Two separate things: (1) the descriptive findings (panic-tax multiple, far-out share) are *shares of listings* — true of the data we have. (2) The **monetized** figures (decision-tree EMV, market funnel) are NOT listing-row counts times rupees — they're anchored to the cited **110M-passenger DGCA base** × six-metro share × Tata served share × far-out share, giving ~3.3M far-out economy passengers a year. So the prize is passengers × per-seat uplift, not scrape-rows × 6. The **structural** findings (fuel rises with stops, only Tata sells business, price ≠ fuel cost) don't depend on volume at all.
+*(If pressed: it's in §6d. We'd still want transaction data to firm up the load factor; the served base uses a labelled 88% economy share and the observed far-out share as a booking-share proxy.)*
 
 **Q: Is the pricing uplift causally identified?**
 No, and we don't claim it is. The booking curve confounds price and volume — both move with days-to-departure. That's exactly why we relabel the demand "elasticity" as a *descriptive gradient*, not a causal one. The decision tree handles the uncertainty explicitly with a "demand softens" state; a clean test would need an A/B fare experiment we don't have.
@@ -49,7 +49,7 @@ A fourth would either duplicate one of these or stray into something the data ca
 Fair — we don't size the cabin investment, that's a limitation. But the first step is zero-capex: EMSR seat protection optimises the inventory we already fly. Grow the hard assets only after that banks the easy win.
 
 **Q: Justify the headline money number.**
-A 2–4% revenue-management uplift on Air India's ₹38,812 cr FY24 revenue is ₹780–1,550 cr/yr (≈ €90–170M) — a quarter to a third of the FY24 loss, from pricing discipline alone. The uplift band is conservative and modelled; we slide it live in the app.
+Two ways that agree. **Top-down:** a 2–4% revenue-management uplift on Air India's ₹38,812 cr FY24 revenue is ₹780–1,550 cr/yr (≈ €90–170M) — a quarter to a third of the FY24 loss. **Bottom-up:** the pricing move alone, on ~3.3M far-out economy passengers (from the 110M DGCA base) at a ₹1,378/seat uplift, is ≈ ₹460 cr at 15% capture and ≈ ₹920 cr at 30% (€51–102M) — which sits inside the top-down band once premium and fuel are added. The two derivations reconcile; that's the point.
 
 ---
 
@@ -85,7 +85,7 @@ Correct, and we flag it. The decision tree's "demand softens" branch is a reduce
 Three things: (1) transaction/booking data to turn the proxy figures into a real P&L; (2) an A/B fare test for causal identification of the pricing uplift; (3) a competitive best-response model. Each is named as a limitation, not hidden.
 
 **Q: What's the single most defensible thing here?**
-That it knows its own limits. The standout isn't the 12 engines — it's the Threats-to-Validity section that names what to attack before you can. That's the difference between a dashboard and an analysis.
+That it knows its own limits. The standout isn't the nine OR engines and the decision layer — it's the Threats-to-Validity section that names what to attack before you can. That's the difference between a dashboard and an analysis.
 
 **Q: If the live demo breaks?**
 We have the deck (PDF) and a recorded walkthrough as fallback. Everything in the app also runs from cited numbers in the technical submission. *(Reminder to us: the app needs internet for fonts + the live map; test the venue wifi, pre-warm the backend.)*

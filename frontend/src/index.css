@@ -7,7 +7,7 @@
   --surface-2: #161d30;
   --border: #1f2a44;
   --text: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-muted: #a6b3c9; /* lightened for WCAG AA over the translucent panels */
   /* data accents — hand-tuned, intentionally off the stock framework hexes */
   --data-blue: #356fd6;
   --data-blue-bright: #7bb0f2;

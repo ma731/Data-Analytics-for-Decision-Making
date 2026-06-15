@@ -30,6 +30,7 @@ export default function PriceOptimizer() {
         <div className="slider" style={{ flex: 1 }}>
           <div className="lab"><span>Price elasticity of demand</span><b>{e.toFixed(2)}</b></div>
           <input type="range" min="1.1" max="2.6" step="0.05" value={e} aria-label="Price elasticity"
+            aria-valuetext={`elasticity ${e.toFixed(2)}`}
             onChange={(ev) => onSlide(+ev.target.value)} />
           <div className="mix-bar" aria-hidden="true">
             <span className="mix-end left">BUSINESS · pays anything</span>

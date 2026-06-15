@@ -264,6 +264,17 @@
   color: var(--positive);
   font-weight: 600;
 }
+.rec-invest {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.rec-invest b {
+  color: var(--text);
+}
 
 /* ===================== STRATEGIC RATIONALE (the board memo) ===================== */
 .strat-grid {
@@ -1487,6 +1498,14 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 @keyframes scrollProgress {
   to {
     transform: scaleX(1);
+  }
+}
+/* fixed-attachment parallax janks / jumps on mobile Safari — drop it on phones */
+@media (max-width: 720px) {
+  .finale,
+  .sim-stage,
+  .revenue-stage {
+    background-attachment: scroll;
   }
 }
 

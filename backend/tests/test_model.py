@@ -91,6 +91,46 @@ def test_findings_frontier_sorted():
     check("findings.assumptions == model ASSUMPTIONS", f["assumptions"] == fm.ASSUMPTIONS)
 
 
+def test_business_modules():
+    """Decision-analysis layer invariants: EMV/EVPI, TOPSIS, and the TAM/SAM/SOM funnel."""
+    try:
+        import business
+        import analysis
+    except Exception as exc:  # pragma: no cover
+        print(f"  [skip] business tests (import failed: {exc})")
+        return
+
+    # MCDM is pure (no CSV needed) — always runs
+    mc = business.mcdm_moves()
+    cis = [r["closeness"] for r in mc["ranking"]]
+    check("TOPSIS closeness in [0,1]", all(0.0 <= c <= 1.0 for c in cis), str(cis))
+    check("MCDM ranks exactly 3 moves", len(mc["ranking"]) == 3)
+    check("TOPSIS & weighted-sum agree on #1", mc["methods_agree"] is True)
+    check("weight-stability in [0,100]", 0.0 <= mc["weight_stability_pct"] <= 100.0)
+
+    # decision tree + market sizing need the CSV (build_findings)
+    if not os.path.exists(analysis.DATA_PATH):
+        print("  [skip] decision/market tests (Flight_price.csv not present)")
+        return
+
+    d = business.decision_tree()
+    check("EVPI >= 0", d["evpi_cr"] >= 0, f'{d["evpi_cr"]}')
+    check("aggressive hold-payoff > conservative", d["acts"][0]["payoff_hold_cr"] > d["acts"][1]["payoff_hold_cr"])
+    check("exactly one recommended act", sum(1 for a in d["acts"] if a["recommended"]) == 1)
+    check("flip-probability in [0,1]",
+          d["flip_probability"] is None or 0.0 <= d["flip_probability"] <= 1.0)
+    check("far-out base is passengers, not rows (0<x<50M)", 0 < d["far_out_eco_pax_m"] < 50)
+
+    m = business.market_sizing()
+    rev = [L["revenue_cr"] for L in m["levels"]]   # TAM, SAM, SOM
+    pax = [L["pax_m"] for L in m["levels"]]
+    check("TAM >= SAM >= SOM (revenue)", rev[0] >= rev[1] >= rev[2], str(rev))
+    check("TAM >= SAM >= SOM (pax)", pax[0] >= pax[1] >= pax[2], str(pax))
+    check("pricing uplift > 0", m["panic_uplift_cr"] > 0)
+    lo, hi = m["som_range_cr"]
+    check("SOM sits inside its sensitivity band", lo <= rev[2] <= hi, f"{lo} <= {rev[2]} <= {hi}")
+
+
 if __name__ == "__main__":
     print("Air India War Room — model sanity tests\n")
     test_assumptions_match_constants()
@@ -98,5 +138,6 @@ if __name__ == "__main__":
     test_fuel_monotonic_in_stops()
     test_fuel_breakdown_sane()
     test_findings_frontier_sorted()
+    test_business_modules()
     print(f"\n{PASS} passed, {FAIL} failed")
     sys.exit(1 if FAIL else 0)

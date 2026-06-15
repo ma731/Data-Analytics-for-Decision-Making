@@ -63,6 +63,7 @@ def monte_carlo_fuel(volatility_pct=20.0, n=6000):
     uncertain. ATF price modelled as lognormal around the base with the given
     volatility (2022 ATF swung ~20-40% on the Ukraine shock).
     """
+    RNG = np.random.default_rng(42)   # per-function seed -> order-independent
     rt = route_table()
     # annualised fuel litres across the modelled network (volume = observed sample)
     total_fuel_litres = float((rt.fuel_kg / JET_A_DENSITY_KG_L * rt.volume).sum())
@@ -103,8 +104,9 @@ def optimize_pricing(elasticity=1.4):
 
     Realism: late bookers (business) are price-INELASTIC; early bookers (leisure)
     are ELASTIC. The `elasticity` slider scales the early end. Each bucket's fare is
-    moved toward its revenue-maximising point p* = p0*(1+e)/(2e), so total optimised
-    revenue is always >= current (each window is individually optimised).
+    moved toward its revenue-maximising point p* = p0*(1+e)/(2e). Absent the clamp
+    that is >= current per window; the [0.82, 1.28] clamp can bite, so we report the
+    TRUE uplift (no longer floored at 0) rather than over-claiming the guarantee.
     """
     df = analysis.load()
     eco = df[df["class"] == "Economy"]
@@ -186,6 +188,7 @@ def nsga2_pareto(pop_size=60, generations=40):
     MINIMISE total fuel and MINIMISE negative-revenue (i.e. maximise revenue).
     Returns a per-generation snapshot of the population so the front can be animated.
     """
+    RNG = np.random.default_rng(202)   # per-function seed -> order-independent
     rt = route_table()
     R = len(rt)
     rev = rt.rev_per_flight.to_numpy()
@@ -302,6 +305,7 @@ def rl_pricing(episodes=4000):
     heatmap, and the evaluated revenue vs a static-price baseline — so the UI can
     show the agent *learning* (reward curve rising, heatmap sharpening, uplift).
     """
+    RNG = np.random.default_rng(303)   # per-function seed -> order-independent
     H = 20                                   # horizon (days)
     SEATS = 60                               # inventory
     seat_buckets = 6
@@ -553,8 +557,8 @@ def emsr_protection():
         "uplift_pct": round(uplift, 1),
         "note": ("Fares are data-driven; premium demand is an assumption "
                  "(~12% of cabin, CV 0.4 — listings aren't bookings). Uplift is vs a "
-                 "cabin that never protects a premium seat. Protection is exact "
-                 "(Littlewood's rule)."),
+                 "never-protect (FCFS) cabin — a deliberate worst-case baseline. "
+                 "Protection itself is exact (Littlewood's rule)."),
     }
 
 
