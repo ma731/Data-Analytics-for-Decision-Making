@@ -178,7 +178,23 @@ are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
 efficiency frontier into its provably-optimal form — and EMSR/LP/DEA add the
 exact-optimal, marginal-value, and efficiency-scoring lenses alongside them.
 
-## 6c. Threats to validity (what a skeptic should attack first)
+## 6c. Decision analysis & business case (`backend/business.py`)
+
+The OR engine finds what's optimal; a thin decision-analysis layer turns it into a
+board-level call — all computed live from the findings:
+
+| Module | Method | What it answers |
+|---|---|---|
+| **Decision tree** | Expected monetary value across demand-response states, with EVPI and the probability flip-point | "How aggressively do we roll out dynamic pricing?" EMV favours the aggressive rollout (~₹151 cr/yr vs ₹94 cr); EVPI is small (~₹12 cr), and the recommendation only flips if you believe demand softens >75% of the time. |
+| **MCDM (TOPSIS)** | Six weighted criteria ranked by closeness to the ideal, cross-checked with a weighted sum and a 4,000-draw weight-stability test | "Which move first?" Re-time pricing ranks #1 (stable in ~66% of perturbed weightings, mean rank 1.4), premium #2, connections #3. |
+| **Market sizing** | TAM / SAM / SOM funnel from one cited macro figure + labelled assumptions | "How big is the prize?" ≈ €7.3B domestic → €2.2B six-metro → €405M Tata served base the moves grow. |
+
+The live app is organised as three acts — **Diagnosis** (descriptive), **Operations
+Research** (prescriptive), **Business Strategy** (the decision) — ending on the money number.
+
+---
+
+## 6d. Threats to validity (what a skeptic should attack first)
 
 We hold the project to a research standard: a limitation you **scope and own** is
 defensible; one you hide is a finding waiting to be demolished. The honest threats:
