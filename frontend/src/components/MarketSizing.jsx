@@ -63,9 +63,8 @@ export default function MarketSizing() {
         the routes where Tata already has the metal and the only two business cabins.
       </p>
       <div className="assume">
-        Order-of-magnitude sizing. Cited: 110M domestic pax and the 18.4% Tata combined share (DGCA 2022). Labelled
-        assumptions: a ₹{d?.avg_fare_inr ?? 6000} average fare and a {d?.metro_trunk_share_pct ?? 30}% six-metro trunk
-        share. Not a bottom-up forecast.
+        Cited: 110M pax, 18.4% Tata share (DGCA 2022). Assumed: ₹{d?.avg_fare_inr ?? 6000} fare,{" "}
+        {d?.metro_trunk_share_pct ?? 30}% trunk share. Order-of-magnitude, not a forecast.
       </div>
     </div>
   );

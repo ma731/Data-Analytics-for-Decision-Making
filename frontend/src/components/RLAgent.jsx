@@ -120,8 +120,7 @@ export default function RLAgent() {
         <b style={{ color: "var(--accent)" }}>{d ? `+${d.uplift_pct}%` : "…"}</b> over the discount-to-fill instinct.
       </p>
       <div className="assume">
-        Trained on a stylised, fixed-inventory demand model for illustration — it shows that RL <i>rediscovers</i> revenue
-        management, not a forecast of Air India&rsquo;s actual bookings.
+        Stylised fixed-inventory demand model — it shows RL <i>rediscovers</i> revenue management, not a booking forecast.
       </div>
     </div>
   );

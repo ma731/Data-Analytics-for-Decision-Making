@@ -83,9 +83,7 @@ export default function PanicTax({ panic }) {
         </ResponsiveContainer>
       </div>
       <p className="chart-caption">
-        Book at T-1 and you pay <b style={{ color: "var(--accent)" }}>{panic.multiplier}×</b> the
-        far-out fare — yet <b>{panic.far_out_share}%</b> of seats sell in that cheapest window. The
-        blue line marks where the cliff begins (~20 days).
+        The blue line marks where the cliff begins — about 20 days out.
       </p>
     </div>
   );

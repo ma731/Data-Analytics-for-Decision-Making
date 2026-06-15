@@ -68,11 +68,11 @@ export default function Hero() {
       <div className="hero-body">
         <div className="hero-eyebrow">A new Air India · the owner&rsquo;s opening diagnostic</div>
         <h1 className="hero-title">
-          TWO LEVERS.<br />
-          <span className="hl">ONE DECISION.</span>
+          <span className="line"><span className="line-in">TWO LEVERS.</span></span>
+          <span className="line"><span className="line-in hl">ONE DECISION.</span></span>
         </h1>
         <p className="hero-sub">
-          300,153 flights. Zero fuel data — so we engineered it from physics. Then six live
+          300,153 flights. Zero fuel data — so we engineered it from physics. Then nine live
           operations-research engines turn every insight into an order. This is what optimizing
           <b> fuel and price</b> actually looks like.
         </p>
@@ -85,7 +85,7 @@ export default function Hero() {
         <div className="hero-stats">
           <div><b>2.8×</b><span>panic-tax swing</span></div>
           <div><b>8×</b><span>business-class premium</span></div>
-          <div><b>6</b><span>live OR engines</span></div>
+          <div><b>9</b><span>live OR engines</span></div>
         </div>
       </div>
 
