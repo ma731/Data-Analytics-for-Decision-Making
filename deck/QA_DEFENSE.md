@@ -92,5 +92,38 @@ We have the deck (PDF) and a recorded walkthrough as fallback. Everything in the
 
 ---
 
+## 7. The operating model & the "data-driven department" (Act IV)
+
+**Q: Why an operating-model section — isn't that beyond the analysis?**
+Because finding a number is a *project*; keeping the loop turning is a *department*. The brief is "head of data," not "analyst for a day." Act IV shows we can translate analytics into an operating capability: the same finding reframed for the **board, the data scientist, and the data engineer** (each with the expectation that keeps them aligned), a **RACI** on the three moves, a data→decision **flywheel**, the **maturity ladder** (we reach prescriptive), and a **90-day activation** plan. That's the rubric's "executive thinking" dimension made concrete.
+
+**Q: How would you actually staff and run it?**
+Five seats: data engineering (the feeds and contracts), data science (the models), an analytics translator (frames each result for its audience), revenue management, and an exec owner. Cadence: a weekly war-room and a decision log. The principle: decisions over dashboards — a chart that doesn't change a decision is overhead.
+
+**Q: You label fuel a "proxy" and the booking curve a "gap" — isn't that admitting the work is incomplete?**
+It's the opposite — it's the work being honest about its inputs. The data-readiness ledger names exactly what's solid (fares), what's modelled (fuel, cost), and what's missing (live booking curve, competitor fares), each with an owner. The findings are sound on what we have; the prize grows as the gaps close. Naming them is expectation management, not weakness.
+
+---
+
+## 8. Methods we deliberately did *not* use
+
+**Q: Does queuing theory apply here?**
+It applies to *waiting-line* problems — runway/taxi-out queues (which drive taxi-and-hold fuel burn), ATC slot allocation, terminal and check-in throughput. We excluded it on purpose: the fares dataset has no operational timing data (no arrival rates, no service times), and our problem is revenue management and optimisation, not congestion. Forcing it in would be the wrong tool for the data. It's logged as a future unlock in the data-readiness ledger — give us a runway/taxi timing feed and queuing theory quantifies congestion fuel.
+
+**Q: Why not deep learning / a neural net for demand?**
+On ~300k rows with a dozen features, gradient boosting is the right call — stronger on tabular data, far more interpretable, and it lets us *rank the levers* a revenue team can pull (cabin, timing dominate). A neural net would add opacity without accuracy on a problem this size. Right tool, not the fanciest tool.
+
+---
+
+## 9. Format & delivery
+
+**Q: Why present from a live web app instead of slides?**
+Two reasons: it's the **technical submission**, and it's live proof the analysis is real — the model runs on the server, you can change a route and watch the fare move. In the room we present the *executive narrative* and surface only two or three live demos (the fuel calculator, the RL euro fare desk); the nine engines are depth for this Q&A, not the script. A static PDF deck is the failsafe if the venue or the laptop misbehaves.
+
+**Q: The RL "fare desk" — is that a real quote?**
+No, and it says so. It applies the agent's *converged policy* to each sector's **observed** fare range (far-out → last-minute) scaled by great-circle distance. It's an illustration of the learned behaviour — hold cheap when empty and far out, escalate as seats fill and departure nears — not a live booking-system price.
+
+---
+
 ## One-line close (if you only remember one thing)
 *"Fuel and price are not two problems — they're one decision. We engineered the fuel the data was missing, computed the optimal moves nine ways, and we're honest about exactly what we can and can't claim."*

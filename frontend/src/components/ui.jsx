@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-export function Section({ eyebrow, title, sub, delay = 0, id, children }) {
+export function Section({ eyebrow, title, sub, method, bank, delay = 0, id, children }) {
   return (
     <section className="section" id={id} style={{ animationDelay: `${delay}ms` }}>
+      {bank && <div className="section-bank">{bank}</div>}
       {eyebrow && <div className="section-eyebrow">{eyebrow}</div>}
       {title && <h2 className="section-title">{title}</h2>}
       {sub && <p className="section-sub">{sub}</p>}
+      {method && <div className="method-note">{method}</div>}
       {children}
     </section>
   );
@@ -93,7 +95,7 @@ export function ChartTip({ active, payload, label, render }) {
   return (
     <div
       style={{
-        background: "rgba(17,23,38,0.96)",
+        background: "rgba(20,24,22,0.96)",
         border: "1px solid var(--border)",
         borderRadius: 10,
         padding: "10px 12px",

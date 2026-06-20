@@ -62,6 +62,7 @@ export default function McdmRanking() {
                 width: `${(r.closeness / maxCi) * 100}%`, height: "100%",
                 background: r.rank === 1 ? "var(--positive)" : "var(--data-blue-bright)",
                 borderRadius: 999, transition: "width 0.8s ease-out",
+                boxShadow: r.rank === 1 ? "0 0 16px rgba(27,164,124,0.55)" : "none",
               }} />
             </div>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, minWidth: 42, textAlign: "right" }}>
