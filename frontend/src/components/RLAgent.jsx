@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { getRL } from "../api.js";
-import { ChartTip } from "./ui.jsx";
+import { getRL, fmtINR } from "../api.js";
+import { ChartTip, useCountUp } from "./ui.jsx";
 
 // price level index (0=cheapest .. 4=dearest) -> colour
 function fareColor(idx, n = 5) {
@@ -10,7 +10,33 @@ function fareColor(idx, n = 5) {
   return `hsl(${hue}, ${55 + t * 20}%, ${52 + (1 - t) * 6}%)`;
 }
 
-export default function RLAgent() {
+// the six metros — coords for sector distance, so picking a route moves the fare
+const CITIES = {
+  Delhi: { code: "DEL", lat: 28.556, lon: 77.1 },
+  Mumbai: { code: "BOM", lat: 19.089, lon: 72.868 },
+  Bengaluru: { code: "BLR", lat: 13.199, lon: 77.71 },
+  Hyderabad: { code: "HYD", lat: 17.24, lon: 78.429 },
+  Chennai: { code: "MAA", lat: 12.99, lon: 80.169 },
+  Kolkata: { code: "CCU", lat: 22.654, lon: 88.447 },
+};
+const REF_KM = 1140; // Delhi–Mumbai, the reference sector
+function haversineKm(a, b) {
+  const R = 6371, toR = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * toR, dLon = (b.lon - a.lon) * toR;
+  const la1 = a.lat * toR, la2 = b.lat * toR;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+// the policy the agent converges to, as a quotable move
+const MOVES = [
+  { k: "Hold — fill the plane", c: "var(--data-blue-bright)" },
+  { k: "Ease up gently", c: "var(--data-blue-bright)" },
+  { k: "Nudge the fare", c: "var(--accent)" },
+  { k: "Push hard", c: "var(--accent)" },
+  { k: "Peak — last seats", c: "var(--negative)" },
+];
+
+export default function RLAgent({ f }) {
   const [d, setD] = useState(null);
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -44,6 +70,25 @@ export default function RLAgent() {
   const uplift = snap && baseRev ? Math.round(((snap.agent_rev - baseRev) / baseRev) * 100) : 0;
   const pct = d ? Math.round((frame / (d.history.length - 1)) * 100) : 0;
   const heat = snap?.heatmap || []; // [day][seatBucket] = price idx
+
+  // ---- interactive euro fare desk: the agent's converged policy, quoted on any route ----
+  const [orig, setOrig] = useState("Delhi");
+  const [dest, setDest] = useState("Mumbai");
+  const [daysLeft, setDaysLeft] = useState(7);
+  const [seatsPct, setSeatsPct] = useState(45);
+  const farOut = f?.panic_tax?.far_out_avg ?? 4000;
+  const lastMin = f?.panic_tax?.last_minute_avg ?? 11000;
+  const sameRoute = orig === dest;
+  const km = sameRoute ? 0 : haversineKm(CITIES[orig], CITIES[dest]);
+  const distFactor = Math.pow(Math.max(km, 1) / REF_KM, 0.6);
+  const timePressure = 1 - (daysLeft - 1) / 19; // 0 far out .. 1 day-of
+  const scarcity = 1 - seatsPct / 100;          // 0 empty plane .. 1 nearly full
+  const fareIdx = sameRoute ? 0 : Math.max(0, Math.min(4, Math.round((0.5 * timePressure + 0.5 * scarcity) * 4)));
+  const levelFare = farOut + (lastMin - farOut) * (fareIdx / 4);
+  const fareInr = Math.round(levelFare * distFactor);
+  const fareEur = Math.round(fareInr / 90);
+  const move = MOVES[fareIdx];
+  const eurShown = useCountUp(sameRoute ? 0 : fareEur, { duration: 450, format: (v) => `€${Math.round(v).toLocaleString("en-US")}` });
 
   return (
     <div className="panel">
@@ -114,6 +159,45 @@ export default function RLAgent() {
         </div>
       </div>
 
+      {/* interactive euro fare desk */}
+      <div className="faredesk">
+        <div className="fd-controls">
+          <div className="rl-cap">Try the policy live — quote a fare on any route, in euros</div>
+          <label className="fd-field">
+            <span className="fd-k">Route</span>
+            <div className="fd-route-row">
+              <select value={orig} onChange={(e) => setOrig(e.target.value)} aria-label="Origin city">
+                {Object.keys(CITIES).map((c) => <option key={c} value={c}>{c} ({CITIES[c].code})</option>)}
+              </select>
+              <span className="fd-arrow" aria-hidden="true">→</span>
+              <select value={dest} onChange={(e) => setDest(e.target.value)} aria-label="Destination city">
+                {Object.keys(CITIES).map((c) => <option key={c} value={c}>{c} ({CITIES[c].code})</option>)}
+              </select>
+            </div>
+          </label>
+          <label className="fd-field">
+            <span className="fd-k">Days before departure <b>{daysLeft}</b></span>
+            <input type="range" min="1" max="20" value={daysLeft} onChange={(e) => setDaysLeft(+e.target.value)} aria-label="Days before departure" />
+          </label>
+          <label className="fd-field">
+            <span className="fd-k">Seats still unsold <b>{seatsPct}%</b></span>
+            <input type="range" min="5" max="95" value={seatsPct} onChange={(e) => setSeatsPct(+e.target.value)} aria-label="Seats still unsold" />
+          </label>
+        </div>
+        <div className="fd-out">
+          <div className="fd-price">
+            <span className="fd-eur mono">{sameRoute ? "—" : eurShown}</span>
+            <span className="fd-inr mono">{sameRoute ? "pick two different cities" : `${fmtINR(fareInr)} · ${Math.round(km)} km sector`}</span>
+          </div>
+          <div className="fd-move" style={{ borderColor: move.c, color: move.c }}>
+            <span className="fd-move-k">Agent</span>{sameRoute ? "—" : move.k}
+          </div>
+          <div className="fd-levels" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map((l) => <span key={l} className={`fd-dot ${!sameRoute && l <= fareIdx ? "on" : ""}`} />)}
+          </div>
+        </div>
+      </div>
+
       <p className="chart-caption">
         The agent rediscovers <b style={{ color: "var(--positive)" }}>revenue management</b> on its own: hold cheap fares
         when the plane is empty and far out, escalate hard as seats fill and departure nears. Final policy earns{" "}
@@ -121,7 +205,9 @@ export default function RLAgent() {
       </p>
       <div className="assume">
         Stylised fixed-inventory demand model; uplift is vs an always-cheapest baseline (a deliberate worst case). It shows
-        RL <i>rediscovers</i> revenue management, not a booking forecast.
+        RL <i>rediscovers</i> revenue management, not a booking forecast. The fare desk applies that learned policy to each
+        sector&rsquo;s observed fare range (₹{Math.round(farOut).toLocaleString("en-US")}–₹{Math.round(lastMin).toLocaleString("en-US")}),
+        scaled by distance — illustrative, not a live quote.
       </div>
     </div>
   );

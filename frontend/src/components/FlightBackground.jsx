@@ -52,7 +52,7 @@ export default function FlightBackground() {
               cy: (nodes[i].y + nodes[j].y) / 2 - (dx / d) * d * 0.18,
               speed: 0.04 + Math.random() * 0.12,
               offset: Math.random(),
-              hue: Math.random() < 0.5 ? "59,130,246" : "251,191,36",
+              hue: Math.random() < 0.6 ? "91,227,173" : "120,134,128",
             });
           }
         }
@@ -75,9 +75,9 @@ export default function FlightBackground() {
 
       // slow aurora blobs
       const blobs = [
-        { x: W * 0.85, y: H * 0.08, c: "211,17,69", r: 520 },
-        { x: W * 0.05, y: H * 0.12, c: "59,130,246", r: 460 },
-        { x: W * (0.5 + 0.15 * Math.sin(t)), y: H * (0.9 + 0.05 * Math.cos(t * 0.7)), c: "16,185,129", r: 380 },
+        { x: W * 0.85, y: H * 0.08, c: "91,227,173", r: 520 },
+        { x: W * 0.05, y: H * 0.12, c: "91,227,173", r: 460 },
+        { x: W * (0.5 + 0.15 * Math.sin(t)), y: H * (0.9 + 0.05 * Math.cos(t * 0.7)), c: "120,134,128", r: 380 },
       ];
       for (const b of blobs) {
         const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
@@ -115,7 +115,7 @@ export default function FlightBackground() {
         const tw = 0.5 + 0.5 * Math.sin(t * 4 + n.ph);
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(148,163,184,${0.25 + tw * 0.5})`;
+        ctx.fillStyle = `rgba(150,160,154,${0.25 + tw * 0.5})`;
         ctx.fill();
       }
 

@@ -178,6 +178,14 @@ are the showpieces: one *learns* the panic-tax curve, the other *evolves* the
 efficiency frontier into its provably-optimal form — and EMSR/LP/DEA add the
 exact-optimal, marginal-value, and efficiency-scoring lenses alongside them.
 
+**On method appropriateness.** We use the technique that fits the data, not the fanciest one.
+Two deliberate exclusions: (1) **queuing theory** is the right tool for airport/runway congestion
+and taxi-and-hold fuel burn, but the fares dataset has no operational timing data, so applying it
+here would be the wrong instrument — it is logged as a future unlock once a runway/taxi-timing feed
+exists (§6d data-readiness). (2) **Deep learning** was not used for demand: on ~300k tabular rows,
+gradient boosting is stronger and interpretable, and it lets us *rank the levers* a revenue team can
+pull — a neural net would add opacity without accuracy at this scale.
+
 ## 6c. Decision analysis & business case (`backend/business.py`)
 
 The OR engine finds what's optimal; a thin decision-analysis layer turns it into a
@@ -189,12 +197,36 @@ board-level call — all computed live from the findings:
 | **MCDM (TOPSIS)** | Six weighted criteria ranked by closeness to the ideal, cross-checked with a weighted sum and a 4,000-draw weight-stability test | "Which move first?" Re-time pricing ranks #1 (stable in ~66% of perturbed weightings, mean rank 1.4), premium #2, connections #3. |
 | **Market sizing** | TAM / SAM / SOM funnel from one cited macro figure + labelled assumptions | "How big is the prize?" ≈ €7.3B domestic → €2.2B six-metro → €405M Tata served base the moves grow. |
 
-The live app is organised as three acts — **Diagnosis** (descriptive), **Operations
-Research** (prescriptive), **Business Strategy** (the decision) — ending on the money number.
+The live app is organised as four acts — **Diagnosis** (descriptive), **Operations
+Research** (prescriptive), **Business Strategy** (the decision), and **the Operating Model**
+(the capability, §6d) — ending on the money number.
 
 ---
 
-## 6d. Threats to validity (what a skeptic should attack first)
+## 6d. From analysis to a data-driven department (Act IV)
+
+A finding is a project; a repeatable decision is a department. The brief is *head of data*, so the
+final act turns the analysis into an operating capability — the "executive thinking" dimension.
+
+- **One finding, three audiences.** The Panic Tax is reframed for the **board** (decision + money),
+  the **data scientist** (model + uncertainty), and the **data engineer** (pipeline + data contract),
+  each with the expectation that keeps them aligned — the same insight communicated differently to
+  each owner.
+- **Data → decision flywheel + RACI.** Ingest → model → frame → decide → measure, with a named owner
+  on every hop and an explicit Responsible/Accountable/Consulted/Informed matrix for the three moves.
+- **Data-readiness ledger.** Each input is labelled *have* (fares), *proxy* (fuel, cost) or *gap*
+  (live booking curve, competitor fares) with the owner who closes it — making the limits of the
+  current analysis explicit rather than hidden.
+- **Analytics maturity ladder.** The work climbs descriptive → diagnostic → predictive →
+  prescriptive; the stated organisational task is to *stay* at prescriptive by automating ingest,
+  monitoring and re-training.
+- **90-day activation.** Prove (pilot the price floor + stand up the booking feed) → scale (roll out
+  + replace the fuel proxy with telemetry) → automate (RL in shadow mode, weekly war-room, drift
+  monitoring).
+
+---
+
+## 6e. Threats to validity (what a skeptic should attack first)
 
 We hold the project to a research standard: a limitation you **scope and own** is
 defensible; one you hide is a finding waiting to be demolished. The honest threats:
@@ -254,4 +286,11 @@ data/                   # Flight_price.csv, market_context.json, findings.json
 ```
 
 Run: `python backend/app.py` + `npm --prefix frontend run dev` → open `http://localhost:5173`.
-The dashboard's **Live Fuel Calculator** runs the model on any route in real time.
+The dashboard's **Live Fuel Calculator** and **RL euro fare desk** run the model on any route in real time.
+
+### Deliverables
+- This technical submission (`deck/TECHNICAL_SUBMISSION.md`).
+- Executive deck — `deck/AirIndia_WarRoom.pdf` (+ `exec-summary.html`, `AirIndia_ExecSummary.pdf`).
+- `deck/RUN_OF_SHOW.md` — the 10-minute executive run-of-show.
+- `deck/QA_DEFENSE.md` — Q&A defense sheet.
+- The live application (`backend/` + `frontend/`), the analytical core of this submission.

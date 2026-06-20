@@ -42,8 +42,8 @@ export default function EmsrProtection() {
           <AreaChart data={d?.curve || []} margin={{ top: 12, right: 18, bottom: 26, left: 8 }}>
             <defs>
               <linearGradient id="emsrFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#c99a3b" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="#c99a3b" stopOpacity={0.03} />
+                <stop offset="0%" stopColor="#5be3ad" stopOpacity={0.5} />
+                <stop offset="100%" stopColor="#5be3ad" stopOpacity={0.03} />
               </linearGradient>
             </defs>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
@@ -59,7 +59,7 @@ export default function EmsrProtection() {
                   <b style={{ color: "var(--brand-gold)" }}>{fmtINR(p[0]?.payload.revenue)}</b></div>
               </div>
             )} />} />
-            <Area dataKey="revenue" type="monotone" stroke="#c99a3b" strokeWidth={3}
+            <Area dataKey="revenue" type="monotone" stroke="#5be3ad" strokeWidth={3}
               fill="url(#emsrFill)" isAnimationActive animationDuration={700} />
             {d && <ReferenceLine x={d.protection_optimal} stroke="var(--positive)" strokeWidth={2}
               strokeDasharray="5 4"

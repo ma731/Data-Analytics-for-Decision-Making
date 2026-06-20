@@ -104,7 +104,7 @@ export default function Frontier({ frontier }) {
             />
             <Scatter data={data} fillOpacity={0.78}>
               {data.map((d, i) => (
-                <Cell key={i} fill={d.fill} stroke="#0a0e1a" strokeWidth={1} />
+                <Cell key={i} fill={d.fill} stroke="#0a0c0b" strokeWidth={1} />
               ))}
             </Scatter>
           </ScatterChart>

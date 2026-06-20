@@ -77,7 +77,7 @@ export default function BusinessWhitespace({ airlines, business }) {
             />
             <Bar dataKey="avg_price" name="Avg economy fare" radius={[0, 6, 6, 0]}>
               {data.map((d, i) => (
-                <Cell key={i} fill={d.sells_business ? "var(--brand-gold)" : "#3b4663"} />
+                <Cell key={i} fill={d.sells_business ? "var(--brand-gold)" : "#2c332e"} />
               ))}
             </Bar>
           </BarChart>

@@ -19,11 +19,14 @@ backend/      FastAPI — serves the fuel model, findings, AND a live OR engine
   optimize.py     operations-research engine (9 modules, see below)
   business.py     decision analysis + business case (decision tree, MCDM, TAM/SAM/SOM)
   app.py          API: /api/findings, /api/route, /api/context + 9 OR + 3 decision endpoints
-frontend/     React + Vite dashboard (Recharts), Fraunces editorial type on a dark
-              cinematic theme. Organised as three acts: Diagnosis -> Operations
-              Research -> Business Strategy, ending on the money number.
+frontend/     React + Vite dashboard (Recharts). Dark, near-monochrome theme with a
+              single mint accent (Hanken Grotesk + DM Mono). Four acts: Diagnosis ->
+              Operations Research -> Business Strategy -> the Operating Model, over a
+              cinematic scroll journey (exterior aircraft -> cabin -> airport), ending
+              on the money number.
 data/         Flight_price.csv (real), market_context.json (real, cited), findings.json
-deck/         Executive presentation (HTML + PDF) + technical submission
+deck/         Executive deck (HTML + PDF), technical submission, Q&A defense sheet,
+              and the 10-minute run-of-show
 ```
 
 ## Operations Research engine (`backend/optimize.py`)
@@ -53,6 +56,26 @@ The OR engine says what's optimal; this layer turns it into a boardroom decision
 | Decision tree | Expected monetary value, **EVPI**, and the probability flip-point for the pricing rollout under demand uncertainty | `/api/decision` |
 | MCDM ranking | **TOPSIS** over six weighted criteria (+ weighted-sum cross-check + a weight-stability test) — what to do first | `/api/mcdm` |
 | Market sizing | **TAM / SAM / SOM** funnel from cited macro figures + labelled assumptions | `/api/market` |
+
+## Act IV — the operating model (turning analysis into a capability)
+The brief is *head of data*, not analyst-for-a-day — so the story closes on how a data-driven
+department actually runs:
+- **One finding, three ways** — the Panic Tax reframed for the board, the data scientist and the
+  data engineer, each with the expectation that keeps them aligned.
+- **Data → decision flywheel + RACI** — named owners on every hop and every move.
+- **Data-readiness ledger** — what's solid (fares), modelled (fuel), and still a gap (live booking
+  curve / competitor fares), each with an owner to close it.
+- **Analytics maturity ladder** — the work reaches *prescriptive*; the org task is to stay there.
+- **90-day activation plan** — prove → scale → automate.
+
+Plus a live, interactive **euro fare desk** (the RL agent's learned policy quoting a fare on any
+route) and a navigable **engine rack** indexing the nine OR engines.
+
+## Presenting it
+- `deck/RUN_OF_SHOW.md` — a 10-minute, beat-by-beat executive run-of-show (what to show vs skip, speaker split, tech failsafe).
+- `deck/QA_DEFENSE.md` — the questions a sharp examiner will ask, with tight answers.
+- Present live from the app; `deck/AirIndia_WarRoom.pdf` is the failsafe. If the projector
+  stutters, enable the OS "Reduce motion" setting — the app drops to a static, lightweight render.
 
 ## Run it
 ```powershell
