@@ -36,7 +36,7 @@ export default function LiveMap() {
       fr.forEach((r, ri) => {
         const n = Math.max(1, Math.round((r.volume / total) * TOTAL_PLANES));
         for (let k = 0; k < n; k++) {
-          planes.push({ ri, t: Math.random(), speed: 0.035 + Math.random() * 0.03, hue: Math.random() < 0.7 ? "251,191,36" : "96,165,250" });
+          planes.push({ ri, t: Math.random(), speed: 0.035 + Math.random() * 0.03, hue: Math.random() < 0.7 ? "91,227,173" : "143,193,246" });
         }
       });
       planesRef.current = planes;
@@ -98,15 +98,15 @@ export default function LiveMap() {
         ctx.closePath();
       }
       const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, "rgba(31,42,68,0.55)");
-      g.addColorStop(1, "rgba(17,23,38,0.35)");
+      g.addColorStop(0, "rgba(30,36,33,0.6)");
+      g.addColorStop(1, "rgba(18,22,20,0.4)");
       ctx.fillStyle = g;
       ctx.fill();
-      ctx.strokeStyle = "rgba(96,165,250,0.5)";
+      ctx.strokeStyle = "rgba(91,227,173,0.55)";
       ctx.lineWidth = 1.2;
       ctx.stroke();
       // state borders
-      ctx.strokeStyle = "rgba(96,165,250,0.10)";
+      ctx.strokeStyle = "rgba(91,227,173,0.12)";
       ctx.lineWidth = 0.6;
       for (const ring of m.states) {
         ctx.beginPath();
@@ -141,7 +141,7 @@ export default function LiveMap() {
         const p0 = pos[r.source_city], p1 = pos[r.destination_city];
         const c = arc(p0, p1);
         ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.quadraticCurveTo(c.cx, c.cy, p1.x, p1.y);
-        ctx.strokeStyle = "rgba(251,191,36,0.06)"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.strokeStyle = "rgba(91,227,173,0.07)"; ctx.lineWidth = 1; ctx.stroke();
       }
 
       // planes + contrails
@@ -178,10 +178,10 @@ export default function LiveMap() {
         const { x, y } = pos[name]; const code = CITIES[name].code;
         const pulse = 5 + Math.sin(ts / 500) * 1.4;
         const gg = ctx.createRadialGradient(x, y, 0, x, y, pulse * 2.6);
-        gg.addColorStop(0, "rgba(218,14,41,0.55)"); gg.addColorStop(1, "rgba(218,14,41,0)");
+        gg.addColorStop(0, "rgba(91,227,173,0.55)"); gg.addColorStop(1, "rgba(91,227,173,0)");
         ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, pulse * 2.6, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "rgba(251,191,36,0.95)"; ctx.fillText(code, x + 8, y - 6);
+        ctx.fillStyle = "rgba(132,240,200,0.95)"; ctx.fillText(code, x + 8, y - 6);
       }
 
       // surface arrival to React (debounced 2.6s)

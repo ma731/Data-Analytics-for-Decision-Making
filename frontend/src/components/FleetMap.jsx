@@ -63,7 +63,7 @@ export default function FleetMap() {
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.quadraticCurveTo(cx, cy, p1.x, p1.y);
-        ctx.strokeStyle = `rgba(251,191,36,${alpha})`;
+        ctx.strokeStyle = `rgba(91,227,173,${alpha})`;
         ctx.lineWidth = w;
         ctx.stroke();
         // travelling pulse, frequency-gated
@@ -73,8 +73,8 @@ export default function FleetMap() {
         const px = v * v * p0.x + 2 * v * u * cx + u * u * p1.x;
         const py = v * v * p0.y + 2 * v * u * cy + u * u * p1.y;
         const g = ctx.createRadialGradient(px, py, 0, px, py, 6);
-        g.addColorStop(0, "rgba(255,235,160,0.95)");
-        g.addColorStop(1, "rgba(251,191,36,0)");
+        g.addColorStop(0, "rgba(200,255,235,0.95)");
+        g.addColorStop(1, "rgba(91,227,173,0)");
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
       }

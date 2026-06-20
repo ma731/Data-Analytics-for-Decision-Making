@@ -58,7 +58,7 @@ export default function DecisionTree() {
           </thead>
           <tbody>
             {acts.map((a) => (
-              <tr key={a.act} style={a.recommended ? { background: "rgba(218,14,41,0.07)" } : undefined}>
+              <tr key={a.act} style={a.recommended ? { background: "rgba(91,227,173,0.09)" } : undefined}>
                 <td style={{ color: ACT_COLOR[a.act], fontWeight: 600 }}>{a.act}</td>
                 <td className="num">{a.payoff_hold_cr}</td>
                 <td className="num">{a.payoff_soften_cr}</td>

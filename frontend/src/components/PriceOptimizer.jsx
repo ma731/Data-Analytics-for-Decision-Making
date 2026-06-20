@@ -46,19 +46,19 @@ export default function PriceOptimizer() {
         </div>
       </div>
 
-      <div style={{ width: "100%", height: 320 }}>
+      <div style={{ width: "100%", height: 344 }}>
         <ResponsiveContainer>
-          <ComposedChart data={d?.curve || []} margin={{ top: 12, right: 18, bottom: 28, left: 8 }}>
+          <ComposedChart data={d?.curve || []} margin={{ top: 8, right: 18, bottom: 38, left: 8 }}>
             <defs>
               <linearGradient id="optFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.55} />
-                <stop offset="100%" stopColor="#fbbf24" stopOpacity={0.04} />
+                <stop offset="0%" stopColor="#5be3ad" stopOpacity={0.55} />
+                <stop offset="100%" stopColor="#5be3ad" stopOpacity={0.04} />
               </linearGradient>
             </defs>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis dataKey="days_left" reversed stroke="var(--border)"
               tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: "var(--font-mono)" }}
-              label={{ value: "Days before departure  →  closer in", position: "bottom", offset: 12, fill: "var(--text-muted)", fontSize: 12 }} />
+              label={{ value: "Days before departure  →  closer in", position: "bottom", offset: 18, fill: "var(--text-muted)", fontSize: 12 }} />
             <YAxis stroke="var(--border)" tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: "var(--font-mono)" }}
               tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
             <Tooltip content={<ChartTip render={(p) => (
@@ -68,9 +68,9 @@ export default function PriceOptimizer() {
                 <div className="muted">Optimal <b style={{ color: "var(--accent)" }}>₹{p[0]?.payload.optimal_price?.toLocaleString("en-US")}</b></div>
               </div>
             )} />} />
-            <Legend wrapperStyle={{ fontSize: 13 }} />
+            <Legend verticalAlign="top" align="right" height={26} wrapperStyle={{ fontSize: 13, paddingBottom: 12 }} />
             <Area className="glow-gold" dataKey="optimal_price" name="Optimal fare" type="monotone"
-              stroke="#fbbf24" strokeWidth={3} fill="url(#optFill)" isAnimationActive animationDuration={500} />
+              stroke="#5be3ad" strokeWidth={3} fill="url(#optFill)" isAnimationActive animationDuration={500} />
             <Line className="glow-blue" dataKey="current_price" name="Current fare" type="monotone"
               stroke="var(--data-blue-bright)" strokeWidth={2} strokeDasharray="6 4" dot={false} isAnimationActive />
           </ComposedChart>
