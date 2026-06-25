@@ -264,7 +264,11 @@ The decision is how aggressively to roll out dynamic pricing under two demand-re
 \label{eq:emv}
 \end{equation}
 \begin{equation}
-\mathrm{EVPI} = \Big[p\max_a \pi_a(\text{hold}) + (1-p)\max_a \pi_a(\text{soften})\Big] - \max_a \mathrm{EMV}(a).
+\begin{aligned}
+\mathrm{EVPI} ={}& p\max_a \pi_a(\text{hold}) \\
+&+ (1-p)\max_a \pi_a(\text{soften}) \\
+&- \max_a \mathrm{EMV}(a).
+\end{aligned}
 \label{eq:evpi}
 \end{equation}
 The aggressive rollout maximises EMV (Table~\ref{tab:dt}). The EVPI is only \INR{}\,53\cr{} against a \INR{}\,651\cr{} prize---the decision is robust, so perfect demand research would barely change the call. The recommendation flips to the conservative pilot only if one believes demand holds with probability below $0.248$ (softens more than $\sim$75\% of the time); we believe $\sim$0.65. Because the capture rate and the realised-fraction-if-soften are also assumptions, we Monte-Carlo all of them (5{,}000 draws): Aggressive stays the EMV-maximising act in \textbf{97.7\%} of draws. The headline call is demonstrated-robust, not an artefact of the assumed numbers. All figures are anchored to 3.34M far-out economy passengers derived from the cited 110M DGCA base, not to scrape-row counts.
