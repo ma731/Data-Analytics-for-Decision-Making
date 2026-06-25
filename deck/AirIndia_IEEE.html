@@ -263,7 +263,7 @@
   <h3>A. Decision tree, EMV and EVPI (RQ4)</h3>
   <p>The decision is how hard to push the dynamic-pricing rollout under two demand states (demand <i>holds</i> with prior \(p=0.65\); <i>softens</i> with 0.35). For act \(a\) with state payoffs \(\pi_a(\cdot)\),</p>
   <div class="eq">\[ \text{EMV}(a) = p\,\pi_a(\text{hold}) + (1-p)\,\pi_a(\text{soften}) \quad(5) \]</div>
-  <div class="eq">\[ \text{EVPI} = \big[p\max_a \pi_a(\text{hold}) + (1-p)\max_a \pi_a(\text{soften})\big] - \max_a \text{EMV}(a) \quad(6) \]</div>
+  <div class="eq">\[ \begin{aligned} \text{EVPI} ={}& p\max_a \pi_a(\text{hold}) \\ &+ (1-p)\max_a \pi_a(\text{soften}) \\ &- \max_a \text{EMV}(a) \quad(6) \end{aligned} \]</div>
   <p class="noindent">The aggressive rollout has the highest EMV (Table VII). The EVPI is only Rs. 53 cr against a Rs. 651 cr prize, so the decision is robust and more research would not change the call. The recommendation flips to the gentle pilot only if you believe demand holds with probability below 0.248 (that is, softens more than about 75 percent of the time); we believe about 0.65. Because the capture rate and the realised-fraction-if-soften are also assumptions, we run a 5,000-draw Monte Carlo over all of them, and the aggressive rollout stays best in 97.7 percent of draws. The headline call is robust, not an artefact of the assumed numbers. All figures are tied to 3.34M far-out economy passengers from the cited 110M DGCA base, not to listing rows.</p>
 
   <div class="tabwrap">
