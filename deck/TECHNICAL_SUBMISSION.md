@@ -87,11 +87,30 @@ cities. **Every fuel, cost and CO₂ figure is a labelled estimate**, not invent
 is implemented in `backend/fuel_model.py` and runs live in the app — any route can be recomputed
 on demand during Q&A.
 
-### 4.1 Known limitations (for honest defense)
+### 4.1 External validation (multi-anchor envelope check)
+No per-flight fuel ground truth exists in this dataset, so we cannot *calibrate*. Instead we check
+the engineered nonstop estimate against **published A320-family trip-fuel envelopes at four stage
+lengths** (`/api/fuel_validation`, enforced by a unit test):
+
+| Sector | Stage (km) | Model | Published band | In band? |
+|---|---|---|---|---|
+| Bangalore→Chennai | 268 | 1.63 t | 1.4–2.2 t | ✓ |
+| Hyderabad→Mumbai | 623 | 2.69 t | 2.2–3.2 t | ✓ |
+| Delhi→Mumbai | 1,137 | 4.24 t | 3.5–4.5 t | ✓ |
+| Delhi→Bangalore | 1,709 | 5.95 t | 5.0–6.5 t | ✓ |
+
+All four land inside band; **mean absolute deviation from band midpoint is 4.8%** (max 9.5% on the
+shortest, LTO-dominated hop). Bands are consistent with published Airbus / ICAO-EEA fuel-vs-distance
+performance; short sectors carry wider bands because the LTO cycle dominates. This upgrades the old
+single Delhi–Mumbai anchor into a four-sector envelope check across the full stage-length range.
+
+### 4.2 Known limitations (for honest defense)
 - Single fleet assumption (A320 narrowbody) — correct for these domestic metro routes, but Air
   India flies widebodies on some sectors. We deliberately keep one transparent assumption rather
   than fabricate per-flight aircraft types.
-- No load-factor or payload weight data; per-seat figures assume a full 180-seat cabin.
+- No measured load-factor or payload data. We now report fuel per **passenger** as well as per
+  available seat, using a **labelled 80% load-factor assumption** (DGCA 2022 domestic ran ~80–87%);
+  e.g. Delhi–Mumbai is 23.5 kg/available-seat → 29.4 kg/passenger.
 - `price_minus_fuel` is a **directional** "what's left after fuel" lens, **not** a true margin
   (it excludes crew, ownership, airport and overhead costs).
 
@@ -153,11 +172,11 @@ learning, machine learning, exact revenue management, and efficiency analysis.
 | Module | Method | What it answers |
 |---|---|---|
 | **Monte Carlo fuel-risk** | Simulate the annual fuel bill under lognormal ATF price shocks (~6,000 draws) → P10/P50/P90 + 95% Value-at-Risk | "How exposed are we to a fuel-price spike, and how big a hedge do the efficiency moves buy?" |
-| **Dynamic price optimiser** | Per booking-window linear-demand revenue maximisation with elasticity rising over the horizon (early leisure elastic, late business inelastic) | "What fare should we charge in each window?" |
+| **Dynamic price optimiser** | Per booking-window linear-demand revenue maximisation with elasticity rising over the horizon (early leisure elastic, late business inelastic). The demand gradient is **estimated from the data with a bootstrap CI** and that uncertainty is **propagated** to a revenue-uplift *band* (`/api/pricing_uncertainty`) | "What fare should we charge in each window — and how much does the elasticity uncertainty move the answer?" |
 | **NSGA-II Pareto** | Multi-objective genetic algorithm over capacity-share vectors; non-dominated sorting + crowding distance, 40 generations | "What is the *provably* best set of fuel-vs-revenue network trade-offs?" |
 | **Fleet MILP** | Integer program (`scipy.optimize.milp`): maximise contribution s.t. a fleet block-hour budget and service bounds | "Exactly how many flights should we fly on each route?" |
 | **RL pricing agent** | Tabular Q-learning; state = (days-left, seats-left), reward = realised fare revenue, 4,000 episodes | "Can an agent *learn* the optimal pricing ladder from scratch?" (it rediscovers revenue management) |
-| **ML demand engine** | Gradient-boosted fare model on 40k flights, validated on a leakage-proof flight-grouped split (out-of-sample R², MAPE, calibrated P10–P90 intervals, skill vs baseline) + permutation importance | "What drives the fare, how accurately can we predict it, and how reliable is that prediction?" |
+| **ML demand engine** | Gradient-boosted fare model on 40k flights, leakage-proof flight-grouped split. Accuracy reported as **mean ± SD over 3 folds** (R² 0.96 ± 0.001, MAPE 15.8 ± 0.5%); P10–P90 intervals **recalibrated with split-conformal (CQR)** so coverage moves 73.6% → 77.8% toward the 80% nominal; skill vs baseline + permutation importance | "What drives the fare, how accurately (with an error bar) can we predict it, and are the intervals trustworthy?" |
 | **EMSR seat protection** | Littlewood's rule — the exact two-class fare protection level (the optimum the RL agent only approximates) | "How many seats should we protect for Business instead of selling cheap early?" |
 | **LP shadow prices** | LP relaxation of the fleet program; the dual of the block-hour budget prices capacity | "What is one more aircraft-hour — or one more jet — actually worth?" |
 | **DEA route efficiency** | Input-oriented CCR data envelopment analysis, one linear program per route | "Which routes are on the efficiency frontier, and exactly which peer should each laggard copy?" |
@@ -193,8 +212,8 @@ board-level call — all computed live from the findings:
 
 | Module | Method | What it answers |
 |---|---|---|
-| **Decision tree** | Expected monetary value across demand-response states, with EVPI and the probability flip-point | "How aggressively do we roll out dynamic pricing?" EMV favours the aggressive rollout (~₹151 cr/yr vs ₹94 cr); EVPI is small (~₹12 cr), and the recommendation only flips if you believe demand softens >75% of the time. |
-| **MCDM (TOPSIS)** | Six weighted criteria ranked by closeness to the ideal, cross-checked with a weighted sum and a 4,000-draw weight-stability test | "Which move first?" Re-time pricing ranks #1 (stable in ~66% of perturbed weightings, mean rank 1.4), premium #2, connections #3. |
+| **Decision tree** | Expected monetary value across demand-response states, with EVPI, the probability flip-point, and a **5,000-draw Monte Carlo over all the labelled knobs** (P(hold), capture, both soften-keeps) | "How aggressively do we roll out dynamic pricing?" EMV favours the aggressive rollout (~₹651 cr/yr vs ₹405 cr); EVPI is small (~₹53 cr); the call flips only if demand softens >75% of the time (P(hold) < 0.248); and **Aggressive stays the EMV-max act in 97.7% of the Monte-Carlo draws** — robust, not an artefact of the assumed numbers. |
+| **MCDM (TOPSIS)** | Six weighted criteria ranked by closeness to the ideal, cross-checked with a weighted sum, a 4,000-draw **weight**-stability test **and a 4,000-draw score-stability test** (perturbing the 1–5 scores, not just the weights) | "Which move first?" Re-time pricing ranks #1, stable in **66% of perturbed weightings and 72% of perturbed score matrices** (mean rank 1.4), premium #2, connections #3. |
 | **Market sizing** | TAM / SAM / SOM funnel from one cited macro figure + labelled assumptions | "How big is the prize?" ≈ €7.3B domestic → €2.2B six-metro → €405M Tata served base the moves grow. |
 
 The live app is organised as four acts — **Diagnosis** (descriptive), **Operations
@@ -242,27 +261,30 @@ defensible; one you hide is a finding waiting to be demolished. The honest threa
    the gap" is a causal claim resting on a cross-sectional pattern, and the booking
    curve confounds it (price and volume both move with days-to-departure — which is
    exactly why we relabel the demand "elasticity" as a *descriptive gradient*, not a
-   causal one). We do **not** claim the uplift is identified. The decision tree makes
-   the demand-response uncertainty explicit (a "demand softens" state) and its
-   flip-probability shows how robust the recommendation is to being wrong — but this
-   is decision analysis under uncertainty, not a causal estimate. A clean test would
+   causal one). We do **not** claim the uplift is identified. We now also **estimate
+   that gradient from the data with a 1,000-sample bootstrap 95% CI** (−0.36, CI
+   [−0.54, −0.17]) and **propagate that uncertainty through the pricing optimiser** to
+   a revenue-uplift *band* rather than a point — but the gradient is still descriptive,
+   so this is an uncertainty band, not a causal estimate. A clean causal test would
    need an A/B fare experiment or a natural experiment we don't have.
 3. **Assumption-driven decision modules — mitigated by sensitivity, not eliminated.**
    The decision tree's state probabilities and the MCDM's 1–5 scores and weights are
-   *labelled judgements*, not estimates. We attack each with the same tornado
-   discipline as the fuel model: the decision tree ships its **EMV-vs-probability
-   sweep and flip-point**; the MCDM ships a **weight-stability check** (re-ranking
-   across 4,000 Gaussian-perturbed weightings). A ranking that survives the weights
-   is a finding; one that flips is an opinion. We report which.
-4. **The fuel model is robust, and now has one external anchor.** The ±20%
+   *labelled judgements*, not estimates. We attack each with tornado discipline: the
+   decision tree ships its EMV-vs-probability sweep, flip-point, **and a 5,000-draw
+   Monte Carlo over *all* its knobs (P(hold), capture, both soften-keeps) — Aggressive
+   stays optimal in 97.7%**; the MCDM ships **both a weight-stability check and a
+   score-stability check** (re-ranking across 4,000 perturbed weightings *and* 4,000
+   perturbed 1–5 score matrices — #1 holds in 66% and 72% respectively). A ranking
+   that survives both axes is a finding; one that flips is an opinion. We report which.
+4. **The fuel model is robust, with a four-anchor external check.** The ±20%
    sensitivity (Spearman ≈ 0.997) shows the conclusions don't depend on any single
    constant — but note it holds great-circle distance *fixed* (distance is geometric,
    not assumed), so it stress-tests the engineered constants, not the dominant
-   distance driver. There is no per-flight fuel ground truth in the dataset; as a
-   sanity check the model's **Delhi–Mumbai nonstop estimate (~4.2 t)** lands inside
-   the published **A320 trip-fuel range (~3.5–4.5 t** for a ~1.4 h sector) — one
-   external check (enforced by a unit test), not a full calibration. Every figure is
-   still a labelled estimate.
+   distance driver. There is no per-flight fuel ground truth in the dataset; instead
+   the model is checked against **published A320 trip-fuel envelopes at four stage
+   lengths (270–1,709 km) — all inside band, mean absolute deviation 4.8%**
+   (`/api/fuel_validation`, §4.1, enforced by a unit test). This is a multi-anchor
+   envelope check, not a full calibration. Every figure is still a labelled estimate.
 5. **Staleness & seasonality.** Data is Feb–Mar 2022; annual figures scale the
    two-month sample ×6, which ignores seasonality. The Vistara merger (completed 2024)
    post-dates the data, so "pre-merger" framing is a narrative device for the 2022
