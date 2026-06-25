@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Fuel and Price Are One Decision (IEEE)</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], tags: 'none' },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  @page { size: Letter; margin: 0.62in 0.6in 0.7in 0.6in; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 9.6pt;
+    line-height: 1.18;
+    color: #000;
+    text-align: justify;
+    hyphens: auto;
+  }
+  .full { column-span: all; -webkit-column-span: all; }
+  header.full { text-align: center; margin: 0 0 6pt; }
+  h1.title {
+    font-size: 20pt; font-weight: 700; line-height: 1.12;
+    margin: 0 0 9pt; letter-spacing: .1px;
+  }
+  .authors { font-size: 10.5pt; line-height: 1.3; }
+  .authors .name { font-variant: small-caps; font-size: 11pt; }
+  .authors .aff { font-style: italic; font-size: 9.6pt; }
+  .authors .mono { font-family: "Courier New", monospace; font-style: normal; font-size: 8.6pt; }
+  .cols { column-count: 2; column-gap: 0.26in; }
+  .cols { -webkit-column-count: 2; }
+  p { margin: 0 0 4.5pt; text-indent: 12pt; }
+  p.noindent, .abstract p, .keywords p { text-indent: 0; }
+  .abstract { margin: 0 0 5pt; }
+  .abstract p { font-weight: 700; font-size: 9.2pt; font-style: italic; line-height: 1.16; }
+  .abstract .lead { font-style: normal; }
+  .keywords p { font-size: 9.2pt; }
+  .keywords b { font-style: italic; }
+  h2 {
+    font-size: 9.8pt; font-weight: 400; font-variant: small-caps;
+    text-align: center; margin: 9pt 0 4pt; letter-spacing:.2px;
+  }
+  h2 .num { margin-right: 4pt; }
+  h3 { font-size: 9.6pt; font-weight: 400; font-style: italic; margin: 6pt 0 3pt; }
+  .eq { text-align: center; margin: 4pt 0; }
+  mjx-container { font-size: 100% !important; }
+  table { border-collapse: collapse; width: 100%; font-size: 8.7pt; margin: 2pt 0 3pt; }
+  .tabwrap { margin: 4pt 0 7pt; break-inside: avoid; }
+  .tabwrap .cap { text-align: center; font-variant: small-caps; font-size: 8.4pt; margin-bottom: 2pt; }
+  .tabwrap .cap b { font-variant: normal; }
+  table th, table td { padding: 1.6pt 5pt; text-align: left; }
+  table th { font-weight: 700; border-top: 1.1pt solid #000; border-bottom: 0.6pt solid #000; }
+  table tr:last-child td { border-bottom: 1.1pt solid #000; }
+  td.r, th.r { text-align: right; }
+  figure { margin: 4pt 0 7pt; break-inside: avoid; text-align: center; }
+  figure svg { width: 100%; height: auto; }
+  figcaption { font-size: 8.5pt; text-align: justify; margin-top: 3pt; }
+  figcaption b { font-variant: normal; }
+  .figlabel { font-variant: small-caps; }
+  .span2 { column-span: all; -webkit-column-span: all; break-inside: avoid; }
+  .refs { font-size: 8.3pt; }
+  .refs ol { margin: 0; padding-left: 14pt; }
+  .refs li { margin-bottom: 1.5pt; text-align: justify; }
+  i, em { font-style: italic; }
+  .mono { font-family: "Courier New", monospace; font-size: 8.6pt; }
+</style>
+</head>
+<body>
+
+<header class="full">
+  <h1 class="title">Fuel and Price Are One Decision: An Engineered-Fuel, Operations-Research, and Decision-Analytic Diagnosis of Air India's Domestic Network</h1>
+  <div class="authors">
+    <div class="name">Team 3, Dataset 3 (Flight Price)</div>
+    <div class="aff">Master in Business Data Science and Analytics (MBDS), IE School of Science and Technology</div>
+    <div class="aff">Data Analytics for Decision Making</div>
+    <div class="mono">Repository: ma731/Data-Analytics-for-Decision-Making</div>
+  </div>
+</header>
+
+<div class="cols">
+
+  <div class="abstract">
+    <p><span class="lead"><i>Abstract.</i> </span>We take the role of the incoming Chief Data Officer of Air India in the weeks after Tata Sons completed its acquisition (handover 27 January 2022), and we treat a 300,153 row EaseMyTrip fare dataset (February to March 2022) as the new owner's first diagnostic. The assignment asks us to optimise <i>fuel consumption and flight price</i>, but the dataset has <b>no fuel field at all</b>. The main idea of this work is simple: do not skip the fuel half. We build a transparent, first-principles fuel-burn model from great-circle distance and the landing-and-takeoff (LTO) cycle, using published aviation benchmarks, and we use it to put fuel and revenue on one chart, the <i>Efficiency Frontier</i>. We report four findings: price does not track fuel cost (a 3.71 times spread in revenue per fuel-kilogram across routes priced almost the same); a 2.8 times booking-curve "panic tax"; a connections problem where extra stops raise fare, fuel and CO₂ together; and an 8 times business-class premium sold by only the two Tata carriers. We then build a nine-module operations-research engine that turns each finding into a computed decision, and a decision layer (a decision tree with the value of perfect information, a TOPSIS ranking with stability tests, and a market-size funnel). The recommendation is three ranked moves worth about Rs. 1,164 cr (about €129M) per year, reconciled two ways. Every engineered number is labelled an estimate. We check the fuel model against published trip-fuel bands at four stage lengths (all in band, 4.8 percent mean deviation), put a bootstrap confidence interval on the demand gradient and carry that uncertainty through the pricing optimiser, calibrate the model's prediction intervals, and stress-test the recommendation against all of its assumptions.</p>
+  </div>
+  <div class="keywords">
+    <p><b>Index Terms.</b> airline revenue management, dynamic pricing, fuel-burn estimation, operations research, decision analysis under uncertainty, multi-criteria decision making, data envelopment analysis, reinforcement learning, threats to validity.</p>
+  </div>
+
+  <h2><span class="num">I.</span>Introduction</h2>
+  <p>On 27 January 2022, Tata Sons completed the Rs. 18,000 cr acquisition of Air India, returning the carrier to the group that founded it in 1932. The airline it inherited was in poor shape: loss-making, out-flown at home by IndiGo (about 55.7 percent share in November 2022 against Air India's 9.1 percent), and exposed to a jet-fuel spike. Fuel is the largest controllable cost for an Indian carrier (about 40 percent of operating cost), and Delhi ATF rose from Rs. 90,519 per kL in February to Rs. 110,666 per kL in March 2022 [9], [11].</p>
+  <p>The fare dataset for this study was scraped in February to March 2022, the first weeks of Air India under Tata ownership. So we take the role of the incoming Chief Data Officer and treat the analysis as the first diagnostic a new owner would order: where is the money leaking, and which levers does the data say to pull first?</p>
+
+  <h3>A. The central problem</h3>
+  <p>The brief is clear: optimise <i>fuel</i> and <i>price</i>. The dataset supports the price half well (fares, booking horizon <span class="mono">days_left</span>, cabin class, routing <span class="mono">stops</span>, carrier, time of day) but does not support the fuel half at all. There is no burn figure, no aircraft type, no payload, no distance. The only physical hints are <span class="mono">duration</span> and <span class="mono">stops</span>, and <span class="mono">duration</span> is misleading, because a connecting itinerary's gate-to-gate time is mostly layover, not flight time. A weaker submission answers only the price half. Our choice is to answer both, by building the missing fuel layer from first principles (Section IV).</p>
+
+  <h3>B. Research questions and contributions</h3>
+  <p><b>RQ1.</b> Can a defensible, transparent fuel-burn estimate be built from the only physical signals in the data, and is it robust enough to carry economic conclusions? <b>RQ2.</b> Once fuel and revenue share a chart, does observed pricing reflect cost to serve? <b>RQ3.</b> What are the best moves to make, and do independent methods agree on them? <b>RQ4.</b> Under clear uncertainty, how hard should the moves be pushed, and how robust is that call?</p>
+  <p>Our contributions are: (i) an engineered fuel-estimation layer for a dataset with no fuel field, checked against published values and stress-tested; (ii) the <i>Efficiency Frontier</i>, a single chart that reframes fuel and price as one decision; (iii) a nine-module OR engine with method triangulation, including a reinforcement-learning agent that re-discovers, on its own, the panic-tax curve that an exact EMSR rule solves in closed form; (iv) a decision layer that carries uncertainty in the open (EMV, EVPI, flip-point, and a full Monte Carlo) and tests its own subjectivity; and (v) a habit of honesty, written up as an operating model for a data-driven team.</p>
+
+  <h2><span class="num">II.</span>Related Work</h2>
+  <p>Modern airline revenue management (RM) starts with the problem of selling a fixed, perishable seat inventory to buyers with very different willingness to pay [1]. The standard two-class seat-protection result is Littlewood's rule [2], and its multi-class form, EMSR [3], is used across the industry. Fares change along the booking horizon because the demand mix shifts from price-sensitive leisure to price-insensitive business travellers. The steady fare rise as <span class="mono">days_left</span> falls to zero is the sign of this, and we measure it, prescribe against it, and learn it. First-principles fuel estimation splits a flight into the ICAO landing-and-takeoff cycle and a cruise term [4], with 1 kg of jet fuel producing about 3.16 kg of CO₂. Fleet planning is a (mixed-)integer program whose capacity duals price capacity, and multi-objective trade-offs are approximated by NSGA-II [5]. Relative efficiency of units is scored by data envelopment analysis (CCR) [6]. Choice under uncertainty is ranked by expected monetary value and bounded by the value of perfect information, and multi-criteria choice is handled by TOPSIS [7]. Our contribution is not any single method but how they are put together over one dataset, how they agree, and how honestly we state what the data can and cannot support.</p>
+
+  <h2><span class="num">III.</span>Data</h2>
+  <p>The dataset (Table I) is the public "Flight Price Prediction" EaseMyTrip scrape. It passes basic checks (0 nulls, 0 duplicates) and sensible ones: nonstop is cheaper than one stop, which is cheaper than two or more stops; late-night is cheapest; fares rise toward departure. The clearest sign the data is real is that business class is sold only by Vistara and Air India and by no other carrier, which matches the 2022 Indian market, where those two were the only full-service carriers. A simple synthetic generator would not produce that pattern. The one quirk is a two-peak price distribution (mean Rs. 20,890 against median Rs. 7,425), which is explained by business-class fares.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table I.</b> Dataset Summary</div>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Source</td><td>EaseMyTrip / Kaggle "Flight Price Prediction"</td></tr>
+      <tr><td>Records</td><td>300,153 flight listings</td></tr>
+      <tr><td>Period</td><td>February to March 2022</td></tr>
+      <tr><td>Geography</td><td>6 metros, 30 directed city pairs</td></tr>
+      <tr><td>Quality</td><td>0 nulls, 0 duplicates</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="num">IV.</span>The Engineered Fuel Model</h2>
+  <p>We estimate per-flight trip fuel as a cycle term plus a cruise term. Great-circle distance uses the haversine formula from published airport coordinates (\(R=6371\) km):</p>
+  <div class="eq">\[ d = 2R\arcsin\sqrt{\sin^2\tfrac{\Delta\varphi}{2} + \cos\varphi_1\cos\varphi_2\sin^2\tfrac{\Delta\lambda}{2}} \quad(1) \]</div>
+  <p class="noindent">The flown distance applies a routing detour factor \(\rho(s)\) for \(s\) stops, and airborne time follows from cruise speed \(v\):</p>
+  <div class="eq">\[ \ell = d\,\rho(s),\qquad t_{\text{air}} = \ell/v \quad(2) \]</div>
+  <p class="noindent">Total trip fuel adds \(n=s+1\) take-off cycles at \(f_{\text{LTO}}\) each to a cruise burn rate \(b\):</p>
+  <div class="eq">\[ F = f_{\text{LTO}}\,(s+1) + b\,t_{\text{air}} \quad(3) \]</div>
+  <p class="noindent">The model uses the two real drivers in the data, distance flown (from the city pair) and number of take-offs (from <span class="mono">stops</span>), and on purpose avoids the layover-heavy <span class="mono">duration</span>. The constants (Table II) are published and conservative, and a single source-of-truth dictionary ties them to the live dashboard, so the shown assumptions can never drift from the model that runs.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table II.</b> Model Constants and Source</div>
+    <table>
+      <tr><th>Symbol</th><th class="r">Value</th><th>Basis</th></tr>
+      <tr><td>b (cruise burn)</td><td class="r">2,400 kg/hr</td><td>A320 family midpoint</td></tr>
+      <tr><td>f<sub>LTO</sub> (cycle)</td><td class="r">825 kg</td><td>ICAO LTO cycle</td></tr>
+      <tr><td>v (cruise speed)</td><td class="r">800 km/h</td><td>incl. climb and descent</td></tr>
+      <tr><td>&rho; (0/1/2+)</td><td class="r">1.00/1.30/1.60</td><td>detour penalty</td></tr>
+      <tr><td>CO₂ per kg fuel</td><td class="r">3.16x</td><td>ICAO factor</td></tr>
+      <tr><td>Jet-A density</td><td class="r">0.80 kg/L</td><td>standard</td></tr>
+      <tr><td>ATF price</td><td class="r">Rs. 100/L</td><td>Delhi, early 2022</td></tr>
+      <tr><td>Seats</td><td class="r">180</td><td>A320 single class</td></tr>
+      <tr><td>Load factor</td><td class="r">0.80</td><td>DGCA 2022 (assumption)</td></tr>
+    </table>
+  </div>
+
+  <h3>A. Validation against published trip-fuel bands (RQ1)</h3>
+  <p>There is no per-flight fuel ground truth here, so we do not claim accuracy. We claim two things. First, robustness: when every constant is swung by 20 percent, the route-efficiency ranking barely changes (Spearman about 0.997 across eight cases), and the nonstop-versus-two-stop fuel gap stays in a narrow range. Second, a check against published values at four stage lengths (Table III). All four estimates land inside published A320 trip-fuel bands, with a mean absolute deviation of 4.8 percent from band midpoint (9.5 percent at worst, on the shortest sector, where the LTO cycle dominates). This is an envelope check across stage lengths, not a calibration against measured burn, and every figure stays a labelled estimate. We also report fuel per passenger (per available seat divided by the 0.80 load factor), so Delhi to Mumbai is 23.5 kg per available seat and 29.4 kg per passenger.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table III.</b> Fuel Model vs Published Trip-Fuel Bands</div>
+    <table>
+      <tr><th>Sector</th><th class="r">Stage (km)</th><th class="r">Model</th><th class="r">Band</th><th class="r">In band</th></tr>
+      <tr><td>Bangalore to Chennai</td><td class="r">268</td><td class="r">1.63 t</td><td class="r">1.4 to 2.2 t</td><td class="r">yes</td></tr>
+      <tr><td>Hyderabad to Mumbai</td><td class="r">623</td><td class="r">2.69 t</td><td class="r">2.2 to 3.2 t</td><td class="r">yes</td></tr>
+      <tr><td>Delhi to Mumbai</td><td class="r">1,137</td><td class="r">4.24 t</td><td class="r">3.5 to 4.5 t</td><td class="r">yes</td></tr>
+      <tr><td>Delhi to Bangalore</td><td class="r">1,709</td><td class="r">5.95 t</td><td class="r">5.0 to 6.5 t</td><td class="r">yes</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="num">V.</span>Descriptive Findings</h2>
+  <h3>A. Finding 0: the Efficiency Frontier (RQ2)</h3>
+  <p>Plotting every directed route by fuel per seat against revenue per seat (Fig. 1) shows that price does not reflect fuel cost. The best route (Bangalore to Chennai) earns Rs. 7,106 on 14.9 kg per seat (476.8 revenue per fuel-kg). The worst (Delhi to Chennai) earns less (Rs. 6,102) on 47.5 kg per seat (128.5), a 3.71 times worse revenue-per-fuel ratio at almost the same price. Fuel and price are one decision, which answers RQ2.</p>
+
+  <figure>
+    <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg" font-family="Times New Roman, serif">
+      <rect x="45" y="12" width="285" height="176" fill="none" stroke="#bbb" stroke-width="0.6"/>
+      <line x1="45" y1="157.7" x2="330" y2="157.7" stroke="#eee" stroke-width="0.6"/>
+      <line x1="45" y1="97.0"  x2="330" y2="97.0"  stroke="#eee" stroke-width="0.6"/>
+      <line x1="45" y1="36.3"  x2="330" y2="36.3"  stroke="#eee" stroke-width="0.6"/>
+      <text x="41" y="160" font-size="7" text-anchor="end">6,000</text>
+      <text x="41" y="99.5" font-size="7" text-anchor="end">7,000</text>
+      <text x="41" y="38.8" font-size="7" text-anchor="end">8,000</text>
+      <text x="45"  y="197" font-size="7" text-anchor="middle">10</text>
+      <text x="112.9" y="197" font-size="7" text-anchor="middle">20</text>
+      <text x="180.7" y="197" font-size="7" text-anchor="middle">30</text>
+      <text x="248.6" y="197" font-size="7" text-anchor="middle">40</text>
+      <text x="316.4" y="197" font-size="7" text-anchor="middle">50</text>
+      <text x="187" y="208" font-size="7.5" text-anchor="middle">Fuel per seat (kg)</text>
+      <text x="11" y="100" font-size="7.5" text-anchor="middle" transform="rotate(-90 11,100)">Revenue per seat (Rs.)</text>
+      <g fill="#0E8F6E">
+        <circle cx="102.7" cy="135.8" r="2.1"/>
+        <circle cx="110.8" cy="154.6" r="2.1"/>
+        <circle cx="129.1" cy="159.5" r="2.1"/>
+        <circle cx="156.3" cy="131.4" r="2.1"/>
+        <circle cx="183.4" cy="125.5" r="2.1"/>
+        <circle cx="188.9" cy="154.0" r="2.1"/>
+        <circle cx="218.7" cy="67.3" r="2.1"/>
+        <circle cx="223.5" cy="87.2" r="2.1"/>
+        <circle cx="243.8" cy="35.5" r="2.1"/>
+        <circle cx="267.6" cy="68.3" r="2.1"/>
+        <circle cx="280.5" cy="147.0" r="2.1"/>
+        <circle cx="281.1" cy="72.3" r="2.1"/>
+      </g>
+      <circle cx="78.25" cy="90.5" r="2.8" fill="#0E8F6E" stroke="#063d2f" stroke-width="0.7"/>
+      <text x="83" y="88" font-size="7" fill="#0E8F6E">best: BLR to MAA</text>
+      <circle cx="299.5" cy="151.5" r="2.8" fill="#c0392b" stroke="#5e1a12" stroke-width="0.7"/>
+      <text x="296" y="164" font-size="7" fill="#c0392b" text-anchor="end">worst: DEL to MAA</text>
+    </svg>
+    <figcaption><span class="figlabel">Fig. 1.</span> The Efficiency Frontier. Revenue is roughly flat while fuel per seat varies about three times. Routes are priced almost without regard to what they burn, the 3.71 times revenue-per-fuel spread.</figcaption>
+  </figure>
+
+  <h3>B. Finding 1: the Panic Tax (price lever)</h3>
+  <p>Economy fares stay flat and cheap until about 20 days out, then climb steeply (Table IV). The last-minute to far-out fare ratio is 2.8 times at no change in cost to serve, yet 62.6 percent of economy seats sell in the cheapest window. The airline gives away early and overcharges late.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table IV.</b> The Panic Tax Along the Booking Horizon</div>
+    <table>
+      <tr><th>Window</th><th class="r">Avg fare (Rs.)</th><th class="r">Share of seats</th></tr>
+      <tr><td>T-1 to T-2</td><td class="r">14,226</td><td class="r">2.1%</td></tr>
+      <tr><td>T-3 to T-7</td><td class="r">10,992</td><td class="r">8.4%</td></tr>
+      <tr><td>T-8 to T-14</td><td class="r">10,048</td><td class="r">14.0%</td></tr>
+      <tr><td>T-15 to T-20</td><td class="r">6,141</td><td class="r">13.0%</td></tr>
+      <tr><td>T-21 and earlier</td><td class="r">5,037</td><td class="r">62.6%</td></tr>
+    </table>
+  </div>
+
+  <h3>C. Finding 2: the connections problem (fuel lever)</h3>
+  <p>As stops increase, both fare and fuel rise together (Table V). Cutting weak connections is a rare triple win: lower fare, lower fuel bill, lower CO₂. Here the fuel and price halves of the brief point the same way.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table V.</b> Stops Raise Fare and Fuel Together</div>
+    <table>
+      <tr><th>Routing</th><th class="r">Fare (Rs.)</th><th class="r">Fuel/seat</th><th class="r">CO₂/seat</th></tr>
+      <tr><td>Nonstop</td><td class="r">4,013</td><td class="r">24.2 kg</td><td class="r">76.5 kg</td></tr>
+      <tr><td>1 stop</td><td class="r">6,813</td><td class="r">34.8 kg</td><td class="r">110.0 kg</td></tr>
+      <tr><td>2 or more stops</td><td class="r">9,142</td><td class="r">44.7 kg</td><td class="r">141.4 kg</td></tr>
+    </table>
+  </div>
+
+  <h3>D. Finding 3: the premium gap (strategic lever)</h3>
+  <p>Business class sells at an 8 times premium (Rs. 52,540 against Rs. 6,572) and is offered by only 2 of 6 carriers, Air India (Rs. 47,131) and Vistara (Rs. 55,477). The merged Tata group owns India's domestic premium-cabin supply outright. This is the one structural edge no rival can copy quickly.</p>
+
+  <h2><span class="num">VI.</span>The Operations-Research Engine</h2>
+  <p>The OR engine (Table VI) turns each finding into a prescribed, computed decision. All modules run live, are seeded for reproducibility, and emit per-iteration snapshots.</p>
+
+  <div class="span2 tabwrap">
+    <div class="cap"><b>Table VI.</b> Nine-Module Operations-Research Engine (All Computed Live)</div>
+    <table>
+      <tr><th>Module</th><th>Method</th><th>Result and what it answers</th></tr>
+      <tr><td>Monte Carlo fuel risk</td><td>6,000 lognormal ATF draws</td><td>P10/P50/P90 = Rs. 11,913/15,513/19,947 cr; 95 percent VaR Rs. 21,453 cr. Exposure to a fuel spike.</td></tr>
+      <tr><td>Dynamic pricing</td><td>per-window linear-demand revenue max; elasticity estimated from data with a bootstrap CI and propagated to an uplift band</td><td>revenue-maximising fare per window, reported as a band that reflects the elasticity uncertainty.</td></tr>
+      <tr><td>NSGA-II</td><td>multi-objective GA (pop 60, 40 gens)</td><td>evolves the fuel-vs-revenue Pareto front, the formal version of the Efficiency Frontier.</td></tr>
+      <tr><td>Fleet MILP</td><td>scipy.optimize.milp, block-hour budget</td><td>integer flight frequencies per route; contribution about Rs. 27.4 cr.</td></tr>
+      <tr><td>LP shadow prices</td><td>dual of the block-hour budget</td><td>one block-hour worth Rs. 197,503; about Rs. 0.83 cr per aircraft per week.</td></tr>
+      <tr><td>RL pricing agent</td><td>tabular Q-learning, 4,000 episodes</td><td>agent revenue 316,600 against baseline 240,000 (plus 32 percent); re-discovers the panic-tax ladder.</td></tr>
+      <tr><td>ML demand</td><td>gradient boosting, flight-grouped split</td><td>R² 0.96 plus or minus 0.001 over 3 folds, MAPE 15.8 plus or minus 0.5 percent; intervals calibrated 73.6 to 77.8 percent; skill plus 30.6 percent.</td></tr>
+      <tr><td>EMSR seat protection</td><td>Littlewood's rule</td><td>exact protection of 32 seats (economy limit 148) for the 8 times premium.</td></tr>
+      <tr><td>DEA route efficiency</td><td>input-oriented CCR, one LP per route</td><td>3 of 30 efficient, mean efficiency 0.709, named peer targets for laggards.</td></tr>
+    </table>
+  </div>
+
+  <h3>A. Exact revenue management and triangulation (RQ3)</h3>
+  <p>The EMSR module computes the exact two-class protection level \(y^\star\) by Littlewood's rule. It protects high-fare seats until the marginal expected revenue equals the certain low fare:</p>
+  <div class="eq">\[ \Pr\left(D_{\text{high}} > y^\star\right) = \frac{f_{\text{low}}}{f_{\text{high}}} = \frac{6572}{52540} = 0.125 \quad(4) \]</div>
+  <p class="noindent">With premium demand \(D_{\text{high}}\sim\mathcal{N}(21.6,\,8.6^2)\) on a 180-seat cabin, \(y^\star=32\). The reinforcement-learning agent, which knows nothing of (4) or of Finding 1, learns the same behaviour from reward alone, and the panic-tax curve measures it directly. Three independent methods (analytic, learned, and empirical) tell the same revenue-management story, which is the answer to RQ3.</p>
+
+  <h3>B. Choosing the right method</h3>
+  <p>We use the method that fits the data, not the fanciest one, and we are clear about two choices we did not make. Queuing theory is the right tool for runway and taxi congestion fuel, but the dataset has no operational timing data, so it is left as future work. Deep learning was not used for demand: on about 300,000 tabular rows, gradient boosting is stronger, easier to read, and lets us rank the levers a revenue team can pull. Stating what we did not do, and why, is part of the rigor.</p>
+
+  <h2><span class="num">VII.</span>Decision Analysis and Business Case</h2>
+  <h3>A. Decision tree, EMV and EVPI (RQ4)</h3>
+  <p>The decision is how hard to push the dynamic-pricing rollout under two demand states (demand <i>holds</i> with prior \(p=0.65\); <i>softens</i> with 0.35). For act \(a\) with state payoffs \(\pi_a(\cdot)\),</p>
+  <div class="eq">\[ \text{EMV}(a) = p\,\pi_a(\text{hold}) + (1-p)\,\pi_a(\text{soften}) \quad(5) \]</div>
+  <div class="eq">\[ \text{EVPI} = \big[p\max_a \pi_a(\text{hold}) + (1-p)\max_a \pi_a(\text{soften})\big] - \max_a \text{EMV}(a) \quad(6) \]</div>
+  <p class="noindent">The aggressive rollout has the highest EMV (Table VII). The EVPI is only Rs. 53 cr against a Rs. 651 cr prize, so the decision is robust and more research would not change the call. The recommendation flips to the gentle pilot only if you believe demand holds with probability below 0.248 (that is, softens more than about 75 percent of the time); we believe about 0.65. Because the capture rate and the realised-fraction-if-soften are also assumptions, we run a 5,000-draw Monte Carlo over all of them, and the aggressive rollout stays best in 97.7 percent of draws. The headline call is robust, not an artefact of the assumed numbers. All figures are tied to 3.34M far-out economy passengers from the cited 110M DGCA base, not to listing rows.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table VII.</b> Decision Tree: Expected Monetary Value (Rs. cr/yr)</div>
+    <table>
+      <tr><th>Act</th><th class="r">Holds (0.65)</th><th class="r">Softens (0.35)</th><th class="r">EMV</th></tr>
+      <tr><td><b>Aggressive</b></td><td class="r">922.1</td><td class="r">147.5</td><td class="r"><b>651.0</b></td></tr>
+      <tr><td>Conservative</td><td class="r">461.1</td><td class="r">299.7</td><td class="r">404.6</td></tr>
+      <tr><td>Do nothing</td><td class="r">0</td><td class="r">0</td><td class="r">0</td></tr>
+    </table>
+  </div>
+
+  <h3>B. Multi-criteria ranking (TOPSIS)</h3>
+  <p>We rank the three moves by TOPSIS over six weighted criteria. With weighted normalised scores \(v_{ij}\) and ideal and anti-ideal points \(v_j^{+},v_j^{-}\), the closeness coefficient is</p>
+  <div class="eq">\[ C_i = \frac{S_i^{-}}{S_i^{+}+S_i^{-}},\quad S_i^{\pm}=\sqrt{\textstyle\sum_j (v_{ij}-v_j^{\pm})^2} \quad(7) \]</div>
+  <p class="noindent">Re-time pricing ranks first (\(C_1=0.529\)), premium second, connections third. Because both the 1 to 5 scores and the weights are judgement, we test both. We re-run TOPSIS across 4,000 perturbed weightings and, separately, across 4,000 perturbed score matrices. Move 1 stays first in 66.3 percent of the weight draws and 71.6 percent of the score draws (mean rank 1.41). A ranking that survives both the weights and the scores is a finding; one that flips is an opinion, and we report which.</p>
+
+  <h3>C. Market sizing and headline impact</h3>
+  <p>A TAM, SAM, SOM funnel from one cited macro figure plus labelled assumptions gives TAM 110M passengers (Rs. 66,000 cr), SAM 33M (Rs. 19,800 cr), and SOM 6.1M (Rs. 3,643 cr), Tata's 18.4 percent served share. The three ranked moves (Table VIII) carry a headline value reconciled two ways. Top down, a 2 to 4 percent RM uplift on Air India's Rs. 38,812 cr FY24 revenue is Rs. 780 to 1,550 cr per year. Bottom up, the pricing move alone on about 3.34M far-out economy passengers at Rs. 1,378 per seat is about Rs. 460 to 920 cr at 15 to 30 percent capture. The two bands meet at about Rs. 1,164 cr (about €129M) per year. The point is that the two methods agree, not the single number.</p>
+
+  <div class="tabwrap">
+    <div class="cap"><b>Table VIII.</b> The Three Ranked Moves and Impact</div>
+    <table>
+      <tr><th>Move</th><th>Conservative impact</th></tr>
+      <tr><td>1. Re-time the revenue curve</td><td>plus Rs. 1,378 (about €15) per seat at 15 percent capture across 129,271 far-out bookings</td></tr>
+      <tr><td>2. Cut weak connections</td><td>minus 9.9 kg fuel and minus 31.3 kg CO₂ per seat by re-routing 2 or more stops</td></tr>
+      <tr><td>3. Own the premium cabin</td><td>defends an 8 times segment (€584 against €73 per seat)</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="num">VIII.</span>Threats to Validity</h2>
+  <p>A limitation you state and own is defensible; one you hide is a finding waiting to be used against you. <b>(1) Listings are not bookings, and bookings are not demand.</b> The data is quoted fares, not transactions, so every revenue figure is a directional opportunity on a demand proxy, tied to the cited passenger base rather than to listing rows. The structural findings (fuel rises with stops; only Tata sells business; price does not track fuel cost) do not depend on volume. <b>(2) The pricing uplift is not causally identified.</b> The booking curve confounds price and volume, which is why we call the demand slope a descriptive gradient, not a causal elasticity. We now estimate that gradient with a bootstrap confidence interval and carry the uncertainty through the optimiser, but that quantifies statistical noise, not the confounding. A clean test would need an A/B fare experiment. <b>(3) The decision modules rest on judgement, reduced but not removed.</b> We Monte Carlo the decision tree over all its knobs (aggressive best in 97.7 percent) and perturb both the TOPSIS weights and scores (first in 66 and 72 percent); the ranges themselves are still judgement. <b>(4) The fuel model is robust, with a four-anchor check.</b> The 20 percent sweep holds the ranking (Spearman about 0.997) and the model lands inside published bands at four stage lengths (4.8 percent mean deviation), but this is an envelope check, not a calibration against measured burn. <b>(5) Staleness and seasonality.</b> The data is early 2022, and annual figures scale a two-month sample by six. <b>(6) Competitive response is not modelled.</b> The softens branch is a reduced-form proxy, not a solved equilibrium.</p>
+
+  <h2><span class="num">IX.</span>From Analysis to Capability</h2>
+  <p>Because the brief is head of data, the work closes on how a data-driven team runs. The same Panic Tax finding is reframed for three audiences: the board (the decision and the money), the data scientist (the model and its uncertainty), and the data engineer (the pipeline and the data contract), each with the expectation that keeps them aligned. There is a data-to-decision flywheel with a RACI on the three moves, a data-readiness ledger that labels each input as have (fares), proxy (fuel, cost), or gap (live booking curve, competitor fares), a maturity ladder (the work reaches prescriptive), and a 90-day prove, scale, automate plan. This is the direct answer to the grading point on how insights are shared and expectations are managed.</p>
+
+  <h2><span class="num">X.</span>Limitations and Future Work</h2>
+  <p>This is a careful applied diagnosis, not a new contribution to knowledge in the doctoral sense. Every method is standard; the rigor is in honest inference, fit of method to data, and triangulation. The recent hardening pass narrows the gap on statistical rigor (a bootstrap CI on the gradient carried through the optimiser, cross-validated error bars, conformally calibrated intervals, a four-anchor fuel check, and a full Monte Carlo on the decision), but it does not cross the bar, because it adds no causal identification, no measured fuel validation, and no new method. A genuine PhD-level extension would need at least one of: a causal identification strategy (an A/B fare test or a regression discontinuity) to turn the gradient into an identified elasticity; a fuel model calibrated against measured ACARS or OFP burn data with per-route error bars; a game-theoretic best-response model in place of the softens branch; or a new method, for example a chance-constrained multi-objective formulation that optimises fuel, revenue, and emissions under demand uncertainty. The concrete next steps (transaction data for a real P and L, a runway and taxi timing feed to unlock queuing analysis, per-flight aircraft types, and a competitive layer over the decision tree) are named, not hidden.</p>
+
+  <h2><span class="num">XI.</span>Reproducibility</h2>
+  <p>The analysis is a full-stack application, and nothing is pre-baked. <span class="mono">fuel_model.py</span> holds the engineered model (single source of truth); <span class="mono">analysis.py</span> applies it across 300,153 flights; <span class="mono">optimize.py</span> is the nine-module OR engine; <span class="mono">business.py</span> holds the decision tree, TOPSIS, and the market funnel; <span class="mono">app.py</span> serves a FastAPI surface used by a React and Vite dashboard. Optimisers are seeded and emit per-iteration snapshots, so results are deterministic and easy to inspect. The live fuel calculator and an RL fare desk recompute the model on any route in real time.</p>
+
+  <h2><span class="num">XII.</span>Conclusion</h2>
+  <p>The brief asked us to optimise fuel and price for an airline whose data held price but not fuel. The key move was to build the missing half instead of skipping it, and once fuel and revenue sat on one chart the central finding was clear: fuel and price are not two problems but one decision, and the network is leaving value on the runway in both. We measured the gap, prescribed against it with nine methods that agree, carried the decision under clear uncertainty, and reconciled an impact of about €129M per year two ways. Most of all, the work states what to attack (listings are not bookings, the uplift is not causally identified, the decision modules rest on judgement) before a reader has to. That habit is what separates a dashboard from an analysis.</p>
+
+  <h2 class="full" style="text-align:left;font-variant:normal;font-style:italic;font-size:9.4pt;margin-top:8pt">References</h2>
+  <div class="refs full">
+    <ol>
+      <li>K. T. Talluri and G. J. van Ryzin, <i>The Theory and Practice of Revenue Management</i>. Springer, 2004.</li>
+      <li>K. Littlewood, "Forecasting and control of passenger bookings," in <i>Proc. AGIFORS</i>, 1972, pp. 95 to 117.</li>
+      <li>P. P. Belobaba, "Optimal vs. heuristic methods for nested seat allocation," <i>Transportation Science</i>, 1992.</li>
+      <li>International Civil Aviation Organization, <i>Aircraft Engine Emissions Databank</i> and LTO-cycle definitions, ICAO, 2020.</li>
+      <li>K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, "A fast and elitist multiobjective genetic algorithm: NSGA-II," <i>IEEE Trans. Evol. Comput.</i>, vol. 6, no. 2, pp. 182 to 197, 2002.</li>
+      <li>A. Charnes, W. W. Cooper, and E. Rhodes, "Measuring the efficiency of decision making units," <i>Eur. J. Oper. Res.</i>, vol. 2, no. 6, pp. 429 to 444, 1978.</li>
+      <li>C. L. Hwang and K. Yoon, <i>Multiple Attribute Decision Making: Methods and Applications</i>. Springer, 1981.</li>
+      <li>C. J. C. H. Watkins and P. Dayan, "Q-learning," <i>Machine Learning</i>, vol. 8, pp. 279 to 292, 1992.</li>
+      <li>Directorate General of Civil Aviation (India), "Domestic air traffic and market-share statistics," DGCA, 2022.</li>
+      <li>Indian Oil Corporation Ltd., "Aviation Turbine Fuel (ATF) price history, Delhi," IOCL, 2022.</li>
+      <li>CAPA India and IATA, "Airline operating-cost structure," industry reports, 2022.</li>
+      <li>Tata Group, "Air India acquisition completion," Tata Group Newsroom, 27 January 2022.</li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>

@@ -127,6 +127,26 @@ def decision_tree():
     flip_p = -intercept / slope if slope else None  # p_hold where aggr overtakes cons
     flip_p = float(min(max(flip_p, 0.0), 1.0)) if flip_p is not None else None
 
+    # ---- robustness: the flip-point only stress-tests P(hold). The other knobs
+    # (aggressive capture, and the realised-fraction-if-soften for each act) are
+    # also labelled assumptions. Monte-Carlo ALL of them at once and report how
+    # often 'Aggressive' stays the EMV-maximising act — so the headline call is a
+    # demonstrated-robust result, not an artefact of one set of assumed numbers. ----
+    rng_d = np.random.default_rng(23)
+    N_ROB = 5000
+    wins = 0
+    for _ in range(N_ROB):
+        p = float(np.clip(rng_d.normal(P_HOLD, 0.12), 0.0, 1.0))   # P(hold)
+        ac = float(rng_d.uniform(0.20, 0.40))                       # aggressive capture
+        aks = float(rng_d.uniform(0.05, 0.30))                      # aggr realised if soften
+        cks = float(rng_d.uniform(0.50, 0.80))                      # cons realised if soften
+        aggr_h = annual_cr(ac)
+        emv_a = p * aggr_h + (1 - p) * aggr_h * aks
+        emv_c = p * cons_hold + (1 - p) * cons_hold * cks
+        if emv_a >= emv_c:
+            wins += 1
+    aggressive_optimal_pct = round(wins / N_ROB * 100, 1)
+
     # EMV-vs-probability sweep, for the chart (each act is linear in p)
     sweep = []
     for k in range(0, 21):
@@ -161,6 +181,16 @@ def decision_tree():
         "flip_probability": round(flip_p, 3) if flip_p is not None else None,
         "current_p_hold": P_HOLD,
         "far_out_eco_pax_m": round(far_out_eco_pax / 1e6, 2),
+        # share of 5,000 Monte-Carlo draws (over P_hold, capture, both soften-keeps)
+        # where Aggressive stays the EMV-max act — robustness of the headline call
+        "aggressive_optimal_pct": aggressive_optimal_pct,
+        "robustness_draws": N_ROB,
+        "robustness_ranges": {
+            "p_hold": "N(0.65, 0.12)",
+            "aggressive_capture": "U(0.20, 0.40)",
+            "aggr_realised_if_soften": "U(0.05, 0.30)",
+            "cons_realised_if_soften": "U(0.50, 0.80)",
+        },
         "sweep": sweep,
         "assumptions": {
             "conservative_capture": cons_capture,
@@ -266,6 +296,24 @@ def mcdm_moves():
     weight_stability_pct = round(stays_top / N * 100, 1)
     mean_rank = {moves[i]["move"]: round(float(rank_sum[i] / N), 2) for i in range(R_moves)}
 
+    # ---- score-sensitivity: the test above perturbs only the WEIGHTS. The 1-5
+    # criterion SCORES are also a labelled judgement, so perturb them too (Gaussian
+    # noise, clipped to [1,5]) at the base weights and re-rank. A move that stays #1
+    # under BOTH weight and score noise is a genuinely robust pick, not a calibration
+    # artefact — closing the 'you just assumed the scores' critique. ----
+    rng_s = np.random.default_rng(13)
+    stays_top_s = 0
+    for _ in range(N):
+        Mp = np.clip(M + rng_s.normal(0.0, 0.6, size=M.shape), 1.0, 5.0)
+        normp = Mp / np.sqrt((Mp ** 2).sum(axis=0))
+        Vp = normp * w
+        dbp = np.sqrt(((Vp - Vp.max(axis=0)) ** 2).sum(axis=1))
+        dwp = np.sqrt(((Vp - Vp.min(axis=0)) ** 2).sum(axis=1))
+        cp = dwp / (dbp + dwp)
+        if int(np.argmax(cp)) == winner_i:
+            stays_top_s += 1
+    score_stability_pct = round(stays_top_s / N * 100, 1)
+
     return {
         "method": "TOPSIS (+ weighted-sum cross-check)",
         "criteria": criteria,
@@ -273,6 +321,7 @@ def mcdm_moves():
         "winner": topsis_winner,
         "methods_agree": bool(wsum_winner == topsis_winner),
         "weight_stability_pct": weight_stability_pct,
+        "score_stability_pct": score_stability_pct,
         "mean_rank": mean_rank,
         "n_weight_draws": N,
         "note": ("Each criterion scored 1-5 (higher = better), calibrated to the "
@@ -280,7 +329,9 @@ def mcdm_moves():
                  "judgement (sum = 1). TOPSIS ranks by closeness to the ideal "
                  "solution; the weighted-sum is a sanity check. Weight-stability = "
                  "share of 4,000 Gaussian-perturbed weightings (sigma 0.05) where the "
-                 "#1 move stays #1 — robustness, not just a point ranking."),
+                 "#1 move stays #1. Score-stability does the same perturbing the 1-5 "
+                 "SCORES (sigma 0.6, clipped) — robustness on both subjective axes, not "
+                 "just a point ranking."),
     }
 
 

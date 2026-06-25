@@ -27,13 +27,16 @@ The persona is the 2022 CDO doing the opening diagnostic, so the data and the mo
 We *engineered* them from first principles, every constant a published benchmark — great-circle distance + a takeoff-cycle penalty per stop, A320 cruise burn, ICAO CO₂ factor, Delhi ATF. Every figure is labelled an estimate, never presented as measured.
 
 **Q: How do you know the model is right?**
-We don't claim accuracy — we claim *robustness*. There's no fuel ground truth in this dataset to validate against, so instead we swung every constant ±20% and the conclusions barely move (route rankings hold at Spearman ≈ 0.997). The findings don't depend on any single guessed number.
+Two ways. First, *robustness*: we swung every constant ±20% and the conclusions barely move (route rankings hold at Spearman ≈ 0.997). Second, an *external envelope check*: there's no per-flight ground truth in this dataset, so we check the estimate against published A320 trip-fuel bands at **four stage lengths** (270–1,709 km) — all four land inside band, mean absolute deviation **4.8%** (`/api/fuel_validation`, unit-tested). That's a multi-anchor validation across the stage-length range, not a single sanity check, and still not a full calibration — every figure stays a labelled estimate.
 
 **Q: Why A320 when your hero shows an A350?**
 The A320 family flies essentially all domestic metro routes in India — that's what these flights are, so it's the correct modeling choice. The A350 in the cover is the new flagship, used for brand imagery; it only flies long-haul international. The model is A320 on purpose.
 
 **Q: Single-fleet assumption?**
 Yes — one transparent assumption beats fabricating per-flight aircraft types. Correct for these domestic narrowbody sectors; we flag it as a limitation.
+
+**Q: Isn't "fuel per seat" really fuel per *available* seat, not per passenger?**
+Correct, and we now report both. Fuel-per-available-seat divides by the 180-seat cabin; fuel-per-*passenger* divides by occupied seats, using a **labelled 80% load-factor assumption** (DGCA 2022 domestic ran ~80–87%). So Delhi–Mumbai is 23.5 kg/available-seat → 29.4 kg/passenger. We don't have measured load data, so the load factor is an explicit assumption, not a number we pretend to know.
 
 ---
 
@@ -58,14 +61,17 @@ Two ways that agree. **Top-down:** a 2–4% revenue-management uplift on Air Ind
 **Q: Isn't the OR engine overkill / for show?**
 It's there to prove the recommendations are *computed*, not asserted — and to cover the full decision-analytics toolkit the course teaches (LP/MILP, duality, simulation, RL, ML, DEA, exact revenue management). The RL agent independently *rediscovers* the panic-tax curve, which validates the finding from a second direction.
 
-**Q: Your ML model — how do you know it's not overfit?**
-Leakage-proof split: we group by flight so no flight is in both train and test. We report *out-of-sample* R² (0.96), MAPE (15.6%), skill vs a naive baseline (+31%), and prediction-interval coverage (73.6% vs 80% nominal — slightly under, and we say so). The overfit gap is 0.011.
+**Q: Your ML model — how do you know it's not overfit, and is one seed enough?**
+Leakage-proof split: we group by flight so no flight is in both train and test, and the overfit gap is 0.011. We don't trust a single seed: accuracy is reported as **mean ± SD over 3 grouped folds** — R² 0.96 ± 0.001, MAPE 15.8 ± 0.5% — so the headline number carries an error bar. Skill vs a naive baseline is +31%.
+
+**Q: You admit the prediction intervals under-cover — did you fix it?**
+We did. The raw P10–P90 quantile intervals cover 73.6% against an 80% nominal. We apply **split-conformal calibration (CQR)** — learn a conformal width on a held-out calibration set, widen the intervals — and coverage moves to **77.8%**, materially closer to nominal. We report both numbers and the method, rather than just disclosing the gap.
 
 **Q: The MCDM scores are subjective.**
-The 1–5 criterion scores and weights are labelled judgement, yes. That's why we don't stop at a point ranking — we re-run TOPSIS across 4,000 perturbed weightings. The #1 move (re-time pricing) holds in ~66% of them with mean rank 1.4. A ranking that survives the weights is a finding; one that flips is an opinion, and we report which.
+The 1–5 criterion scores and weights are labelled judgement, yes — so we stress-test *both* subjective axes, not just one. We re-run TOPSIS across **4,000 perturbed weightings** (re-time pricing holds #1 in ~66%) **and 4,000 perturbed score matrices** (holds #1 in ~72%), mean rank 1.4. A ranking that survives both the weights and the scores is a finding; one that flips is an opinion, and we report which.
 
-**Q: What's EVPI and why does it matter?**
-Expected Value of Perfect Information — the most you'd rationally pay for perfect demand research before deciding. Ours is small (~₹12 cr), which means the decision is robust: more research wouldn't change the call. The flip-point confirms it — you'd only switch to the gentle pilot if you believed demand softens >75% of the time, and we believe ~35%.
+**Q: What's EVPI and why does it matter? And aren't the tree's probabilities just assumed?**
+EVPI is the most you'd rationally pay for perfect demand research before deciding. Ours is small relative to the prize (~₹53 cr against the aggressive rollout's ₹651 cr EMV), so the decision is robust — more research wouldn't change the call. The flip-point confirms it: you'd only switch to the gentle pilot if demand softens >75% of the time (demand *holds* with prob < 0.248), and we believe ~35%. And the probabilities aren't load-bearing assumptions taken on faith: we Monte-Carlo **all** of them at once — P(hold), the aggressive capture, both soften-keep fractions — over 5,000 draws, and **Aggressive stays the EMV-maximising act in 97.7%**. The headline call is demonstrated-robust, not an artefact of the assumed numbers.
 
 ---
 

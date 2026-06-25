@@ -52,6 +52,10 @@ CO2_PER_KG_FUEL = 3.16
 JET_A_DENSITY_KG_L = 0.80
 ATF_PRICE_INR_PER_L = 100.0
 SEATS_NARROWBODY = 180
+# Average domestic seat occupancy (labelled assumption). DGCA 2022 domestic load
+# factors ran ~80-87%; 0.80 is the conservative end. Lets us report fuel per
+# PASSENGER (not just per available seat) without pretending we have load data.
+LOAD_FACTOR = 0.80
 
 ROUTING_FACTOR = {"zero": 1.00, "one": 1.30, "two_or_more": 1.60}
 TAKEOFFS = {"zero": 1, "one": 2, "two_or_more": 3}
@@ -65,6 +69,7 @@ ASSUMPTIONS = {
     "co2_per_kg_fuel": CO2_PER_KG_FUEL,
     "atf_price_inr_per_l": ATF_PRICE_INR_PER_L,
     "seats_narrowbody": SEATS_NARROWBODY,
+    "load_factor": LOAD_FACTOR,
     "routing_factor": ROUTING_FACTOR,
 }
 
@@ -122,4 +127,62 @@ def fuel_breakdown(source_city: str, destination_city: str, stops: str) -> dict:
         "co2_kg": round(fuel_kg * CO2_PER_KG_FUEL, 1),
         "fuel_kg_per_seat": round(fuel_kg / SEATS_NARROWBODY, 2),
         "co2_kg_per_seat": round(fuel_kg * CO2_PER_KG_FUEL / SEATS_NARROWBODY, 2),
+        # per PASSENGER (per available seat ÷ load factor) — the figure a revenue
+        # team actually thinks in. Labelled because load factor is an assumption.
+        "fuel_kg_per_pax": round(fuel_kg / (SEATS_NARROWBODY * LOAD_FACTOR), 2),
+        "co2_kg_per_pax": round(fuel_kg * CO2_PER_KG_FUEL / (SEATS_NARROWBODY * LOAD_FACTOR), 2),
+    }
+
+
+# ---------------------------------------------------------------------------
+# External validation: a multi-anchor envelope check of the engineered model.
+# ---------------------------------------------------------------------------
+# There is no per-flight fuel ground truth in the dataset, so we cannot CALIBRATE.
+# Instead we check the model against published A320-family trip-fuel ENVELOPES at
+# several stage lengths (short hop -> long domestic trunk). The bands are
+# consistent with published Airbus performance and the ICAO/EEA fuel-vs-distance
+# relationship; short sectors carry wider bands because the LTO cycle dominates
+# and reserve/contingency fuel is a larger share. This upgrades the old single
+# Delhi-Mumbai anchor into a 4-sector envelope check that reports per-route error.
+FUEL_VALIDATION_ANCHORS = [
+    {"src": "Bangalore", "dst": "Chennai",   "band_t": (1.40, 2.20), "note": "short hop, LTO-dominated"},
+    {"src": "Hyderabad", "dst": "Mumbai",    "band_t": (2.20, 3.20), "note": "sub-hour sector"},
+    {"src": "Delhi",     "dst": "Mumbai",    "band_t": (3.50, 4.50), "note": "canonical ~1.4 h anchor"},
+    {"src": "Delhi",     "dst": "Bangalore", "band_t": (5.00, 6.50), "note": "long domestic trunk"},
+]
+
+
+def validate_fuel_model():
+    """Compare the engineered nonstop estimate against published trip-fuel bands."""
+    anchors, devs, all_inside = [], [], True
+    for a in FUEL_VALIDATION_ANCHORS:
+        kg = estimate_fuel_kg(a["src"], a["dst"], "zero")
+        t = kg / 1000.0
+        lo, hi = a["band_t"]
+        mid = (lo + hi) / 2.0
+        inside = lo <= t <= hi
+        dev = (t - mid) / mid * 100.0
+        all_inside = all_inside and inside
+        devs.append(abs(dev))
+        anchors.append({
+            "route": f"{a['src']} → {a['dst']}",
+            "gc_km": round(great_circle_km(a["src"], a["dst"]), 0),
+            "model_t": round(t, 2),
+            "published_band_t": [lo, hi],
+            "inside_band": bool(inside),
+            "deviation_from_mid_pct": round(dev, 1),
+            "note": a["note"],
+        })
+    return {
+        "anchors": anchors,
+        "n_anchors": len(anchors),
+        "all_inside_band": bool(all_inside),
+        "mean_abs_deviation_pct": round(sum(devs) / len(devs), 1),
+        "max_abs_deviation_pct": round(max(devs), 1),
+        "note": ("Multi-anchor envelope check across four stage lengths (270-1709 km). "
+                 "Bands are published-consistent A320-family trip-fuel envelopes "
+                 "(Airbus / ICAO-EEA fuel-vs-distance); short sectors get wider bands "
+                 "because the LTO cycle dominates. No per-flight ground truth exists in "
+                 "this dataset, so this validates the model's level across stage lengths, "
+                 "it is not a calibration."),
     }

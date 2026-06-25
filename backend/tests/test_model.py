@@ -65,13 +65,27 @@ def test_fuel_monotonic_in_stops():
 
 def test_fuel_breakdown_sane():
     b = fm.fuel_breakdown("Delhi", "Mumbai", "zero")
-    check("DEL-BOM nonstop fuel in 4-7t band", 4000 < b["fuel_kg"] < 7000, f'{b["fuel_kg"]}kg')
+    # tightened to the published A320 trip-fuel band for a ~1.4h sector (was 4-7t)
+    check("DEL-BOM nonstop fuel in published 3.5-4.5t band",
+          3500 < b["fuel_kg"] < 4500, f'{b["fuel_kg"]}kg')
     check("takeoffs(zero) == 1", b["takeoffs"] == 1)
     check("co2 == fuel * 3.16", abs(b["co2_kg"] - b["fuel_kg"] * fm.CO2_PER_KG_FUEL) < 1.0)
+    # per-passenger > per-available-seat (divides by load factor < 1)
+    check("fuel/pax > fuel/seat", b["fuel_kg_per_pax"] > b["fuel_kg_per_seat"])
     # cost is derived from full-precision fuel_kg inside the breakdown, so allow a
     # few INR of slack vs recomputing from the 1-decimal rounded fuel_kg here.
     check("fuel_cost matches helper",
           abs(b["fuel_cost_inr"] - fm.fuel_cost_inr(b["fuel_kg"])) < 50.0)
+
+
+def test_fuel_validation_anchors():
+    """The engineered model must land inside published trip-fuel bands at every stage length."""
+    v = fm.validate_fuel_model()
+    check("all anchors inside published band", v["all_inside_band"] is True,
+          str([(a["route"], a["model_t"], a["inside_band"]) for a in v["anchors"]]))
+    check("4 stage-length anchors", v["n_anchors"] == 4)
+    check("mean abs deviation < 12%", v["mean_abs_deviation_pct"] < 12.0,
+          f'{v["mean_abs_deviation_pct"]}%')
 
 
 def test_findings_frontier_sorted():
@@ -137,6 +151,7 @@ if __name__ == "__main__":
     test_great_circle()
     test_fuel_monotonic_in_stops()
     test_fuel_breakdown_sane()
+    test_fuel_validation_anchors()
     test_findings_frontier_sorted()
     test_business_modules()
     print(f"\n{PASS} passed, {FAIL} failed")
