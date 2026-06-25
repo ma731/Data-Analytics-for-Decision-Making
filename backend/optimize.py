@@ -135,6 +135,48 @@ def optimize_pricing(elasticity=1.4):
             "revenue_uplift_pct": round(float(uplift), 1)}
 
 
+@lru_cache(maxsize=1)
+def pricing_uncertainty():
+    """
+    Propagate the DATA-ESTIMATED demand-gradient uncertainty through the pricing
+    optimiser, so the recommended fare move comes as a BAND, not a fragile point.
+
+    The fare/volume gradient (and its bootstrap CI) is estimated from the data in
+    ml_demand. We map its relative uncertainty onto the optimiser's elasticity and
+    re-run the revenue-maximisation at the low / mid / high elasticity. The result
+    is a revenue-uplift band — 'exact optimum on an evidenced input range', rather
+    than 'exact optimum on one assumed number'. (The gradient is still descriptive,
+    not causal, so this is an uncertainty band, not a causal guarantee.)
+    """
+    d = ml_demand()
+    g = abs(float(d.get("fare_volume_gradient") or 0.0)) or 1.0
+    se = float(d.get("gradient_se", 0.0))
+    rel = min(se / g, 0.6) if g else 0.3           # relative uncertainty, capped
+    base_e = 1.4
+    e_lo = round(max(1.05, base_e * (1 - rel)), 2)
+    e_hi = round(min(3.0, base_e * (1 + rel)), 2)
+    band = {}
+    for tag, e in [("low", e_lo), ("mid", base_e), ("high", e_hi)]:
+        r = optimize_pricing(elasticity=e)
+        band[tag] = {"elasticity": r["elasticity"], "revenue_uplift_pct": r["revenue_uplift_pct"]}
+    uplifts = [band["low"]["revenue_uplift_pct"], band["mid"]["revenue_uplift_pct"],
+               band["high"]["revenue_uplift_pct"]]
+    return {
+        "estimated_gradient": d.get("fare_volume_gradient"),
+        "gradient_ci": d.get("gradient_ci"),
+        "gradient_se": round(se, 3),
+        "relative_uncertainty_pct": round(rel * 100, 1),
+        "elasticity_used": {"low": e_lo, "mid": base_e, "high": e_hi},
+        "uplift_band_pct": [round(min(uplifts), 1), round(uplifts[1], 1), round(max(uplifts), 1)],
+        "band": band,
+        "note": ("The optimiser is re-run across the elasticity range implied by the "
+                 "bootstrap uncertainty of the data-estimated fare/volume gradient. "
+                 "The uplift is reported as a band, not a point. The gradient is "
+                 "descriptive (confounded by the booking curve), so this is an "
+                 "uncertainty range, not a causal claim."),
+    }
+
+
 # ----------------------------------------------------------------------------
 # 3. NSGA-II — multi-objective fuel-vs-revenue Pareto front (genetic algorithm)
 # ----------------------------------------------------------------------------
@@ -457,6 +499,66 @@ def ml_demand():
     Xe = sm.add_constant(np.log(el["price"]))
     ols = sm.OLS(np.log(el["q"]), Xe).fit()
     gradient = float(ols.params.iloc[1])
+
+    # ---- bootstrap the gradient: it's fit on only ~49 booking-day points, so a
+    # point slope without a CI is thin support. Resample the points (with
+    # replacement), refit, and report the 95% CI + SE. This turns the estimate
+    # from a bare number into an estimate WITH uncertainty. ----
+    logp = np.log(el["price"].to_numpy())
+    logq = np.log(el["q"].to_numpy())
+    n_pts = len(logp)
+    rng_b = np.random.default_rng(11)
+    boot = []
+    for _ in range(1000):
+        idx_b = rng_b.integers(0, n_pts, size=n_pts)
+        try:
+            bb = sm.OLS(logq[idx_b], sm.add_constant(logp[idx_b])).fit()
+            boot.append(float(bb.params[1]))
+        except Exception:
+            pass
+    boot = np.array(boot) if boot else np.array([gradient])
+    grad_lo, grad_hi = float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5))
+    grad_se = float(boot.std(ddof=1)) if len(boot) > 1 else 0.0
+
+    # ---- split-conformal (CQR) calibration of the prediction interval. The raw
+    # P10-P90 quantile models under-cover (reported below). We carve a CALIBRATION
+    # set out of train (grouped, no leakage), fit the quantile models on the rest,
+    # learn the conformal width Q on calibration, and apply it to test — so the
+    # interval actually hits its 80% nominal coverage instead of just claiming to. ----
+    g_tr = groups[tr_idx]
+    gss2 = GroupShuffleSplit(n_splits=1, test_size=0.30, random_state=1)
+    fit_rel, cal_rel = next(gss2.split(Xtr, groups=g_tr))
+    Xfit, yfit = Xtr.iloc[fit_rel], ytr.iloc[fit_rel]
+    Xcal, ycal = Xtr.iloc[cal_rel], ytr.iloc[cal_rel]
+    qlo = HistGradientBoostingRegressor(loss="quantile", quantile=0.1, max_iter=120,
+                                        max_depth=7, random_state=0).fit(Xfit, yfit)
+    qhi = HistGradientBoostingRegressor(loss="quantile", quantile=0.9, max_iter=120,
+                                        max_depth=7, random_state=0).fit(Xfit, yfit)
+    yc = ycal.to_numpy()
+    E = np.maximum(qlo.predict(Xcal) - yc, yc - qhi.predict(Xcal))  # CQR conformity score
+    n_cal = len(E)
+    q_level = min(1.0, np.ceil((n_cal + 1) * 0.8) / n_cal)          # finite-sample 80%
+    Qc = float(np.quantile(E, q_level))
+    yt = yte.to_numpy()
+    lo2, hi2 = qlo.predict(Xte) - Qc, qhi.predict(Xte) + Qc
+    coverage_cal = float(np.mean((yt >= lo2) & (yt <= hi2)) * 100)
+
+    # ---- CV variance: a single seed/split gives a point R²/MAPE with no error bar.
+    # Re-run the model over 3 grouped splits and report mean ± SD, so the headline
+    # accuracy comes with a stability band, not a lucky-seed number. ----
+    r2s, mapes = [], []
+    for seed in (0, 1, 2):
+        ti, vi = next(GroupShuffleSplit(n_splits=1, test_size=0.25,
+                                        random_state=seed).split(s, groups=groups))
+        m = HistGradientBoostingRegressor(max_iter=140, max_depth=7, random_state=seed)
+        m.fit(X.iloc[ti], y.iloc[ti])
+        r2s.append(float(m.score(X.iloc[vi], y.iloc[vi])))
+        pv = np.exp(m.predict(X.iloc[vi]))
+        pt = s["price"].iloc[vi].to_numpy()
+        mapes.append(float(np.mean(np.abs(pv - pt) / pt) * 100))
+    r2_mean, r2_sd = float(np.mean(r2s)), float(np.std(r2s, ddof=1))
+    mape_mean, mape_sd = float(np.mean(mapes)), float(np.std(mapes, ddof=1))
+
     return {
         "r2": round(r2_test, 3),                       # out-of-sample (what the UI shows)
         "importance": imp,
@@ -468,18 +570,29 @@ def ml_demand():
             "baseline_mae_inr": round(base_mae, 0),
             "skill_score": round(skill, 3),
             "interval_coverage_pct": round(coverage, 1),
+            "interval_coverage_calibrated_pct": round(coverage_cal, 1),  # after split-conformal (CQR)
             "interval_nominal_pct": 80,
+            # mean ± SD over 3 grouped splits — accuracy with an error bar, not one seed
+            "r2_cv_mean": round(r2_mean, 3),
+            "r2_cv_sd": round(r2_sd, 3),
+            "mape_cv_mean": round(mape_mean, 1),
+            "mape_cv_sd": round(mape_sd, 1),
+            "cv_folds": 3,
             "n_train": int(len(tr_idx)),
             "n_test": int(len(te_idx)),
             "split": "grouped by flight (no leakage)",
         },
         "elasticity": round(gradient, 2),  # kept key for the frontend
         "fare_volume_gradient": round(gradient, 2),
+        "gradient_ci": [round(grad_lo, 3), round(grad_hi, 3)],   # bootstrap 95% CI
+        "gradient_se": round(grad_se, 3),
+        "gradient_n_boot": int(len(boot)),
         "gradient_r2": round(float(ols.rsquared), 3),
         "elasticity_note": (
-            "Observed fare/volume gradient (log-log OLS along the booking horizon). "
-            "Descriptive, not a causal elasticity — price and volume both move with "
-            "days-to-departure, so this is confounded by the booking curve."
+            "Observed fare/volume gradient (log-log OLS along the booking horizon), "
+            "now with a 1,000-sample bootstrap 95% CI. Descriptive, not a causal "
+            "elasticity — price and volume both move with days-to-departure, so this "
+            "is confounded by the booking curve."
         ),
     }
 

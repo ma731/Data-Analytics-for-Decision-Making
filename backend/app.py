@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import analysis
 import optimize
 import business
-from fuel_model import fuel_breakdown, CITY_COORDS, ROUTING_FACTOR
+from fuel_model import fuel_breakdown, validate_fuel_model, CITY_COORDS, ROUTING_FACTOR
 
 app = FastAPI(title="Air India War Room API", version="1.0.0")
 
@@ -57,6 +57,7 @@ def _warm_caches():
         ("pareto", _pareto),
         ("rl", _rl),
         ("demand", optimize.ml_demand),
+        ("pricing_uncertainty", optimize.pricing_uncertainty),
         ("emsr", optimize.emsr_protection),
         ("shadow", optimize.fleet_shadow_prices),
         ("dea", optimize.dea_efficiency),
@@ -112,6 +113,12 @@ def cities():
     return {"cities": sorted(CITY_COORDS.keys())}
 
 
+@app.get("/api/fuel_validation")
+def fuel_validation():
+    """Multi-anchor envelope check of the engineered fuel model vs published bands."""
+    return validate_fuel_model()
+
+
 @app.get("/api/route/{source}/{destination}/{stops}")
 def route(source: str, destination: str, stops: str):
     """
@@ -148,6 +155,12 @@ def opt_pricing(elasticity: float = 1.4):
     """Revenue-maximising fare curve from a constant-elasticity demand model."""
     elasticity = float(max(1.05, min(3.0, elasticity)))
     return optimize.optimize_pricing(elasticity=elasticity)
+
+
+@app.get("/api/pricing_uncertainty")
+def pricing_uncertainty():
+    """Revenue-uplift band from propagating the data-estimated elasticity uncertainty."""
+    return optimize.pricing_uncertainty()
 
 
 @lru_cache(maxsize=1)
